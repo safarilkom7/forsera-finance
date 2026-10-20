@@ -16,7 +16,7 @@
                 <div>
                     <label for="periode" class="label">Periode</label>
                     <select id="periode" name="periode" class="input" data-auto-submit>
-                        @foreach (['hari_ini' => 'Hari ini', '7_hari' => '7 hari terakhir', 'bulan_ini' => 'Bulan ini', 'bulan_lalu' => 'Bulan lalu', 'tahun_ini' => 'Tahun ini', 'custom' => 'Custom'] as $key => $label)
+                        @foreach ($pilihan_periode as $key => $label)
                             <option value="{{ $key }}" @selected($periode['preset'] === $key)>{{ $label }}</option>
                         @endforeach
                     </select>
@@ -46,7 +46,7 @@
                 @endif
             </div>
         </div>
-        <p class="mt-2 text-xs text-slate-400">Tanggal hanya dipakai saat memilih periode Custom. Semua angka mengikuti zona waktu Asia/Jakarta.</p>
+        <p class="mt-2 text-xs text-slate-400">Tanggal hanya dipakai saat memilih periode Custom. Periode berjalan mengikuti periode akuntansi (mulai tanggal {{ $periode['tanggal_mulai'] }}, bisa diubah di Pengaturan). Semua angka mengikuti zona waktu Asia/Jakarta.</p>
     </form>
 
     <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
@@ -247,7 +247,7 @@
                 @endif
 
                 @if ($perhatian['selisih_dihapuskan'] > 0)
-                    <p class="rounded-xl bg-slate-100 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">Selisih dihapuskan bulan ini: {{ format_rupiah($perhatian['selisih_dihapuskan']) }}</p>
+                    <p class="rounded-xl bg-slate-100 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">Selisih dihapuskan periode ini: {{ format_rupiah($perhatian['selisih_dihapuskan']) }}</p>
                 @endif
 
                 @if ($perhatianCount === 0)

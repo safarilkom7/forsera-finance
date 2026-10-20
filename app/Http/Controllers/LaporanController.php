@@ -71,6 +71,7 @@ class LaporanController extends Controller
 
         return [
             'periode' => $periode,
+            'pilihan_periode' => $this->filter->pilihan(),
             'units' => UnitUsaha::query()->where('aktif', true)->orderBy('nama')->get(),
             'laba_rugi' => $this->service->labaRugi($mulai, $selesai, $unitId),
             'pemasukan_kategori' => $this->service->pemasukanKategoriMetode($mulai, $selesai, $unitId),

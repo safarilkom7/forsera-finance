@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Tutup Periode')
-@section('subtitle', 'Kunci data bulanan agar laporan tidak berubah')
+@section('subtitle', 'Kunci data per periode akuntansi agar laporan tidak berubah')
 
 @section('content')
     <div class="grid gap-5 xl:grid-cols-3">
@@ -10,18 +10,21 @@
             <div>
                 <h2 class="section-title">Tutup periode</h2>
                 <p class="hint mt-1">Transaksi, rekonsiliasi, dan koreksi pada periode tertutup ditolak untuk semua peran.</p>
+                <p class="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
+                    Periode akuntansi sekarang: <strong>{{ $sekarang['label'] }}</strong> ({{ $sekarang['rentang'] }}).
+                    Tanggal mulai periode diatur di menu Pengaturan.
+                </p>
             </div>
             <div>
-                <label for="tahun" class="label">Tahun</label>
-                <input type="number" id="tahun" name="tahun" min="2020" max="2100" value="{{ old('tahun', $sekarang->year) }}" required class="input">
-            </div>
-            <div>
-                <label for="bulan" class="label">Bulan</label>
-                <select id="bulan" name="bulan" class="input">
-                    @for ($i = 1; $i <= 12; $i++)
-                        <option value="{{ $i }}" @selected((int) old('bulan', $sekarang->month) === $i)>{{ \App\Support\Format::periode((int) $sekarang->year, $i) }}</option>
-                    @endfor
+                <label for="periode" class="label">Periode</label>
+                <select id="periode" name="periode" class="input">
+                    @foreach ($opsi as $pilihan)
+                        <option value="{{ $pilihan['kunci'] }}" @selected(old('periode', sprintf('%04d-%02d', $sekarang['tahun'], $sekarang['bulan'])) === $pilihan['kunci'])>
+                            {{ $pilihan['label'] }} · {{ $pilihan['rentang'] }}{{ $pilihan['berjalan'] ? ' (berjalan)' : '' }}
+                        </option>
+                    @endforeach
                 </select>
+                @error('periode')<p class="error-text mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label for="unit_usaha_id" class="label">Cakupan</label>
@@ -45,7 +48,7 @@
                     <tbody>
                     @forelse ($data as $periode)
                         <tr>
-                            <td class="font-medium">{{ \App\Support\Format::periode($periode->tahun, $periode->bulan) }}</td>
+                            <td class="font-medium">{{ \App\Support\Format::periode($periode->tahun, $periode->bulan) }}<br><span class="text-[11px] text-slate-400">{{ $periode->rentang() }}</span></td>
                             <td>{{ $periode->unitUsaha?->nama ?? 'Semua unit' }}</td>
                             <td class="text-xs">{{ $periode->ditutupOleh?->name }}<br><span class="text-slate-400">{{ format_tanggal($periode->ditutup_at) }}</span></td>
                             <td>
@@ -63,7 +66,7 @@
                                         <form method="POST" action="{{ route('periode.buka', $periode) }}" class="p-5">
                                             @csrf
                                             <h3 class="text-lg font-bold">Buka kembali periode?</h3>
-                                            <p class="mt-1 text-sm text-slate-500">{{ \App\Support\Format::periode($periode->tahun, $periode->bulan) }} · {{ $periode->unitUsaha?->nama ?? 'Semua unit' }}. Alasan wajib dicatat di audit log.</p>
+                                            <p class="mt-1 text-sm text-slate-500">{{ \App\Support\Format::periode($periode->tahun, $periode->bulan) }} ({{ $periode->rentang() }}) · {{ $periode->unitUsaha?->nama ?? 'Semua unit' }}. Alasan wajib dicatat di audit log.</p>
                                             <textarea name="alasan" rows="3" required minlength="5" class="input mt-3" placeholder="Contoh: koreksi data dari franchisor"></textarea>
                                             <div class="mt-4 flex justify-end gap-2">
                                                 <button type="button" class="btn-secondary" data-dialog-close>Batal</button>

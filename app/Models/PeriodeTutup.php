@@ -66,10 +66,21 @@ class PeriodeTutup extends Model
         return $this->unit_usaha_id === null || $this->unit_usaha_id === $unitId;
     }
 
+    /**
+     * Label [tahun, bulan] periode akuntansi untuk sebuah tanggal transaksi.
+     *
+     * @return array{0: int, 1: int}
+     */
     public static function bulanDari(Carbon|string $tanggal): array
     {
-        $c = $tanggal instanceof Carbon ? $tanggal : Carbon::parse($tanggal);
+        $periode = app(\App\Services\PeriodeAkuntansiService::class)->untukTanggal($tanggal);
 
-        return [(int) $c->year, (int) $c->month];
+        return [$periode['tahun'], $periode['bulan']];
+    }
+
+    /** Rentang tanggal periode, mis. "5 Okt 2026 – 4 Nov 2026". */
+    public function rentang(): string
+    {
+        return app(\App\Services\PeriodeAkuntansiService::class)->untukPeriode($this->tahun, $this->bulan)['rentang'];
     }
 }

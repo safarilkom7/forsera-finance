@@ -19,7 +19,10 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-    public function __construct(private readonly PengaturanService $pengaturan) {}
+    public function __construct(
+        private readonly PengaturanService $pengaturan,
+        private readonly PeriodeAkuntansiService $akuntansi,
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -355,10 +358,12 @@ class DashboardService
             ];
         });
 
+        $periode = $this->akuntansi->berjalan();
+
         $data['selisih_dihapuskan'] = Insiden::query()
             ->where('status', StatusInsiden::DIHAPUSKAN->value)
             ->when($unitId, fn ($q) => $q->whereHas('rekonsiliasi', fn ($r) => $r->where('unit_usaha_id', $unitId)))
-            ->whereBetween('ditutup_at', [now()->startOfMonth(), now()->endOfMonth()])
+            ->whereBetween('ditutup_at', [$periode['mulai'], $periode['selesai']])
             ->sum('nominal_selisih');
 
         return $data;

@@ -9,7 +9,7 @@
             <div>
                 <label for="periode" class="label">Periode</label>
                 <select id="periode" name="periode" class="input" data-auto-submit>
-                    @foreach (['hari_ini' => 'Hari ini', '7_hari' => '7 hari terakhir', 'bulan_ini' => 'Bulan ini', 'bulan_lalu' => 'Bulan lalu', 'tahun_ini' => 'Tahun ini', 'custom' => 'Custom'] as $key => $label)
+                    @foreach ($pilihan_periode as $key => $label)
                         <option value="{{ $key }}" @selected($periode['preset'] === $key)>{{ $label }}</option>
                     @endforeach
                 </select>
@@ -37,6 +37,7 @@
             <a href="{{ route('laporan.excel', request()->query()) }}" class="btn-secondary"><x-icon name="download" class="h-4 w-4" /> Excel</a>
             <a href="{{ route('laporan.pdf', request()->query()) }}" class="btn-secondary"><x-icon name="download" class="h-4 w-4" /> PDF</a>
         </div>
+        <p class="mt-2 text-xs text-slate-400">Periode berjalan mengikuti periode akuntansi (mulai tanggal {{ $periode['tanggal_mulai'] }}, bisa diubah di Pengaturan). Tanggal di atas hanya dipakai saat memilih Custom.</p>
     </form>
 
     <nav class="mb-5 flex flex-wrap gap-2 text-xs">

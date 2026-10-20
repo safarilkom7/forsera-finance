@@ -5,20 +5,25 @@ namespace App\Services;
 use App\Models\PeriodeTutup;
 use App\Models\User;
 use Carbon\CarbonInterface;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Spatie\Activitylog\Facades\Activity;
 
 class PeriodeService
 {
+    public function __construct(private readonly PeriodeAkuntansiService $akuntansi) {}
+
+    /**
+     * Periode tutup disimpan dengan label bulan awal periode akuntansi, jadi tanggal
+     * transaksi harus dipetakan dulu ke periode akuntansinya (mis. 3 Nov masuk periode Okt).
+     */
     public function terkunci(CarbonInterface|string $tanggal, ?int $unitUsahaId): bool
     {
-        $carbon = $tanggal instanceof CarbonInterface ? $tanggal : Carbon::parse($tanggal);
+        $periode = $this->akuntansi->untukTanggal($tanggal);
 
         return PeriodeTutup::query()
             ->aktif()
-            ->where('tahun', $carbon->year)
-            ->where('bulan', $carbon->month)
+            ->where('tahun', $periode['tahun'])
+            ->where('bulan', $periode['bulan'])
             ->where(function ($q) use ($unitUsahaId) {
                 $q->whereNull('unit_usaha_id');
 
@@ -35,10 +40,10 @@ class PeriodeService
     public function pastikanTerbuka(CarbonInterface|string $tanggal, ?int $unitUsahaId): void
     {
         if ($this->terkunci($tanggal, $unitUsahaId)) {
-            $carbon = $tanggal instanceof CarbonInterface ? $tanggal : Carbon::parse($tanggal);
+            $periode = $this->akuntansi->untukTanggal($tanggal);
 
             throw ValidationException::withMessages([
-                'tanggal' => 'Periode '.$carbon->translatedFormat('F Y').' sudah ditutup. Data tidak dapat diubah.',
+                'tanggal' => 'Periode '.$periode['label'].' ('.$periode['rentang'].') sudah ditutup. Data tidak dapat diubah.',
             ]);
         }
     }
@@ -54,6 +59,8 @@ class PeriodeService
             throw ValidationException::withMessages(['bulan' => 'Periode ini sudah ditutup.']);
         }
 
+        $rentang = $this->akuntansi->untukPeriode($tahun, $bulan)['rentang'];
+
         $periode = PeriodeTutup::query()->create([
             'tahun' => $tahun,
             'bulan' => $bulan,
@@ -62,10 +69,10 @@ class PeriodeService
             'ditutup_at' => now(),
         ]);
 
-        Activity::useLogName('periode')
+        Activity::useLog('periode')
             ->performedOn($periode)
             ->causedBy($user)
-            ->withProperties(['tahun' => $tahun, 'bulan' => $bulan, 'unit_usaha_id' => $unitUsahaId])
+            ->withProperties(['tahun' => $tahun, 'bulan' => $bulan, 'rentang' => $rentang, 'unit_usaha_id' => $unitUsahaId])
             ->log('Menutup periode');
 
         return $periode;
@@ -91,7 +98,7 @@ class PeriodeService
             'alasan' => $alasan,
         ]);
 
-        Activity::useLogName('periode')
+        Activity::useLog('periode')
             ->performedOn($periode)
             ->causedBy($user)
             ->withProperties(['alasan' => $alasan])

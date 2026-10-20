@@ -8,35 +8,50 @@ use Illuminate\Support\Carbon;
 
 class PeriodeFilterService
 {
+    public function __construct(private readonly PeriodeAkuntansiService $akuntansi) {}
+
     /**
-     * @return array{preset: string, mulai: Carbon, selesai: Carbon, label: string, unit_id: int|null}
+     * @return array{preset: string, mulai: Carbon, selesai: Carbon, label: string, unit_id: int|null, tanggal_mulai: int}
      */
     public function resolve(Request $request, User $user): array
     {
-        $preset = (string) $request->query('periode', 'bulan_ini');
+        $preset = (string) $request->query('periode', 'periode_ini');
+
+        // Alias lama agar tautan/bookmark "bulan_ini"/"bulan_lalu" tetap berjalan.
+        $preset = match ($preset) {
+            'bulan_ini' => 'periode_ini',
+            'bulan_lalu' => 'periode_lalu',
+            default => $preset,
+        };
+
+        $berjalan = $this->akuntansi->berjalan();
 
         $mulai = now()->startOfDay();
         $selesai = now()->endOfDay();
+        $label = 'Hari ini';
 
         switch ($preset) {
             case 'hari_ini':
-                $mulai = now()->startOfDay();
-                $selesai = now()->endOfDay();
+                $label = 'Hari ini';
                 break;
 
             case '7_hari':
                 $mulai = now()->subDays(6)->startOfDay();
                 $selesai = now()->endOfDay();
+                $label = '7 hari terakhir';
                 break;
 
-            case 'bulan_lalu':
-                $mulai = now()->subMonthNoOverflow()->startOfMonth();
-                $selesai = now()->subMonthNoOverflow()->endOfMonth();
+            case 'periode_lalu':
+                $lalu = $this->akuntansi->sebelumnya();
+                $mulai = $lalu['mulai'];
+                $selesai = $lalu['selesai'];
+                $label = 'Periode lalu '.$lalu['rentang'];
                 break;
 
             case 'tahun_ini':
                 $mulai = now()->startOfYear();
                 $selesai = now()->endOfYear();
+                $label = 'Tahun ini';
                 break;
 
             case 'custom':
@@ -51,13 +66,15 @@ class PeriodeFilterService
 
                 $mulai = Carbon::parse($data['dari'])->startOfDay();
                 $selesai = Carbon::parse($data['sampai'])->endOfDay();
+                $label = format_tanggal($mulai).' – '.format_tanggal($selesai);
                 break;
 
-            case 'bulan_ini':
+            case 'periode_ini':
             default:
-                $preset = 'bulan_ini';
-                $mulai = now()->startOfMonth();
-                $selesai = now()->endOfMonth();
+                $preset = 'periode_ini';
+                $mulai = $berjalan['mulai'];
+                $selesai = $berjalan['selesai'];
+                $label = 'Periode '.$berjalan['rentang'];
                 break;
         }
 
@@ -71,21 +88,30 @@ class PeriodeFilterService
             abort(403, 'Anda tidak memiliki akses ke unit usaha ini.');
         }
 
-        $label = match ($preset) {
-            'hari_ini' => 'Hari ini',
-            '7_hari' => '7 hari terakhir',
-            'bulan_lalu' => 'Bulan lalu',
-            'tahun_ini' => 'Tahun ini',
-            'custom' => format_tanggal($mulai).' – '.format_tanggal($selesai),
-            default => 'Bulan ini',
-        };
-
         return [
             'preset' => $preset,
             'mulai' => $mulai,
             'selesai' => $selesai,
             'label' => $label,
             'unit_id' => $unitId,
+            'tanggal_mulai' => $this->akuntansi->tanggalMulai(),
+        ];
+    }
+
+    /**
+     * Pilihan preset untuk dropdown dashboard/laporan.
+     *
+     * @return array<string, string>
+     */
+    public function pilihan(): array
+    {
+        return [
+            'hari_ini' => 'Hari ini',
+            '7_hari' => '7 hari terakhir',
+            'periode_ini' => 'Periode berjalan',
+            'periode_lalu' => 'Periode sebelumnya',
+            'tahun_ini' => 'Tahun ini',
+            'custom' => 'Custom',
         ];
     }
 }

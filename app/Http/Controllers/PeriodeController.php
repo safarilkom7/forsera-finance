@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PeriodeTutup;
 use App\Models\UnitUsaha;
+use App\Services\PeriodeAkuntansiService;
 use App\Services\PeriodeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,7 +12,10 @@ use Illuminate\View\View;
 
 class PeriodeController extends Controller
 {
-    public function __construct(private readonly PeriodeService $service) {}
+    public function __construct(
+        private readonly PeriodeService $service,
+        private readonly PeriodeAkuntansiService $akuntansi,
+    ) {}
 
     public function index(): View
     {
@@ -22,25 +26,27 @@ class PeriodeController extends Controller
                 ->orderByDesc('bulan')
                 ->paginate(20),
             'units' => UnitUsaha::query()->orderBy('nama')->get(),
-            'sekarang' => now(),
+            'opsi' => $this->akuntansi->daftar(),
+            'sekarang' => $this->akuntansi->berjalan(),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'tahun' => ['required', 'integer', 'min:2020', 'max:2100'],
-            'bulan' => ['required', 'integer', 'min:1', 'max:12'],
+            'periode' => ['required', 'string', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/'],
             'unit_usaha_id' => ['nullable', 'integer', 'exists:unit_usaha,id'],
         ], [
-            'tahun.required' => 'Tahun wajib diisi.',
-            'bulan.required' => 'Bulan wajib dipilih.',
+            'periode.required' => 'Periode wajib dipilih.',
+            'periode.regex' => 'Format periode tidak valid.',
         ]);
 
+        [$tahun, $bulan] = array_map('intval', explode('-', $data['periode']));
+
         $this->service->tutup(
-            (int) $data['tahun'],
-            (int) $data['bulan'],
-            $data['unit_usaha_id'] ? (int) $data['unit_usaha_id'] : null,
+            $tahun,
+            $bulan,
+            isset($data['unit_usaha_id']) && $data['unit_usaha_id'] ? (int) $data['unit_usaha_id'] : null,
             $request->user(),
         );
 

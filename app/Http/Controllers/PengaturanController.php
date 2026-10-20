@@ -26,14 +26,16 @@ class PengaturanController extends Controller
 
         foreach (PengaturanService::DEFAULTS as $key => $meta) {
             $aturan[$key] = $meta['tipe'] === 'decimal'
-                ? ['required', 'numeric', 'min:0', 'max:100']
-                : ['required', 'integer', 'min:0'];
+                ? ['required', 'numeric', 'min:'.($meta['min'] ?? 0), 'max:'.($meta['max'] ?? 100)]
+                : ['required', 'integer', 'min:'.($meta['min'] ?? 0), 'max:'.($meta['max'] ?? 999999999999)];
         }
 
         $data = $request->validate($aturan, [
             'required' => 'Semua pengaturan wajib diisi.',
             'integer' => 'Nilai pengaturan harus berupa angka bulat.',
             'numeric' => 'Nilai pengaturan harus berupa angka.',
+            'min' => 'Nilai pengaturan terlalu kecil.',
+            'max' => 'Nilai pengaturan terlalu besar (maksimal :max).',
         ]);
 
         foreach ($data as $key => $value) {

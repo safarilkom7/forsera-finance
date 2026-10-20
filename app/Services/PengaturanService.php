@@ -10,6 +10,13 @@ class PengaturanService
 {
     /** @var array<string, array{value: mixed, tipe: string, deskripsi: string}> */
     public const DEFAULTS = [
+        'tanggal_mulai_periode' => [
+            'value' => 5,
+            'tipe' => 'integer',
+            'min' => 1,
+            'max' => 28,
+            'deskripsi' => 'Tanggal awal periode akuntansi. Periode berjalan dari tanggal ini sampai sehari sebelum tanggal yang sama di bulan berikutnya (mulai 5 = 5 Okt s/d 4 Nov), sehingga gajian tanggal 6 jatuh setelah periode ditutup.',
+        ],
         'toleransi_selisih' => [
             'value' => 1000,
             'tipe' => 'integer',

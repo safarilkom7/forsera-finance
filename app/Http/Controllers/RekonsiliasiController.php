@@ -8,6 +8,7 @@ use App\Models\MetodePembayaran;
 use App\Models\Rekonsiliasi;
 use App\Models\UnitUsaha;
 use App\Services\LampiranService;
+use App\Services\PeriodeAkuntansiService;
 use App\Services\RekonsiliasiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,14 +21,16 @@ class RekonsiliasiController extends Controller
     public function __construct(
         private readonly RekonsiliasiService $service,
         private readonly LampiranService $lampiran,
+        private readonly PeriodeAkuntansiService $akuntansi,
     ) {}
 
     public function index(Request $request): View
     {
         $this->authorize('viewAny', Rekonsiliasi::class);
 
-        $dari = $this->tanggal($request->query('dari'), now()->startOfMonth());
-        $sampai = $this->tanggal($request->query('sampai'), now()->endOfMonth());
+        $periodeBerjalan = $this->akuntansi->berjalan();
+        $dari = $this->tanggal($request->query('dari'), $periodeBerjalan['mulai']);
+        $sampai = $this->tanggal($request->query('sampai'), $periodeBerjalan['selesai']);
         $unitId = $request->integer('unit') ?: null;
 
         if ($unitId !== null) {
@@ -72,12 +75,13 @@ class RekonsiliasiController extends Controller
         $potongan = 0;
         $saran = 0;
         $unitTerpilih = null;
+        $periodeBerjalan = $this->akuntansi->berjalan();
 
         if ($siap) {
             abort_unless($request->user()->bolehAksesUnit($unitId), 403);
 
-            $mulaiCarbon = $this->tanggal($mulai, now()->startOfMonth());
-            $selesaiCarbon = $this->tanggal($selesai, now()->endOfMonth());
+            $mulaiCarbon = $this->tanggal($mulai, $periodeBerjalan['mulai']);
+            $selesaiCarbon = $this->tanggal($selesai, $periodeBerjalan['selesai']);
 
             if ($mulaiCarbon->gt($selesaiCarbon)) {
                 [$mulaiCarbon, $selesaiCarbon] = [$selesaiCarbon, $mulaiCarbon];
@@ -98,8 +102,10 @@ class RekonsiliasiController extends Controller
             'metodes' => MetodePembayaran::query()->where('aktif', true)->orderBy('nama')->get(),
             'unitId' => $unitId,
             'metodeId' => $metodeId,
-            'mulai' => $mulai ? $this->tanggal($mulai, now()->startOfMonth())->toDateString() : now()->startOfMonth()->toDateString(),
-            'selesai' => $selesai ? $this->tanggal($selesai, now()->endOfMonth())->toDateString() : now()->toDateString(),
+            'mulai' => $mulai ? $this->tanggal($mulai, $periodeBerjalan['mulai'])->toDateString() : $periodeBerjalan['mulai']->toDateString(),
+            'selesai' => $selesai
+                ? $this->tanggal($selesai, $periodeBerjalan['selesai'])->toDateString()
+                : ($periodeBerjalan['selesai']->isFuture() ? now()->toDateString() : $periodeBerjalan['selesai']->toDateString()),
             'kandidat' => $kandidat,
             'potongan' => $potongan,
             'saran' => $saran,

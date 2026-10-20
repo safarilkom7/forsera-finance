@@ -12,6 +12,7 @@ use App\Models\UnitUsaha;
 use App\Models\User;
 use App\Services\LampiranService;
 use App\Services\PemasukanService;
+use App\Services\PeriodeAkuntansiService;
 use App\Services\PeriodeService;
 use App\Support\Format;
 use Illuminate\Http\RedirectResponse;
@@ -27,6 +28,7 @@ class PemasukanController extends Controller
         private readonly PemasukanService $service,
         private readonly LampiranService $lampiran,
         private readonly PeriodeService $periode,
+        private readonly PeriodeAkuntansiService $akuntansi,
     ) {}
 
     public function index(Request $request): View
@@ -209,8 +211,9 @@ class PemasukanController extends Controller
      */
     private function filterData(Request $request, User $user): array
     {
-        $dari = $this->tanggal($request->query('dari'), now()->startOfMonth());
-        $sampai = $this->tanggal($request->query('sampai'), now()->endOfMonth());
+        $periodeBerjalan = $this->akuntansi->berjalan();
+        $dari = $this->tanggal($request->query('dari'), $periodeBerjalan['mulai']);
+        $sampai = $this->tanggal($request->query('sampai'), $periodeBerjalan['selesai']);
 
         if ($dari->gt($sampai)) {
             [$dari, $sampai] = [$sampai, $dari];

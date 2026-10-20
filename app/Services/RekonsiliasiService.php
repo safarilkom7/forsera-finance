@@ -23,6 +23,7 @@ class RekonsiliasiService
     public function __construct(
         private readonly PengaturanService $pengaturan,
         private readonly PeriodeService $periode,
+        private readonly PeriodeAkuntansiService $akuntansi,
         private readonly LampiranService $lampiran,
         private readonly InsidenService $insiden,
         private readonly NotifikasiService $notifikasi,
@@ -511,12 +512,15 @@ class RekonsiliasiService
 
     private function pastikanRentangTerbuka(string $mulai, string $selesai, int $unitId): void
     {
-        $cursor = Carbon::parse($mulai)->startOfMonth();
-        $akhir = Carbon::parse($selesai)->startOfMonth();
+        $batas = Carbon::parse($selesai)->endOfDay();
+        $periode = $this->akuntansi->untukTanggal($mulai);
 
-        while ($cursor->lte($akhir)) {
-            $this->periode->pastikanTerbuka($cursor->copy()->startOfMonth(), $unitId);
-            $cursor->addMonth();
+        while ($periode['mulai']->lte($batas)) {
+            $this->periode->pastikanTerbuka($periode['mulai'], $unitId);
+
+            // Hari pertama periode berikutnya, dihitung dari tanggal mulai agar tetap
+            // benar walau tanggal mulai periode diubah di Pengaturan.
+            $periode = $this->akuntansi->untukTanggal($periode['selesai']->copy()->addDay());
         }
     }
 }

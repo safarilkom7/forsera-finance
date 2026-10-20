@@ -65,7 +65,8 @@ Soft delete: `pemasukan`, `pengeluaran`. `rekonsiliasi`/`insiden` memakai status
 ## 4. Service dan tanggung jawab
 
 - **PengaturanService** — baca/tulis `pengaturan` bertipe, cache, invalidasi.
-- **PeriodeService** — `terkunci(tanggal, unit)`, `pastikanTerbuka()`, `tutup()`, `bukaKembali()`.
+- **PeriodeAkuntansiService** — batas periode akuntansi (default tanggal 5 s/d 4 bulan berikutnya, gajian tanggal 6; tanggal mulai diatur lewat pengaturan `tanggal_mulai_periode`), label & rentang periode, daftar periode untuk tutup buku.
+- **PeriodeService** — `terkunci(tanggal, unit)`, `pastikanTerbuka()`, `tutup()`, `bukaKembali()`. Pencocokan `periode_tutup` memakai label periode akuntansi, bukan bulan kalender.
 - **PemasukanService** — validasi sisi server, simpan lampiran, kunci status, koreksi Owner (audit nilai lama/baru), soft delete.
 - **PengeluaranService** — detail item, subtotal & total server-side, `harga_terakhir`, deteksi lonjakan harga, alur persetujuan.
 - **RekonsiliasiService** — kandidat pemasukan, `potonganKas`, preview selisih, simpan (status + insiden otomatis), tandai menunggu settlement, batal, hitung ulang, koreksi terkait.

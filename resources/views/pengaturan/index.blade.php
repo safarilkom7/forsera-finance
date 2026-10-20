@@ -17,7 +17,12 @@
                 <div>
                     <input id="{{ $key }}" name="{{ $key }}" value="{{ old($key, $nilai[$key] ?? $meta['value']) }}" required
                            inputmode="{{ $meta['tipe'] === 'integer' ? 'numeric' : 'decimal' }}"
+                           @isset($meta['min']) min="{{ $meta['min'] }}" @endisset
+                           @isset($meta['max']) max="{{ $meta['max'] }}" @endisset
                            class="input @error($key) input-error @enderror">
+                    @if (isset($meta['min']) || isset($meta['max']))
+                        <p class="mt-1 text-[11px] text-slate-400">Rentang: {{ $meta['min'] ?? 0 }} – {{ $meta['max'] ?? '∞' }}</p>
+                    @endif
                     @error($key)<p class="error-text">{{ $message }}</p>@enderror
                 </div>
                 <p class="hint self-center">{{ $meta['deskripsi'] }}</p>

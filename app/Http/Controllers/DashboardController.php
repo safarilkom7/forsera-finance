@@ -24,6 +24,7 @@ class DashboardController extends Controller
             'user' => $user,
             'periode' => $periode,
             'units' => $units,
+            'pilihan_periode' => $filter->pilihan(),
         ];
 
         if ($user->isStaf()) {

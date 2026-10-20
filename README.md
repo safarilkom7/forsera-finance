@@ -55,6 +55,25 @@ php artisan test               # seluruh test Pest (29 test)
 php artisan migrate:fresh --seed
 ```
 
+## Periode akuntansi (5 – 4, gajian tanggal 6)
+
+Periode keuangan **tidak** memakai bulan kalender. Default periodenya **tanggal 5 s/d 4 bulan
+berikutnya**, sehingga gajian tanggal 6 jatuh tepat setelah periode ditutup:
+
+| Periode | Rentang tanggal |
+| --- | --- |
+| September 2026 | 5 Sep 2026 – 4 Okt 2026 |
+| Oktober 2026 | 5 Okt 2026 – 4 Nov 2026 |
+
+Label periode memakai bulan awal, jadi transaksi 3 November **masih** masuk periode Oktober 2026.
+Tanggal mulai bisa diubah di **Pengaturan → Tanggal Mulai Periode** (1–28). Contoh bila diubah ke 25:
+periode Oktober 2026 = 25 Sep 2026 – 24 Okt 2026.
+
+Semua tampilan dan validasi memakai periode ini: filter “Periode berjalan/Periode sebelumnya” di
+dashboard & laporan, default filter pemasukan/pengeluaran/rekonsiliasi, panel Perlu Perhatian, serta
+penutupan periode (transaksi pada periode tertutup ditolak walau tanggalnya sudah masuk bulan
+berikutnya). Logika terpusat di `app/Services/PeriodeAkuntansiService.php`.
+
 ## Aturan bisnis inti
 
 - **Maker-checker**: staf dan admin tidak boleh memverifikasi transaksi yang mereka buat sendiri;
@@ -62,8 +81,8 @@ php artisan migrate:fresh --seed
 - **Pengeluaran**: total dihitung di server dari detail item; nominal di atas batas persetujuan
   otomatis berstatus menunggu persetujuan Owner.
 - **Batas transaksi & batas persetujuan** diatur di menu Pengaturan, bukan di kode.
-- **Periode terkunci**: transaksi bertanggal pada periode yang sudah ditutup tidak bisa diubah tanpa
-  izin koreksi khusus, dan setiap koreksi tercatat di log aktivitas.
+- **Periode terkunci**: transaksi yang jatuh pada periode akuntansi (5–4) yang sudah ditutup tidak
+  bisa diubah tanpa izin koreksi khusus, dan setiap koreksi tercatat di log aktivitas.
 - **Rekonsiliasi**: selisih di dalam toleransi dianggap sesuai; selisih di luar toleransi otomatis
   membuat insiden dengan kode `INC-YYYYMM-####`.
 - **Penyelesaian insiden**: setoran susulan, koreksi pencatatan, atau write-off (hanya Owner).
