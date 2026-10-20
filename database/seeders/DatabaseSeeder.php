@@ -21,6 +21,9 @@ use Spatie\Permission\PermissionRegistrar;
 
 class DatabaseSeeder extends Seeder
 {
+    /** Password awal semua akun contoh (wajib diganti setelah login pertama). */
+    public const PASSWORD_DEMO = 'Forsera#2026';
+
     public function run(): void
     {
         DB::transaction(function () {
@@ -28,6 +31,10 @@ class DatabaseSeeder extends Seeder
             $this->seedMaster();
             app(PengaturanService::class)->pastikanDefault();
             $this->seedOwner();
+
+            if (app()->environment('local')) {
+                $this->seedAkunDemo();
+            }
         });
     }
 
@@ -205,12 +212,47 @@ class DatabaseSeeder extends Seeder
             ['email' => 'owner@forsera.co.id'],
             [
                 'name' => 'Owner Forsera Group',
-                'password' => Hash::make('Forsera#2026'),
+                'password' => Hash::make(self::PASSWORD_DEMO),
                 'aktif' => true,
                 'must_change_password' => true,
             ],
         );
 
         $owner->syncRoles([User::ROLE_OWNER]);
+    }
+
+    /**
+     * Akun contoh untuk mencoba alur per peran di lingkungan lokal.
+     * Password sama dengan akun owner agar mudah diingat saat demo.
+     */
+    private function seedAkunDemo(): void
+    {
+        $admin = User::query()->firstOrCreate(
+            ['email' => 'admin@forsera.co.id'],
+            [
+                'name' => 'Admin Keuangan',
+                'password' => Hash::make(self::PASSWORD_DEMO),
+                'aktif' => true,
+                'must_change_password' => false,
+            ],
+        );
+        $admin->syncRoles([User::ROLE_ADMIN]);
+
+        $staf = User::query()->firstOrCreate(
+            ['email' => 'staf@forsera.co.id'],
+            [
+                'name' => 'Staf Resto',
+                'password' => Hash::make(self::PASSWORD_DEMO),
+                'aktif' => true,
+                'must_change_password' => false,
+                'last_unit_usaha_id' => 1,
+            ],
+        );
+        $staf->syncRoles([User::ROLE_STAF]);
+
+        $resto = UnitUsaha::query()->where('kode', 'FRS')->first();
+        if ($resto !== null && ! $staf->unitUsaha()->whereKey($resto->id)->exists()) {
+            $staf->unitUsaha()->attach($resto->id);
+        }
     }
 }

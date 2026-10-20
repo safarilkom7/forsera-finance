@@ -1,59 +1,72 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Forsera Finance
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi keuangan internal Forsera Group untuk mencatat pemasukan & pengeluaran tiga unit usaha
+(Forsera Resto, Kopi Arobi, Forsera Barbershop), mencocokkan setoran (rekonsiliasi), menindaklanjuti
+selisih sebagai insiden, dan menghasilkan laporan laba rugi / buku kas.
 
-## About Laravel
+Stack: Laravel 12, Blade + Tailwind (Vite), MySQL, Spatie Permission, Pest, Laravel Excel, DomPDF.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Akun login (hasil seeder)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Semua akun contoh memakai password yang sama dan hanya dibuat di environment `local`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Peran | Email | Password | Akses utama |
+| --- | --- | --- | --- |
+| Owner | `owner@forsera.co.id` | `Forsera#2026` | Semua menu, verifikasi, write-off selisih, tutup periode, kelola pengguna |
+| Admin Keuangan | `admin@forsera.co.id` | `Forsera#2026` | Input & verifikasi transaksi (maker-checker), rekonsiliasi, insiden, laporan, master data |
+| Staf Unit | `staf@forsera.co.id` | `Forsera#2026` | Input pemasukan/pengeluaran unit yang ditugaskan (Forsera Resto) |
 
-## Learning Laravel
+Seeder membuat owner dengan penanda `must_change_password`, tetapi pada database demo saat ini penanda
+tersebut sudah dimatikan agar login langsung masuk dashboard. Untuk mengaktifkan kembali paksaan ganti
+password, set `must_change_password = true` pada user tersebut lewat menu **Pengguna**.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Reset password manual bila lupa:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+php artisan tinker --execute="\App\Models\User::where('email','owner@forsera.co.id')->first()->forceFill(['password'=>'Forsera#2026','must_change_password'=>false])->save();"
+```
 
-## Laravel Sponsors
+Membuat akun staf baru paling mudah lewat menu **Pengguna** (Owner/Admin), termasuk penugasan unit
+usaha. Staf hanya bisa melihat dan mencatat transaksi unit yang ditugaskan padanya.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Instalasi
 
-### Premium Partners
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# sesuaikan kredensial database di .env, lalu
+php artisan migrate --seed
+npm run build          # atau: npm run dev
+php artisan serve
+```
 
-## Contributing
+Seeder bersifat idempoten (`firstOrCreate`), jadi `php artisan db:seed` boleh dijalankan ulang untuk
+menambah akun demo tanpa menghapus data transaksi.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Perintah harian
 
-## Code of Conduct
+```bash
+php artisan serve              # jalankan aplikasi
+npm run dev                    # watch asset
+php artisan test               # seluruh test Pest (29 test)
+php artisan migrate:fresh --seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Aturan bisnis inti
 
-## Security Vulnerabilities
+- **Maker-checker**: staf dan admin tidak boleh memverifikasi transaksi yang mereka buat sendiri;
+  hanya Owner yang bebas. Verifikasi mengubah status pemasukan menjadi `Terverifikasi`.
+- **Pengeluaran**: total dihitung di server dari detail item; nominal di atas batas persetujuan
+  otomatis berstatus menunggu persetujuan Owner.
+- **Batas transaksi & batas persetujuan** diatur di menu Pengaturan, bukan di kode.
+- **Periode terkunci**: transaksi bertanggal pada periode yang sudah ditutup tidak bisa diubah tanpa
+  izin koreksi khusus, dan setiap koreksi tercatat di log aktivitas.
+- **Rekonsiliasi**: selisih di dalam toleransi dianggap sesuai; selisih di luar toleransi otomatis
+  membuat insiden dengan kode `INC-YYYYMM-####`.
+- **Penyelesaian insiden**: setoran susulan, koreksi pencatatan, atau write-off (hanya Owner).
+- **Lampiran** bukti transaksi disimpan di disk privat dan diunduh lewat route terautorisasi.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Detail lengkap: [docs/PLAN.md](docs/PLAN.md).
