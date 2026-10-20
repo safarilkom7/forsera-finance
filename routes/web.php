@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrandingLogoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InsidenController;
 use App\Http\Controllers\ItemController;
@@ -23,6 +24,9 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
+
+// Logo aplikasi tampil di halaman login, jadi harus bisa diakses tanpa login.
+Route::get('branding/logo', BrandingLogoController::class)->name('branding.logo');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'formLogin'])->name('login');
@@ -80,6 +84,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
         Route::resource('pengguna', UserController::class)->only(['index', 'create', 'store', 'edit', 'update'])->parameters(['pengguna' => 'user'])->names('users');
         Route::get('pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
         Route::put('pengaturan', [PengaturanController::class, 'update'])->name('pengaturan.update');
+        Route::put('pengaturan/identitas', [PengaturanController::class, 'updateBranding'])->name('pengaturan.branding');
         Route::get('periode', [PeriodeController::class, 'index'])->name('periode.index');
         Route::post('periode', [PeriodeController::class, 'store'])->name('periode.store');
         Route::post('periode/{periode}/buka', [PeriodeController::class, 'buka'])->name('periode.buka');

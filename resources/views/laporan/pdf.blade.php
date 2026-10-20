@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>Laporan Keuangan Forsera Group</title>
+    <title>Laporan Keuangan {{ $branding['brand'] }}</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 9px; color: #1f2937; margin: 22px; }
@@ -28,10 +28,10 @@
 <body>
     <div class="header">
         <div>
-            <h1>Laporan Keuangan Forsera Group</h1>
+            <h1>Laporan Keuangan {{ $branding['brand'] }}</h1>
             <p class="muted">{{ $periode['label'] }} · {{ format_tanggal($periode['mulai']) }} – {{ format_tanggal($periode['selesai']) }} · {{ collect($units)->firstWhere('id', $periode['unit_id'])?->nama ?? 'Semua unit' }}</p>
         </div>
-        <div class="brand">FORSERA GROUP</div>
+        <div class="brand">{{ mb_strtoupper($branding['brand']) }}</div>
     </div>
 
     <h2>1. Laba Rugi Sederhana</h2>
@@ -163,6 +163,6 @@
         </table>
     @endforeach
 
-    <p class="footer">Dibuat {{ format_tanggal(now()) }} {{ now()->format('H:i') }} WIB oleh {{ auth()->user()?->name }}. Forsera Finance.</p>
+    <p class="footer">Dibuat {{ format_tanggal(now()) }} {{ now()->format('H:i') }} WIB oleh {{ auth()->user()?->name }}. {{ $branding['nama'] }}.</p>
 </body>
 </html>

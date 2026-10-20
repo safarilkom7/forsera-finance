@@ -11,6 +11,7 @@ use App\Models\MetodePembayaran;
 use App\Models\Satuan;
 use App\Models\UnitUsaha;
 use App\Models\User;
+use App\Services\BrandingService;
 use App\Services\PengaturanService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +31,7 @@ class DatabaseSeeder extends Seeder
             $this->seedPeran();
             $this->seedMaster();
             app(PengaturanService::class)->pastikanDefault();
+            app(BrandingService::class)->pastikanDefault();
             $this->seedOwner();
 
             if (app()->environment('local')) {

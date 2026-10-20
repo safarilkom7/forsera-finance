@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Unit Usaha')
-@section('subtitle', 'Tiga unit bisnis Forsera Group')
+@section('subtitle', 'Tiga unit bisnis '.$branding['brand'])
 
 @section('content')
     <div class="mb-5 flex items-center justify-between gap-3">

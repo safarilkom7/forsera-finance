@@ -74,6 +74,22 @@ dashboard & laporan, default filter pemasukan/pengeluaran/rekonsiliasi, panel Pe
 penutupan periode (transaksi pada periode tertutup ditolak walau tanggalnya sudah masuk bulan
 berikutnya). Logika terpusat di `app/Services/PeriodeAkuntansiService.php`.
 
+## Identitas aplikasi (logo, nama, brand, title)
+
+Owner dapat mengganti identitas aplikasi di **Pengaturan → Identitas aplikasi**:
+
+| Kolom | Dipakai di |
+| --- | --- |
+| **Nama aplikasi** (`app_nama`) | Judul tab browser dan footer laporan PDF |
+| **Brand / perusahaan** (`app_brand`) | Nama besar di sidebar, halaman login, hak cipta, header PDF |
+| **Title / subjudul** (`app_title`) | Baris kecil di bawah brand (boleh kosong) |
+| **Logo** (`app_logo`) | Ikon di sidebar, halaman login, dan favicon |
+
+Logo berupa PNG/JPG/WEBP maksimal 2 MB (disarankan persegi). Berkas disimpan privat di
+`storage/app/private/branding/` dan disajikan lewat route publik `/branding/logo` (halaman login juga
+butuh logo). Tanpa logo, aplikasi memakai inisial brand (mis. “FG”). Bila logo dihapus, berkas lama
+ikut dihapus. Setiap perubahan dicatat di Log Aktivitas.
+
 ## Alur verifikasi pemasukan (status “Belum Dicek”)
 
 “Belum Dicek” bukan tombol approve yang terlewat — artinya transaksi sudah dicatat tetapi **belum

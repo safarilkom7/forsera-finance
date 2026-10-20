@@ -4,7 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') — Forsera Finance</title>
+    <title>@yield('title', 'Dashboard') — {{ $branding['nama'] }}</title>
+    @if ($branding['logo_url'])
+        <link rel="icon" href="{{ $branding['logo_url'] }}">
+    @endif
     <script>
         try {
             if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -26,10 +29,17 @@
 <div class="min-h-screen lg:pl-64">
     <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col border-r border-slate-200 bg-white transition-transform duration-200 dark:border-slate-800 dark:bg-slate-900 lg:translate-x-0">
         <div class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200 px-5 dark:border-slate-800">
-            <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-600 text-sm font-black text-white">FG</div>
+            @if ($branding['logo_url'])
+                <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['brand'] }}"
+                     class="h-10 w-10 shrink-0 rounded-xl bg-white object-contain p-1 ring-1 ring-slate-200 dark:ring-slate-700">
+            @else
+                <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-600 text-sm font-black text-white">{{ $branding['inisial'] }}</div>
+            @endif
             <div class="min-w-0">
-                <p class="truncate text-sm font-bold text-slate-900 dark:text-white">Forsera Group</p>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Keuangan &amp; Verifikasi</p>
+                <p class="truncate text-sm font-bold text-slate-900 dark:text-white">{{ $branding['brand'] }}</p>
+                @if ($branding['title'] !== '')
+                    <p class="truncate text-xs text-slate-500 dark:text-slate-400">{{ $branding['title'] }}</p>
+                @endif
             </div>
             <button type="button" class="ml-auto rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden" data-sidebar-close aria-label="Tutup menu">
                 <x-icon name="x" class="h-5 w-5" />

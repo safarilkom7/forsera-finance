@@ -3,7 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Masuk') — Forsera Finance</title>
+    <title>@yield('title', 'Masuk') — {{ $branding['nama'] }}</title>
+    @if ($branding['logo_url'])
+        <link rel="icon" href="{{ $branding['logo_url'] }}">
+    @endif
     <script>
         try {
             if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -20,10 +23,16 @@
         <div class="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-amber-500/10 blur-3xl"></div>
 
         <div class="relative flex items-center gap-3">
-            <div class="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-500 text-base font-black">FG</div>
+            @if ($branding['logo_url'])
+                <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['brand'] }}" class="h-11 w-11 rounded-2xl bg-white object-contain p-1">
+            @else
+                <div class="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-500 text-base font-black">{{ $branding['inisial'] }}</div>
+            @endif
             <div>
-                <p class="text-base font-bold">Forsera Group</p>
-                <p class="text-xs text-slate-400">Keuangan &amp; Verifikasi</p>
+                <p class="text-base font-bold">{{ $branding['brand'] }}</p>
+                @if ($branding['title'] !== '')
+                    <p class="text-xs text-slate-400">{{ $branding['title'] }}</p>
+                @endif
             </div>
         </div>
 
@@ -47,16 +56,22 @@
             </div>
         </div>
 
-        <p class="relative text-xs text-slate-500">© {{ date('Y') }} Forsera Group. Zona waktu Asia/Jakarta.</p>
+        <p class="relative text-xs text-slate-500">© {{ date('Y') }} {{ $branding['brand'] }}. Zona waktu Asia/Jakarta.</p>
     </div>
 
     <div class="flex items-center justify-center px-4 py-10 sm:px-8">
         <div class="w-full max-w-md">
             <div class="mb-8 flex items-center gap-3 lg:hidden">
-                <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-600 text-sm font-black text-white">FG</div>
+                @if ($branding['logo_url'])
+                    <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['brand'] }}" class="h-10 w-10 rounded-xl bg-white object-contain p-1 ring-1 ring-slate-200 dark:ring-slate-700">
+                @else
+                    <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-600 text-sm font-black text-white">{{ $branding['inisial'] }}</div>
+                @endif
                 <div>
-                    <p class="text-sm font-bold text-slate-900 dark:text-white">Forsera Group</p>
-                    <p class="text-xs text-slate-500">Keuangan &amp; Verifikasi</p>
+                    <p class="text-sm font-bold text-slate-900 dark:text-white">{{ $branding['brand'] }}</p>
+                    @if ($branding['title'] !== '')
+                        <p class="text-xs text-slate-500">{{ $branding['title'] }}</p>
+                    @endif
                 </div>
             </div>
 
@@ -74,7 +89,7 @@
             @yield('content')
 
             <div class="mt-8 flex items-center justify-between text-xs text-slate-400">
-                <span>© {{ date('Y') }} Forsera Group</span>
+                <span>© {{ date('Y') }} {{ $branding['brand'] }}</span>
                 <button type="button" class="rounded-lg p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800" data-dark-toggle aria-label="Ganti mode gelap">
                     <x-icon name="sun" class="h-4 w-4 dark:hidden" />
                     <x-icon name="moon" class="hidden h-4 w-4 dark:block" />
