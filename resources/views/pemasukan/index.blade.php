@@ -19,6 +19,20 @@
         </div>
     </div>
 
+    <div class="mb-5 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-xs text-sky-900 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-200">
+        <p class="font-semibold">Apa arti status “Belum Dicek”?</p>
+        <p class="mt-1 leading-relaxed">
+            Transaksi sudah dicatat, tetapi uangnya belum dicocokkan dengan yang benar-benar diterima
+            (kas, QRIS, atau transfer). Pencocokan dilakukan lewat menu <strong>Rekonsiliasi</strong> oleh
+            <strong>Owner</strong> atau <strong>Admin Keuangan</strong>. Tidak perlu “approve” per baris:
+            begitu rekonsiliasi disimpan, status berubah menjadi Sesuai / Selisih / Selesai beserta nama pemeriksanya.
+            Pembuat transaksi tidak boleh mencocokkan transaksinya sendiri (maker-checker), kecuali Owner.
+        </p>
+        @if ($boleh_verifikasi)
+            <a href="{{ route('rekonsiliasi.create') }}" class="mt-2 inline-flex font-semibold text-sky-700 hover:underline dark:text-sky-300">Mulai rekonsiliasi →</a>
+        @endif
+    </div>
+
     <form method="GET" action="{{ route('pemasukan.index') }}" class="card mb-5 card-pad">
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
@@ -99,11 +113,17 @@
                         <x-status-badge :status="$item->status_verifikasi" />
                     </div>
                     <p class="mt-2 text-lg font-bold text-slate-900 dark:text-white">{{ format_rupiah($item->nominal) }}</p>
+                    @if ($item->rekonsiliasi)
+                        <p class="mt-1 text-[11px] text-slate-500">{{ $item->rekonsiliasi->kode }} · dicek {{ $item->rekonsiliasi->diverifikasiOleh?->name ?? '—' }}</p>
+                    @endif
                     <p class="mt-1 text-xs text-slate-500">{{ $item->metode?->nama }} · oleh {{ $item->dibuatOleh?->name }}</p>
                     @if ($item->note)
                         <p class="mt-1 text-xs text-slate-500">{{ $item->note }}</p>
                     @endif
                     <div class="mt-3 flex flex-wrap gap-2">
+                        @if ($boleh_verifikasi && $item->status_verifikasi === \App\Enums\StatusVerifikasi::BELUM_DICEK)
+                            <a href="{{ route('rekonsiliasi.create', ['unit' => $item->unit_usaha_id, 'metode' => $item->metode_pembayaran_id, 'mulai' => $item->tanggal->toDateString(), 'selesai' => now()->toDateString()]) }}" class="btn-secondary btn-sm text-emerald-700">Verifikasi</a>
+                        @endif
                         @can('update', $item)
                             <a href="{{ route('pemasukan.edit', $item) }}" class="btn-secondary btn-sm">{{ $item->terkunci() ? 'Koreksi' : 'Ubah' }}</a>
                         @endcan
@@ -148,11 +168,22 @@
                         </td>
                         <td>{{ $item->metode?->nama }}</td>
                         <td class="whitespace-nowrap text-right font-semibold">{{ format_rupiah($item->nominal) }}</td>
-                        <td><x-status-badge :status="$item->status_verifikasi" /></td>
+                        <td>
+                            <x-status-badge :status="$item->status_verifikasi" />
+                            @if ($item->rekonsiliasi)
+                                <p class="mt-1 whitespace-nowrap text-[11px] text-slate-500">
+                                    {{ $item->rekonsiliasi->kode }} · dicek {{ $item->rekonsiliasi->diverifikasiOleh?->name ?? '—' }}
+                                </p>
+                            @endif
+                        </td>
                         <td class="max-w-[14rem] truncate">{{ $item->note ?: '—' }}</td>
                         <td class="whitespace-nowrap text-xs">{{ $item->dibuatOleh?->name }}</td>
                         <td class="whitespace-nowrap text-right">
                             <div class="flex justify-end gap-1">
+                                @if ($boleh_verifikasi && $item->status_verifikasi === \App\Enums\StatusVerifikasi::BELUM_DICEK)
+                                    <a href="{{ route('rekonsiliasi.create', ['unit' => $item->unit_usaha_id, 'metode' => $item->metode_pembayaran_id, 'mulai' => $item->tanggal->toDateString(), 'selesai' => now()->toDateString()]) }}"
+                                       class="btn-ghost btn-sm text-emerald-600" title="Cocokkan dengan dana yang diterima">Verifikasi</a>
+                                @endif
                                 @can('update', $item)
                                     <a href="{{ route('pemasukan.edit', $item) }}" class="btn-ghost btn-sm">{{ $item->terkunci() ? 'Koreksi' : 'Ubah' }}</a>
                                 @endcan

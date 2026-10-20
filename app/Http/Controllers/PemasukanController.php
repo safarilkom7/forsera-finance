@@ -41,7 +41,7 @@ class PemasukanController extends Controller
         $total = (int) (clone $query)->sum('nominal');
 
         $data = $query
-            ->with(['unitUsaha', 'kategori', 'metode', 'dibuatOleh'])
+            ->with(['unitUsaha', 'kategori', 'metode', 'dibuatOleh', 'rekonsiliasi.diverifikasiOleh'])
             ->orderByDesc('tanggal')
             ->orderByDesc('id')
             ->paginate(20)
@@ -55,6 +55,7 @@ class PemasukanController extends Controller
             'metodes' => MetodePembayaran::query()->orderBy('nama')->get(),
             'kategoris' => KategoriPemasukan::query()->orderBy('nama')->get(),
             'statuses' => StatusVerifikasi::cases(),
+            'boleh_verifikasi' => $user->isOwner() || $user->isAdmin(),
             'pembuat' => $user->isStaf()
                 ? collect()
                 : User::query()->whereIn('id', Pemasukan::query()->select('dibuat_oleh'))->orderBy('name')->get(),

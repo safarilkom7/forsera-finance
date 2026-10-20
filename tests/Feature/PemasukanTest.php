@@ -3,6 +3,7 @@
 use App\Enums\StatusVerifikasi;
 use App\Models\Pemasukan;
 use App\Models\PeriodeTutup;
+use App\Models\Rekonsiliasi;
 use App\Models\User;
 use App\Services\PengaturanService;
 
@@ -111,4 +112,48 @@ it('mengunci pemasukan yang sudah direkonsiliasi', function () {
         ->assertRedirect(route('pemasukan.index'));
 
     expect($pemasukan->refresh()->nominal)->toBe(600_000);
+});
+
+it('menampilkan pemeriksa transaksi dan tautan verifikasi sesuai peran', function () {
+    $master = masterDasar();
+    $owner = pengguna(User::ROLE_OWNER);
+    $staf = pengguna(User::ROLE_STAF, [$master['resto']]);
+
+    Pemasukan::factory()->create([
+        'unit_usaha_id' => $master['resto']->id,
+        'kategori_pemasukan_id' => $master['kategori_resto']->id,
+        'metode_pembayaran_id' => $master['qris']->id,
+        'nominal' => 300_000,
+        'status_verifikasi' => StatusVerifikasi::BELUM_DICEK,
+        'dibuat_oleh' => $staf->id,
+    ]);
+
+    $rekonsiliasi = Rekonsiliasi::factory()->create([
+        'unit_usaha_id' => $master['resto']->id,
+        'metode_pembayaran_id' => $master['qris']->id,
+        'diverifikasi_oleh' => $owner->id,
+    ]);
+
+    Pemasukan::factory()->create([
+        'unit_usaha_id' => $master['resto']->id,
+        'kategori_pemasukan_id' => $master['kategori_resto']->id,
+        'metode_pembayaran_id' => $master['qris']->id,
+        'nominal' => 700_000,
+        'status_verifikasi' => StatusVerifikasi::SESUAI,
+        'rekonsiliasi_id' => $rekonsiliasi->id,
+        'dibuat_oleh' => $staf->id,
+    ]);
+
+    $this->actingAs($owner)->get('/pemasukan')
+        ->assertOk()
+        ->assertSee('Belum Dicek')
+        ->assertSee('Verifikasi')
+        ->assertSee(route('rekonsiliasi.create'), false)
+        ->assertSee($rekonsiliasi->kode)
+        ->assertSee('dicek '.$owner->name);
+
+    // Staf boleh input, tetapi tidak punya akses ke rekonsiliasi/verifikasi.
+    $this->actingAs($staf)->get('/pemasukan')
+        ->assertOk()
+        ->assertDontSee(route('rekonsiliasi.create'), false);
 });

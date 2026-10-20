@@ -74,6 +74,24 @@ dashboard & laporan, default filter pemasukan/pengeluaran/rekonsiliasi, panel Pe
 penutupan periode (transaksi pada periode tertutup ditolak walau tanggalnya sudah masuk bulan
 berikutnya). Logika terpusat di `app/Services/PeriodeAkuntansiService.php`.
 
+## Alur verifikasi pemasukan (status “Belum Dicek”)
+
+“Belum Dicek” bukan tombol approve yang terlewat — artinya transaksi sudah dicatat tetapi **belum
+dicocokkan dengan uang yang benar-benar diterima**. Pencocokan dilakukan lewat rekonsiliasi:
+
+1. Staf input pemasukan (kas/QRIS/transfer) → status **Belum Dicek**.
+2. **Owner** atau **Admin Keuangan** membuka **Rekonsiliasi → Rekonsiliasi baru** (atau klik tombol
+   **Verifikasi** pada baris pemasukan, sudah terisi unit/metode/tanggal).
+3. Pilih transaksi dalam rentang, isi **Total diterima** (dana yang masuk ke kas/rekening), biaya
+   admin/MDR, dan potongan kas bila ada, lalu simpan.
+4. Hasilnya otomatis: **Sesuai** (selisih ≤ toleransi Rp 1.000), **Selisih** (insiden dibuat otomatis),
+   atau **Menunggu Settlement** (dana belum masuk, tanpa insiden). Insiden ditindaklanjuti sampai
+   transaksi menjadi **Selesai**.
+5. Di daftar pemasukan tampil kode rekonsiliasi dan **nama pemeriksa** (“REK-… · dicek <nama>”).
+
+**Maker-checker:** Admin Keuangan tidak bisa mencocokkan transaksi yang ia buat sendiri; hanya Owner
+yang dikecualikan. Staf unit tidak punya akses ke menu Rekonsiliasi sama sekali.
+
 ## Aturan bisnis inti
 
 - **Maker-checker**: staf dan admin tidak boleh memverifikasi transaksi yang mereka buat sendiri;
