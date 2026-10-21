@@ -122,4 +122,5 @@ yang dikecualikan. Staf unit tidak punya akses ke menu Rekonsiliasi sama sekali.
 - **Penyelesaian insiden**: setoran susulan, koreksi pencatatan, atau write-off (hanya Owner).
 - **Lampiran** bukti transaksi disimpan di disk privat dan diunduh lewat route terautorisasi.
 
-Detail lengkap: [docs/PLAN.md](docs/PLAN.md).
+Detail teknis: [docs/PLAN.md](docs/PLAN.md). Tupoksi dua finance, alur setoran kas, kas kecil,
+pengadaan, analisa penjualan, fee franchise 5%, dan gajian tanggal 6: [docs/TUPOKSI_DAN_ALUR_KEUANGAN.md](docs/TUPOKSI_DAN_ALUR_KEUANGAN.md).
