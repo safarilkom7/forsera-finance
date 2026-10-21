@@ -207,7 +207,6 @@ class DatabaseSeeder extends Seeder
             );
         }
     }
-
     private function seedOwner(): void
     {
         $owner = User::query()->firstOrCreate(
