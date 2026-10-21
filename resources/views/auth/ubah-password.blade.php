@@ -17,26 +17,15 @@
     <form method="POST" action="{{ route('password.ubah') }}" class="mt-7 space-y-5">
         @csrf
 
-        <div>
-            <label for="password_lama" class="label">Password saat ini</label>
-            <input id="password_lama" name="password_lama" type="password" autocomplete="current-password" required
-                   class="input @error('password_lama') input-error @enderror">
-            @error('password_lama')<p class="error-text">{{ $message }}</p>@enderror
-        </div>
+        <x-password-input name="password_lama" label="Password saat ini"
+                          autocomplete="current-password" />
 
-        <div>
-            <label for="password" class="label">Password baru</label>
-            <input id="password" name="password" type="password" autocomplete="new-password" required
-                   class="input @error('password') input-error @enderror">
-            <p class="hint">Minimal 8 karakter, terdiri dari huruf besar, huruf kecil, dan angka.</p>
-            @error('password')<p class="error-text">{{ $message }}</p>@enderror
-        </div>
+        <x-password-input name="password" label="Password baru"
+                          autocomplete="new-password"
+                          hint="Minimal 8 karakter, terdiri dari huruf besar, huruf kecil, dan angka." />
 
-        <div>
-            <label for="password_confirmation" class="label">Ulangi password baru</label>
-            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
-                   class="input">
-        </div>
+        <x-password-input name="password_confirmation" label="Ulangi password baru"
+                          autocomplete="new-password" />
 
         <button type="submit" class="btn-primary w-full">Simpan password baru</button>
     </form>

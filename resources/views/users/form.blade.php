@@ -36,18 +36,14 @@
                 </select>
                 @error('role')<p class="error-text">{{ $message }}</p>@enderror
             </div>
-            <div>
-                <label for="password" class="label">Password {{ $user ? 'baru (opsional)' : 'awal' }}</label>
-                <input id="password" type="password" name="password" autocomplete="new-password" class="input @error('password') input-error @enderror">
-                <p class="hint">{{ $user ? 'Kosongkan bila tidak ingin mengganti. Bila diisi, pengguna wajib mengganti saat login berikutnya.' : 'Minimal 8 karakter, ada huruf besar, huruf kecil, dan angka.' }}</p>
-                @error('password')<p class="error-text">{{ $message }}</p>@enderror
-            </div>
+            <x-password-input name="password"
+                              :label="'Password '.($user ? 'baru (opsional)' : 'awal')"
+                              autocomplete="new-password" :required="false"
+                              :hint="$user ? 'Kosongkan bila tidak ingin mengganti. Bila diisi, pengguna wajib mengganti saat login berikutnya.' : 'Minimal 8 karakter, ada huruf besar, huruf kecil, dan angka.'" />
         </div>
 
-        <div>
-            <label for="password_confirmation" class="label">Ulangi password</label>
-            <input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" class="input">
-        </div>
+        <x-password-input name="password_confirmation" label="Ulangi password"
+                          autocomplete="new-password" :required="false" />
 
         <div id="unit-wrapper">
             <span class="label">Penugasan unit (untuk Staf Unit)</span>

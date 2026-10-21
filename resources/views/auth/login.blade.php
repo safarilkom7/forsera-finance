@@ -20,15 +20,9 @@
             @enderror
         </div>
 
-        <div>
-            <label for="password" class="label">Password</label>
-            <input id="password" name="password" type="password" autocomplete="current-password" required
-                   class="input @error('password') input-error @enderror"
-                   placeholder="••••••••">
-            @error('password')
-                <p class="error-text">{{ $message }}</p>
-            @enderror
-        </div>
+        <x-password-input name="password" label="Password"
+                          autocomplete="current-password"
+                          placeholder="••••••••" />
 
         <label class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
             <input type="checkbox" name="remember" value="1" @checked(old('remember'))

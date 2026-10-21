@@ -138,6 +138,28 @@ const initCharts = () => {
     });
 };
 
+const initPasswordToggles = () => {
+    document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+        const input = button.parentElement?.querySelector('input');
+        if (!input) return;
+
+        button.addEventListener('click', () => {
+            const tampil = input.type === 'password';
+            input.type = tampil ? 'text' : 'password';
+
+            button.setAttribute('aria-pressed', tampil ? 'true' : 'false');
+            button.setAttribute('aria-label', tampil ? 'Sembunyikan password' : 'Tampilkan password');
+            button.title = tampil ? 'Sembunyikan password' : 'Tampilkan password';
+
+            button.querySelector('[data-password-icon="show"]')?.classList.toggle('hidden', tampil);
+            button.querySelector('[data-password-icon="hide"]')?.classList.toggle('hidden', !tampil);
+
+            input.focus({ preventScroll: true });
+            input.setSelectionRange?.(input.value.length, input.value.length);
+        });
+    });
+};
+
 const initFilters = () => {
     document.querySelectorAll('[data-auto-submit]').forEach((element) => {
         element.addEventListener('change', () => element.closest('form')?.submit());
@@ -152,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initConfirmations();
     initDialogs();
     initFilters();
+    initPasswordToggles();
     initCharts();
 });
 

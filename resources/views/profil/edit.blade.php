@@ -27,22 +27,14 @@
                 <p class="hint">Kosongkan bila tidak ingin mengganti password.</p>
             </div>
 
-            <div>
-                <label for="password_lama" class="label">Password saat ini</label>
-                <input id="password_lama" type="password" name="password_lama" autocomplete="current-password" class="input @error('password_lama') input-error @enderror">
-                @error('password_lama')<p class="error-text">{{ $message }}</p>@enderror
-            </div>
+            <x-password-input name="password_lama" label="Password saat ini"
+                              autocomplete="current-password" :required="false" />
 
             <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                    <label for="password" class="label">Password baru</label>
-                    <input id="password" type="password" name="password" autocomplete="new-password" class="input @error('password') input-error @enderror">
-                    @error('password')<p class="error-text">{{ $message }}</p>@enderror
-                </div>
-                <div>
-                    <label for="password_confirmation" class="label">Ulangi password baru</label>
-                    <input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" class="input">
-                </div>
+                <x-password-input name="password" label="Password baru"
+                                  autocomplete="new-password" :required="false" />
+                <x-password-input name="password_confirmation" label="Ulangi password baru"
+                                  autocomplete="new-password" :required="false" />
             </div>
 
             <div class="flex gap-2 pt-2">
