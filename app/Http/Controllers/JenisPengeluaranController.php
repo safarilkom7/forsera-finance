@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JenisPengeluaran;
+use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -10,10 +11,16 @@ use Illuminate\View\View;
 
 class JenisPengeluaranController extends Controller
 {
+    public function __construct(private readonly MasterDataService $master) {}
+
     public function index(): View
     {
+        $data = JenisPengeluaran::query()->orderBy('nama')->get();
+
         return view('master.jenis.index', [
-            'data' => JenisPengeluaran::query()->orderBy('nama')->get(),
+            'data' => $data,
+            'bolehHapus' => auth()->user()->isOwner(),
+            'keterangan' => $this->master->keteranganPemakaian('jenis', $data->pluck('id')->all()),
         ]);
     }
 

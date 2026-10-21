@@ -56,6 +56,7 @@ class PengeluaranController extends Controller
             'metodes' => MetodePembayaran::query()->orderBy('nama')->get(),
             'jenises' => JenisPengeluaran::query()->orderBy('nama')->get(),
             'statuses' => StatusPersetujuanPengeluaran::cases(),
+            'boleh_hapus' => $user->isOwner(),
         ]);
     }
 
@@ -173,6 +174,33 @@ class PengeluaranController extends Controller
         $this->service->hapus($pengeluaran, $request->user());
 
         return redirect()->route('pengeluaran.index')->with('sukses', 'Pengeluaran berhasil dihapus.');
+    }
+
+    public function hapusMassal(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'id' => ['required', 'array', 'min:1', 'max:200'],
+            'id.*' => ['integer'],
+        ], [
+            'id.required' => 'Centang dulu pengeluaran yang ingin dihapus.',
+            'id.array' => 'Centang dulu pengeluaran yang ingin dihapus.',
+            'id.min' => 'Centang dulu pengeluaran yang ingin dihapus.',
+            'id.max' => 'Maksimal 200 pengeluaran sekali hapus.',
+        ]);
+
+        $hasil = $this->service->hapusBanyak($data['id'], $request->user());
+
+        if ($hasil['terhapus'] === 0) {
+            return back()->with('gagal', 'Tidak ada pengeluaran yang dihapus. '.implode(' ', $hasil['dilewati']));
+        }
+
+        $pesan = $hasil['terhapus'].' pengeluaran dihapus.';
+
+        if ($hasil['dilewati'] !== []) {
+            $pesan .= ' '.count($hasil['dilewati']).' dilewati: '.implode(' ', $hasil['dilewati']);
+        }
+
+        return back()->with('sukses', $pesan);
     }
 
     public function setujui(Request $request, Pengeluaran $pengeluaran): RedirectResponse

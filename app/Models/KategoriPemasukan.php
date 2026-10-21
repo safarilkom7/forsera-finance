@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -35,6 +36,11 @@ class KategoriPemasukan extends Model
     public function unitUsaha(): BelongsTo
     {
         return $this->belongsTo(UnitUsaha::class);
+    }
+
+    public function pemasukan(): HasMany
+    {
+        return $this->hasMany(Pemasukan::class);
     }
 
     public function scopeAktif($query)

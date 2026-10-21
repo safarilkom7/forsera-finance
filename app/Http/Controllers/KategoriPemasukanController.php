@@ -4,16 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\KategoriPemasukan;
 use App\Models\UnitUsaha;
+use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class KategoriPemasukanController extends Controller
 {
+    public function __construct(private readonly MasterDataService $master) {}
+
     public function index(): View
     {
+        $data = KategoriPemasukan::query()->with('unitUsaha')->orderBy('nama')->get();
+
         return view('master.kategori.index', [
-            'data' => KategoriPemasukan::query()->with('unitUsaha')->orderBy('nama')->get(),
+            'data' => $data,
+            'bolehHapus' => auth()->user()->isOwner(),
+            'keterangan' => $this->master->keteranganPemakaian('kategori', $data->pluck('id')->all()),
         ]);
     }
 

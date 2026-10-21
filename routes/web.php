@@ -10,6 +10,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\JenisPengeluaranController;
 use App\Http\Controllers\KategoriPemasukanController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\MetodePembayaranController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PengaturanController;
@@ -45,9 +46,13 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('pemasukan/ekspor', [PemasukanController::class, 'export'])->name('pemasukan.export');
+    Route::post('pemasukan/hapus-massal', [PemasukanController::class, 'hapusMassal'])
+        ->middleware('role:owner')->name('pemasukan.hapus-massal');
     Route::resource('pemasukan', PemasukanController::class)->except(['show']);
 
     Route::get('pengeluaran/ekspor', [PengeluaranController::class, 'export'])->name('pengeluaran.export');
+    Route::post('pengeluaran/hapus-massal', [PengeluaranController::class, 'hapusMassal'])
+        ->middleware('role:owner')->name('pengeluaran.hapus-massal');
     Route::post('pengeluaran/{pengeluaran}/setujui', [PengeluaranController::class, 'setujui'])->name('pengeluaran.setujui');
     Route::post('pengeluaran/{pengeluaran}/tolak', [PengeluaranController::class, 'tolak'])->name('pengeluaran.tolak');
     Route::resource('pengeluaran', PengeluaranController::class)->except(['show']);
@@ -77,6 +82,15 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
         Route::resource('jenis', JenisPengeluaranController::class)->only(['index', 'create', 'store', 'edit', 'update']);
         Route::resource('satuan', SatuanController::class)->only(['index', 'create', 'store', 'edit', 'update']);
         Route::resource('item', ItemController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    });
+
+    // Hapus master data hanya untuk Owner dan hanya bila data belum pernah dipakai.
+    Route::middleware('role:owner')->group(function () {
+        Route::delete('master/{jenis}/{id}', [MasterDataController::class, 'hapus'])
+            ->whereNumber('id')
+            ->name('master.hapus');
+        Route::post('master/{jenis}/hapus-massal', [MasterDataController::class, 'hapusMassal'])
+            ->name('master.hapus-massal');
     });
 
     Route::middleware('role:owner,admin_keuangan')->get('log-aktivitas', [ActivityController::class, 'index'])->name('activity.index');

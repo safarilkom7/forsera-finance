@@ -35,9 +35,12 @@ class PengeluaranPolicy
         return $user->isOwner() || $user->isAdmin() || $pengeluaran->dibuat_oleh === $user->id;
     }
 
+    /** Penghapusan transaksi sementara dibatasi ke Owner. */
     public function delete(User $user, Pengeluaran $pengeluaran): bool
     {
-        return $this->update($user, $pengeluaran);
+        return $user->isOwner()
+            && $this->view($user, $pengeluaran)
+            && $pengeluaran->rekonsiliasi_id === null;
     }
 
     public function setujui(User $user, Pengeluaran $pengeluaran): bool

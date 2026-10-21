@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Satuan;
+use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -10,10 +11,16 @@ use Illuminate\View\View;
 
 class SatuanController extends Controller
 {
+    public function __construct(private readonly MasterDataService $master) {}
+
     public function index(): View
     {
+        $data = Satuan::query()->orderBy('nama')->get();
+
         return view('master.satuan.index', [
-            'data' => Satuan::query()->orderBy('nama')->get(),
+            'data' => $data,
+            'bolehHapus' => auth()->user()->isOwner(),
+            'keterangan' => $this->master->keteranganPemakaian('satuan', $data->pluck('id')->all()),
         ]);
     }
 

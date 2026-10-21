@@ -35,9 +35,13 @@ class PemasukanPolicy
         return $user->isOwner() || $user->isAdmin() || $pemasukan->dibuat_oleh === $user->id;
     }
 
+    /** Penghapusan transaksi sementara dibatasi ke Owner. */
     public function delete(User $user, Pemasukan $pemasukan): bool
     {
-        return $this->update($user, $pemasukan) && ! $pemasukan->terkunci() && $pemasukan->rekonsiliasi_id === null;
+        return $user->isOwner()
+            && $this->view($user, $pemasukan)
+            && ! $pemasukan->terkunci()
+            && $pemasukan->rekonsiliasi_id === null;
     }
 
     public function koreksi(User $user, Pemasukan $pemasukan): bool

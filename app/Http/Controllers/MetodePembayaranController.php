@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\TipeMetodePembayaran;
 use App\Models\MetodePembayaran;
+use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,10 +12,16 @@ use Illuminate\View\View;
 
 class MetodePembayaranController extends Controller
 {
+    public function __construct(private readonly MasterDataService $master) {}
+
     public function index(): View
     {
+        $data = MetodePembayaran::query()->orderBy('nama')->get();
+
         return view('master.metode.index', [
-            'data' => MetodePembayaran::query()->orderBy('nama')->get(),
+            'data' => $data,
+            'bolehHapus' => auth()->user()->isOwner(),
+            'keterangan' => $this->master->keteranganPemakaian('metode', $data->pluck('id')->all()),
         ]);
     }
 

@@ -497,6 +497,69 @@ const initFileUploads = () => {
     });
 };
 
+const initPilihanMassal = () => {
+    document.querySelectorAll('[data-pilih-scope]').forEach((scope) => {
+        const kotak = Array.from(scope.querySelectorAll('[data-pilih]'));
+
+        if (kotak.length === 0) return;
+
+        const bar = scope.querySelector('[data-pilih-bar]');
+        const jumlah = bar?.querySelector('[data-pilih-jumlah]');
+        const tombolHapus = bar?.querySelector('[data-pilih-hapus]');
+        const semua = scope.querySelector('[data-pilih-semua]');
+        const nilaiUnik = Array.from(new Set(kotak.map((k) => k.value)));
+
+        const dipilih = () => Array.from(new Set(kotak.filter((k) => k.checked).map((k) => k.value)));
+
+        const perbarui = () => {
+            const n = dipilih().length;
+
+            if (jumlah) jumlah.textContent = String(n);
+            if (tombolHapus) tombolHapus.disabled = n === 0;
+            bar?.classList.toggle('hidden', n === 0);
+
+            if (semua) {
+                semua.checked = n > 0 && n === nilaiUnik.length;
+                semua.indeterminate = n > 0 && n < nilaiUnik.length;
+            }
+
+            if (bar?.dataset.confirmTemplate) {
+                bar.dataset.confirm = bar.dataset.confirmTemplate.replace('{n}', String(n));
+            }
+        };
+
+        const setNilai = (nilai, dicentang) => {
+            kotak.forEach((k) => {
+                if (k.value === nilai) k.checked = dicentang;
+            });
+        };
+
+        kotak.forEach((k) => {
+            k.addEventListener('change', () => {
+                // Tampilan tabel dan tampilan kartu mobile punya checkbox untuk baris yang sama.
+                setNilai(k.value, k.checked);
+                perbarui();
+            });
+        });
+
+        semua?.addEventListener('change', () => {
+            kotak.forEach((k) => {
+                k.checked = semua.checked;
+            });
+            perbarui();
+        });
+
+        bar?.querySelector('[data-pilih-kosongkan]')?.addEventListener('click', () => {
+            kotak.forEach((k) => {
+                k.checked = false;
+            });
+            perbarui();
+        });
+
+        perbarui();
+    });
+};
+
 const initFilters = () => {
     document.querySelectorAll('[data-auto-submit]').forEach((element) => {
         element.addEventListener('change', () => element.closest('form')?.submit());
@@ -508,6 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initDropdowns();
     initSidebar();
     initRupiahInputs();
+    initPilihanMassal();
     initConfirmations();
     initDialogs();
     initFilters();

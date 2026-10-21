@@ -184,6 +184,34 @@ class PemasukanService
         });
     }
 
+    /**
+     * Hapus beberapa pemasukan sekaligus. Baris yang terkunci atau sudah
+     * direkonsiliasi dilewati dan alasannya dilaporkan ke pemanggil.
+     *
+     * @param  array<int, int>  $ids
+     * @return array{terhapus: int, dilewati: array<int, string>}
+     */
+    public function hapusBanyak(array $ids, User $user): array
+    {
+        $records = Pemasukan::query()
+            ->whereIn('id', array_values(array_unique(array_map('intval', $ids))))
+            ->get();
+
+        $terhapus = 0;
+        $dilewati = [];
+
+        foreach ($records as $pemasukan) {
+            try {
+                $this->hapus($pemasukan, $user);
+                $terhapus++;
+            } catch (ValidationException $exception) {
+                $dilewati[] = $exception->validator->errors()->first();
+            }
+        }
+
+        return ['terhapus' => $terhapus, 'dilewati' => $dilewati];
+    }
+
     private function normalisasi(array $data): array
     {
         $data['tanggal'] = isset($data['tanggal']) ? Carbon::parse($data['tanggal'])->toDateString() : now()->toDateString();

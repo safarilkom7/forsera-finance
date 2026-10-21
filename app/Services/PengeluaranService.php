@@ -135,6 +135,34 @@ class PengeluaranService
         });
     }
 
+    /**
+     * Hapus beberapa pengeluaran sekaligus. Baris yang sudah dipakai rekonsiliasi
+     * atau periodenya tertutup dilewati dan alasannya dilaporkan ke pemanggil.
+     *
+     * @param  array<int, int>  $ids
+     * @return array{terhapus: int, dilewati: array<int, string>}
+     */
+    public function hapusBanyak(array $ids, User $user): array
+    {
+        $records = Pengeluaran::query()
+            ->whereIn('id', array_values(array_unique(array_map('intval', $ids))))
+            ->get();
+
+        $terhapus = 0;
+        $dilewati = [];
+
+        foreach ($records as $pengeluaran) {
+            try {
+                $this->hapus($pengeluaran, $user);
+                $terhapus++;
+            } catch (ValidationException $exception) {
+                $dilewati[] = $exception->validator->errors()->first();
+            }
+        }
+
+        return ['terhapus' => $terhapus, 'dilewati' => $dilewati];
+    }
+
     public function setujui(Pengeluaran $pengeluaran, User $user): Pengeluaran
     {
         if (! $user->isOwner()) {

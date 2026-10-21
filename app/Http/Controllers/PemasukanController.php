@@ -56,6 +56,7 @@ class PemasukanController extends Controller
             'kategoris' => KategoriPemasukan::query()->orderBy('nama')->get(),
             'statuses' => StatusVerifikasi::cases(),
             'boleh_verifikasi' => $user->isOwner() || $user->isAdmin(),
+            'boleh_hapus' => $user->isOwner(),
             'pembuat' => $user->isStaf()
                 ? collect()
                 : User::query()->whereIn('id', Pemasukan::query()->select('dibuat_oleh'))->orderBy('name')->get(),
@@ -177,6 +178,33 @@ class PemasukanController extends Controller
         $this->service->hapus($pemasukan, $request->user());
 
         return redirect()->route('pemasukan.index')->with('sukses', 'Pemasukan berhasil dihapus.');
+    }
+
+    public function hapusMassal(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'id' => ['required', 'array', 'min:1', 'max:200'],
+            'id.*' => ['integer'],
+        ], [
+            'id.required' => 'Centang dulu pemasukan yang ingin dihapus.',
+            'id.array' => 'Centang dulu pemasukan yang ingin dihapus.',
+            'id.min' => 'Centang dulu pemasukan yang ingin dihapus.',
+            'id.max' => 'Maksimal 200 pemasukan sekali hapus.',
+        ]);
+
+        $hasil = $this->service->hapusBanyak($data['id'], $request->user());
+
+        if ($hasil['terhapus'] === 0) {
+            return back()->with('gagal', 'Tidak ada pemasukan yang dihapus. '.implode(' ', $hasil['dilewati']));
+        }
+
+        $pesan = $hasil['terhapus'].' pemasukan dihapus.';
+
+        if ($hasil['dilewati'] !== []) {
+            $pesan .= ' '.count($hasil['dilewati']).' dilewati: '.implode(' ', $hasil['dilewati']);
+        }
+
+        return back()->with('sukses', $pesan);
     }
 
     public function export(Request $request)

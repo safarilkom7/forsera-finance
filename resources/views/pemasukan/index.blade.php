@@ -101,11 +101,21 @@
         </div>
     </form>
 
-    <div class="card overflow-hidden">
+    <div class="card overflow-hidden" data-pilih-scope>
+        @if ($boleh_hapus)
+            <x-aksi-massal :aksi="route('pemasukan.hapus-massal')" kata="pemasukan" judul="Hapus pemasukan terpilih?" />
+        @endif
+
         <div class="divide-y divide-slate-100 dark:divide-slate-800 md:hidden">
             @forelse ($data as $item)
                 <div class="p-4">
                     <div class="flex items-start justify-between gap-3">
+                        @can('delete', $item)
+                            <label class="inline-flex min-h-6 min-w-6 shrink-0 items-center justify-center">
+                                <input type="checkbox" form="aksi-massal-form" name="id[]" value="{{ $item->id }}" data-pilih
+                                       class="checkbox" aria-label="Pilih pemasukan {{ $item->kategori?->nama }} {{ format_rupiah($item->nominal) }}">
+                            </label>
+                        @endcan
                         <div class="min-w-0">
                             <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ $item->kategori?->nama }}</p>
                             <p class="mt-0.5 text-xs text-slate-500">{{ $item->unitUsaha?->nama }} · {{ format_tanggal($item->tanggal) }}</p>
@@ -157,6 +167,13 @@
             <table class="table">
                 <thead>
                 <tr>
+                    @if ($boleh_hapus)
+                        <th class="w-10">
+                            <label class="inline-flex min-h-6 min-w-6 items-center justify-center">
+                                <input type="checkbox" data-pilih-semua class="checkbox" aria-label="Pilih semua pemasukan di halaman ini">
+                            </label>
+                        </th>
+                    @endif
                     <th>Tanggal</th>
                     <th>Unit / Kategori</th>
                     <th>Metode</th>
@@ -170,6 +187,18 @@
                 <tbody>
                 @forelse ($data as $item)
                     <tr>
+                        @if ($boleh_hapus)
+                            <td>
+                                @can('delete', $item)
+                                    <label class="inline-flex min-h-6 min-w-6 items-center justify-center">
+                                        <input type="checkbox" form="aksi-massal-form" name="id[]" value="{{ $item->id }}" data-pilih
+                                               class="checkbox" aria-label="Pilih pemasukan {{ $item->kategori?->nama }} {{ format_rupiah($item->nominal) }}">
+                                    </label>
+                                @else
+                                    <span aria-hidden="true">—</span>
+                                @endcan
+                            </td>
+                        @endif
                         <td class="whitespace-nowrap">{{ format_tanggal($item->tanggal) }}</td>
                         <td>
                             <p class="font-medium text-slate-900 dark:text-slate-100">{{ $item->unitUsaha?->nama }}</p>
@@ -216,7 +245,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="py-10 text-center text-slate-500">Belum ada pemasukan pada filter ini.</td>
+                        <td colspan="{{ $boleh_hapus ? 9 : 8 }}" class="py-10 text-center text-slate-500">Belum ada pemasukan pada filter ini.</td>
                     </tr>
                 @endforelse
                 </tbody>

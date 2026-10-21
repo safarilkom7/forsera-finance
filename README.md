@@ -12,8 +12,8 @@ Semua akun contoh memakai password yang sama dan hanya dibuat di environment `lo
 
 | Peran | Email | Password | Akses utama |
 | --- | --- | --- | --- |
-| Owner | `owner@forsera.co.id` | `Forsera#2026` | Semua menu, verifikasi, write-off selisih, tutup periode, kelola pengguna |
-| Admin Keuangan | `admin@forsera.co.id` | `Forsera#2026` | Input & verifikasi transaksi (maker-checker), rekonsiliasi, insiden, laporan, master data |
+| Owner | `owner@forsera.co.id` | `Forsera#2026` | Semua menu, verifikasi, write-off selisih, tutup periode, kelola pengguna, hapus transaksi & master data |
+| Admin Keuangan | `admin@forsera.co.id` | `Forsera#2026` | Input & verifikasi transaksi (maker-checker), rekonsiliasi, insiden, laporan, master data (tanpa hapus) |
 | Staf Unit | `staf@forsera.co.id` | `Forsera#2026` | Input pemasukan/pengeluaran unit yang ditugaskan (Forsera Resto) |
 
 Seeder membuat owner dengan penanda `must_change_password`, tetapi pada database demo saat ini penanda
@@ -51,7 +51,7 @@ menambah akun demo tanpa menghapus data transaksi.
 ```bash
 php artisan serve              # jalankan aplikasi
 npm run dev                    # watch asset
-php artisan test               # seluruh test Pest (29 test)
+php artisan test               # seluruh test Pest (71 test)
 php artisan migrate:fresh --seed
 ```
 
@@ -121,6 +121,10 @@ yang dikecualikan. Staf unit tidak punya akses ke menu Rekonsiliasi sama sekali.
   membuat insiden dengan kode `INC-YYYYMM-####`.
 - **Penyelesaian insiden**: setoran susulan, koreksi pencatatan, atau write-off (hanya Owner).
 - **Lampiran** bukti transaksi disimpan di disk privat dan diunduh lewat route terautorisasi.
+- **Hapus data (Owner)**: hanya Owner yang bisa menghapus transaksi dan master data, baik per baris
+  maupun lewat ceklist **Hapus terpilih**. Master data yang sudah dipakai transaksi/kategori tidak
+  bisa dihapus (nonaktifkan saja); transaksi terkunci atau yang sudah direkonsiliasi dilewati otomatis
+  dan alasannya ditampilkan.
 
 Detail teknis: [docs/PLAN.md](docs/PLAN.md). Tupoksi dua finance, alur setoran kas, kas kecil,
 pengadaan, analisa penjualan, fee franchise 5%, dan gajian tanggal 6: [docs/TUPOKSI_DAN_ALUR_KEUANGAN.md](docs/TUPOKSI_DAN_ALUR_KEUANGAN.md).

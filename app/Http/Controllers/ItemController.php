@@ -6,6 +6,7 @@ use App\Models\DetailPengeluaran;
 use App\Models\Item;
 use App\Models\JenisPengeluaran;
 use App\Models\Satuan;
+use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,10 +14,16 @@ use Illuminate\View\View;
 
 class ItemController extends Controller
 {
+    public function __construct(private readonly MasterDataService $master) {}
+
     public function index(): View
     {
+        $data = Item::query()->with(['satuanDefault', 'jenisPengeluaran'])->orderBy('nama')->get();
+
         return view('master.item.index', [
-            'data' => Item::query()->with(['satuanDefault', 'jenisPengeluaran'])->orderBy('nama')->get(),
+            'data' => $data,
+            'bolehHapus' => auth()->user()->isOwner(),
+            'keterangan' => $this->master->keteranganPemakaian('item', $data->pluck('id')->all()),
         ]);
     }
 

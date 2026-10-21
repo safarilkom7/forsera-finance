@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\TipeUnitUsaha;
 use App\Models\UnitUsaha;
+use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,10 +12,16 @@ use Illuminate\View\View;
 
 class UnitUsahaController extends Controller
 {
+    public function __construct(private readonly MasterDataService $master) {}
+
     public function index(): View
     {
+        $data = UnitUsaha::query()->withCount(['pemasukan', 'pengeluaran'])->orderBy('nama')->get();
+
         return view('master.unit.index', [
-            'data' => UnitUsaha::query()->withCount(['pemasukan', 'pengeluaran'])->orderBy('nama')->get(),
+            'data' => $data,
+            'bolehHapus' => auth()->user()->isOwner(),
+            'keterangan' => $this->master->keteranganPemakaian('unit', $data->pluck('id')->all()),
         ]);
     }
 

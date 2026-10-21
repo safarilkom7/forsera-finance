@@ -154,6 +154,11 @@
         @apply min-h-7 min-w-7 px-3 py-1.5 text-xs;
     }
 
+    /* Checkbox pilihan baris tabel. Ukuran kotak 16px, area klik 24px dari label pembungkusnya. */
+    .checkbox {
+        @apply h-4 w-4 cursor-pointer accent-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-1 dark:accent-emerald-500 dark:focus-visible:ring-offset-slate-900;
+    }
+
     /* Badge = label status, bukan tombol: huruf kecil-kecil, titik status, sudut rapat. */
     .badge {
         @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ring-1 ring-inset;
