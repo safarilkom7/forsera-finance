@@ -96,13 +96,18 @@ Form memakai komponen Blade sendiri supaya tampilannya seragam dan tetap ramah a
 
 | Komponen | Guna |
 | --- | --- |
-| `<x-pilihan>` | Dropdown pengganti `<select>`, lengkap dengan pencarian opsional |
+| `<x-pilihan>` | Dropdown pengganti `<select>` dengan pencarian di dalam panel |
 | `<x-tanggal>` | Input tanggal dengan kalender popup dan format “22 Okt 2026” |
 | `<x-password-input>` | Input password dengan tombol tampilkan/sembunyikan |
 | `<x-file-upload>` | Dropzone lampiran transaksi |
 | `<x-confirm-dialog>` | Dialog konfirmasi global untuk aksi berisiko |
 
-Keduanya merender kontrol native di dalam markup, lalu `resources/js/app.js` menggantinya dengan
+Kolom pencarian `<x-pilihan>` muncul otomatis saat pilihan berjumlah 8 atau lebih, dan bisa
+dipaksa selalu tampil lewat atribut `searchable`. Pencarian tidak peka huruf besar/kecil maupun
+diakritik (mis. “cafe” tetap menemukan “Café”), menampilkan tombol bersihkan, serta menghormati
+opsi yang disembunyikan skrip halaman (mis. kategori per unit usaha).
+
+Semua komponen itu merender kontrol native di dalam markup, lalu `resources/js/app.js` menggantinya dengan
 tampilan custom. Tanpa JavaScript, `<select>` dan `<input type="date">` tetap tampil dan berfungsi,
 termasuk validasi `required` bawaan browser. Daftar opsi dropdown dibaca langsung dari `<option>`,
 jadi tidak ada data yang diduplikasi di server maupun di JavaScript. Baris form dinamis (detail

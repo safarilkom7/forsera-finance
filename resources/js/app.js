@@ -661,13 +661,33 @@ const initPilihan = (root = document) => {
         const wadahDaftar = akar.querySelector('[data-pilihan-daftar]');
         const wadahCari = akar.querySelector('[data-pilihan-cari-wrap]');
         const cari = akar.querySelector('[data-pilihan-cari]');
+        const tombolBersihkan = akar.querySelector('[data-pilihan-bersihkan]');
+        const status = akar.querySelector('[data-pilihan-status]');
 
         if (!asli || !kontrol || !tombol || !label || !menu || !wadahDaftar) return;
 
         akar.dataset.pilihanSiap = '1';
 
-        const bisaCari = wadahCari !== null && cari !== null && !wadahCari.hasAttribute('hidden');
+        const paksaCari = akar.hasAttribute('data-pilihan-cari-paksa');
+        let bisaCari = false;
         let aktif = -1;
+
+        // Kolom pencarian ditampilkan saat pilihan cukup banyak, atau selalu bila
+        // komponen diminta `searchable`. Ambang ini membuat dropdown preset kecil
+        // (unit usaha, status, periode cepat) tetap ringkas seperti dropdown biasa.
+        const siapkanCari = () => {
+            if (!wadahCari || !cari) return;
+
+            const jumlahOpsi = Array.from(asli.options).filter((opsi) => !opsi.hidden).length;
+
+            bisaCari = paksaCari || jumlahOpsi >= 8;
+            wadahCari.hidden = !bisaCari;
+        };
+
+        const normalisasi = (teks) => teks
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
 
         const perbaruiLabel = () => {
             const opsi = asli.options[asli.selectedIndex] ?? null;
@@ -684,7 +704,12 @@ const initPilihan = (root = document) => {
         const sorot = (posisi) => {
             const item = opsiTampil();
 
-            if (item.length === 0) return;
+            if (item.length === 0) {
+                aktif = -1;
+                tombol.removeAttribute('aria-activedescendant');
+                cari?.removeAttribute('aria-activedescendant');
+                return;
+            }
 
             aktif = Math.max(0, Math.min(posisi, item.length - 1));
 
@@ -695,6 +720,9 @@ const initPilihan = (root = document) => {
             });
 
             tombol.setAttribute('aria-activedescendant', item[aktif].id);
+            // Fokus berada di kolom pencarian saat panel terbuka, jadi opsi aktif
+            // perlu ditandai di sana juga agar dibacakan pembaca layar.
+            cari?.setAttribute('aria-activedescendant', item[aktif].id);
             item[aktif].scrollIntoView({ block: 'nearest' });
         };
 
@@ -702,12 +730,15 @@ const initPilihan = (root = document) => {
             wadahDaftar.textContent = '';
 
             const terpilih = asli.selectedIndex;
-            const kunci = (cari?.value ?? '').trim().toLowerCase();
+            const kunci = normalisasi((cari?.value ?? '').trim());
 
             Array.from(asli.options).forEach((opsi, indeks) => {
                 // Opsi yang disembunyikan skrip halaman (mis. kategori per unit) ikut disembunyikan.
                 if (opsi.hidden) return;
-                if (kunci !== '' && !opsi.textContent.toLowerCase().includes(kunci)) return;
+                // Placeholder (opsi kosong pada select wajib) tidak ikut dicari: teksnya
+                // "Pilih kategori" dan akan mengganggu hasil seperti "kategori".
+                if (kunci !== '' && opsi.value === '' && asli.required) return;
+                if (kunci !== '' && !normalisasi(opsi.textContent).includes(kunci)) return;
 
                 const li = document.createElement('li');
                 li.id = wadahDaftar.id + '-opsi-' + indeks;
@@ -739,6 +770,16 @@ const initPilihan = (root = document) => {
                 wadahDaftar.append(kosong);
             }
 
+            const jumlah = wadahDaftar.querySelectorAll('[role="option"]').length;
+
+            if (status) {
+                status.textContent = jumlah === 0
+                    ? 'Tidak ada pilihan yang cocok.'
+                    : jumlah + ' pilihan tersedia.';
+            }
+
+            if (tombolBersihkan) tombolBersihkan.hidden = (cari?.value ?? '') === '';
+
             aktif = -1;
         };
 
@@ -748,6 +789,7 @@ const initPilihan = (root = document) => {
             menu.hidden = true;
             tombol.setAttribute('aria-expanded', 'false');
             tombol.removeAttribute('aria-activedescendant');
+            cari?.removeAttribute('aria-activedescendant');
             tombol.classList.remove('[&>svg]:rotate-180');
             aktif = -1;
 
@@ -761,6 +803,7 @@ const initPilihan = (root = document) => {
             tutupKalenderLain(null);
 
             if (cari) cari.value = '';
+            siapkanCari();
             gambarDaftar();
             menu.hidden = false;
             tombol.setAttribute('aria-expanded', 'true');
@@ -769,9 +812,9 @@ const initPilihan = (root = document) => {
             const posisiTerpilih = opsiTampil().findIndex((li) => Number(li.dataset.indeks) === asli.selectedIndex);
             sorot(posisiTerpilih >= 0 ? posisiTerpilih : 0);
 
+            // Seperti PrimeReact: kolom pencarian langsung siap diketik.
             if (bisaCari) {
                 cari.focus();
-                cari.select();
             }
         };
 
@@ -808,10 +851,10 @@ const initPilihan = (root = document) => {
             } else if (event.key === 'ArrowUp') {
                 event.preventDefault();
                 sorot(aktif - 1);
-            } else if (event.key === 'Home') {
+            } else if (event.key === 'Home' && event.currentTarget === tombol) {
                 event.preventDefault();
                 sorot(0);
-            } else if (event.key === 'End') {
+            } else if (event.key === 'End' && event.currentTarget === tombol) {
                 event.preventDefault();
                 sorot(item.length - 1);
             } else if (event.key === 'Enter' || (event.key === ' ' && event.currentTarget === tombol)) {
@@ -839,9 +882,32 @@ const initPilihan = (root = document) => {
         });
 
         if (cari) {
-            cari.addEventListener('input', gambarDaftar);
+            cari.addEventListener('input', () => {
+                gambarDaftar();
+
+                // Hasil pertama langsung disorot supaya Enter memilihnya.
+                if (opsiTampil().length > 0) sorot(0);
+            });
             cari.addEventListener('keydown', tanganiTombol);
         }
+
+        tombolBersihkan?.addEventListener('click', () => {
+            if (!cari) return;
+
+            cari.value = '';
+            gambarDaftar();
+            if (opsiTampil().length > 0) sorot(0);
+            cari.focus();
+        });
+
+        // Halaman lain bisa mengubah opsi (mis. kategori per unit), jadi daftar
+        // digambar ulang selama panel terbuka agar isinya tidak basi.
+        new MutationObserver(() => {
+            if (menu.hidden) return;
+
+            siapkanCari();
+            gambarDaftar();
+        }).observe(asli, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'disabled'] });
 
         asli.addEventListener('change', perbaruiLabel);
         tautkanValidasi(asli, tombol);
@@ -876,6 +942,7 @@ const initPilihan = (root = document) => {
         sembunyikanKontrolAsli(asli, tombol);
         kontrol.hidden = false;
         perbaruiLabel();
+        siapkanCari();
         gambarDaftar();
 
         daftarPilihan.push({ akar, tutup });
