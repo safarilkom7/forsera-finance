@@ -90,6 +90,24 @@ Logo berupa PNG/JPG/WEBP maksimal 2 MB (disarankan persegi). Berkas disimpan pri
 butuh logo). Tanpa logo, aplikasi memakai inisial brand (mis. “FG”). Bila logo dihapus, berkas lama
 ikut dihapus. Setiap perubahan dicatat di Log Aktivitas.
 
+## Komponen UI form
+
+Form memakai komponen Blade sendiri supaya tampilannya seragam dan tetap ramah aksesibilitas:
+
+| Komponen | Guna |
+| --- | --- |
+| `<x-pilihan>` | Dropdown pengganti `<select>`, lengkap dengan pencarian opsional |
+| `<x-tanggal>` | Input tanggal dengan kalender popup dan format “22 Okt 2026” |
+| `<x-password-input>` | Input password dengan tombol tampilkan/sembunyikan |
+| `<x-file-upload>` | Dropzone lampiran transaksi |
+| `<x-confirm-dialog>` | Dialog konfirmasi global untuk aksi berisiko |
+
+Keduanya merender kontrol native di dalam markup, lalu `resources/js/app.js` menggantinya dengan
+tampilan custom. Tanpa JavaScript, `<select>` dan `<input type="date">` tetap tampil dan berfungsi,
+termasuk validasi `required` bawaan browser. Daftar opsi dropdown dibaca langsung dari `<option>`,
+jadi tidak ada data yang diduplikasi di server maupun di JavaScript. Baris form dinamis (detail
+pengeluaran) memanggil `window.siapkanKomponen(baris)` setelah hasil klon `<template>` dimasukkan.
+
 ## Alur verifikasi pemasukan (status “Belum Dicek”)
 
 “Belum Dicek” bukan tombol approve yang terlewat — artinya transaksi sudah dicatat tetapi **belum

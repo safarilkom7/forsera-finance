@@ -580,10 +580,31 @@ const formatTanggalPendek = (iso) => {
 };
 
 /** Kontrol native tetap dirender 1px agar validasi browser tidak gagal diam-diam. */
-const sembunyikanKontrolAsli = (kontrol) => {
+const sembunyikanKontrolAsli = (kontrol, pengganti) => {
     kontrol.classList.add('kontrol-asli');
     kontrol.setAttribute('tabindex', '-1');
+
+    // Jangan sembunyikan elemen yang sedang fokus: Chrome menolak dan mencatat error.
+    if (document.activeElement === kontrol && pengganti) pengganti.focus();
+
     kontrol.setAttribute('aria-hidden', 'true');
+};
+
+/**
+ * Saat validasi browser gagal, Chrome memfokuskan kontrol native. aria-hidden
+ * dilepas sementara supaya fokus itu tidak diblokir, lalu dipasang lagi setelah
+ * nilainya diperbaiki.
+ */
+const tautkanValidasi = (kontrol, pengganti) => {
+    kontrol.addEventListener('invalid', () => {
+        kontrol.removeAttribute('aria-hidden');
+        pengganti.classList.add('input-error');
+    });
+
+    kontrol.addEventListener('change', () => {
+        pengganti.classList.remove('input-error');
+        if (kontrol.validity.valid) kontrol.setAttribute('aria-hidden', 'true');
+    });
 };
 
 const daftarPilihan = [];
@@ -737,6 +758,7 @@ const initPilihan = (root = document) => {
             if (asli.disabled) return;
 
             tutupPilihanLain(akar);
+            tutupKalenderLain(null);
 
             if (cari) cari.value = '';
             gambarDaftar();
@@ -822,6 +844,7 @@ const initPilihan = (root = document) => {
         }
 
         asli.addEventListener('change', perbaruiLabel);
+        tautkanValidasi(asli, tombol);
 
         if (asli.disabled) {
             tombol.setAttribute('aria-disabled', 'true');
@@ -850,7 +873,7 @@ const initPilihan = (root = document) => {
 
         if (asli.required) tombol.setAttribute('aria-required', 'true');
 
-        sembunyikanKontrolAsli(asli);
+        sembunyikanKontrolAsli(asli, tombol);
         kontrol.hidden = false;
         perbaruiLabel();
         gambarDaftar();
@@ -946,6 +969,7 @@ const initKalender = (root = document) => {
             if (asli.disabled) return;
 
             tutupKalenderLain(akar);
+            tutupPilihanLain(null);
 
             const dasar = asli.value ? keTanggal(asli.value) : new Date();
             tampilan = new Date(dasar.getFullYear(), dasar.getMonth(), 1);
@@ -966,6 +990,7 @@ const initKalender = (root = document) => {
         };
 
         tombol.addEventListener('click', () => (popup.hidden ? buka() : tutup(true)));
+        tautkanValidasi(asli, tombol);
 
         tombolMundur?.addEventListener('click', () => geserBulan(-1));
         tombolMaju?.addEventListener('click', () => geserBulan(1));
@@ -1024,7 +1049,7 @@ const initKalender = (root = document) => {
             semuaHari[tujuan].focus();
         });
 
-        sembunyikanKontrolAsli(asli);
+        sembunyikanKontrolAsli(asli, tombol);
         kontrol.hidden = false;
         perbaruiLabel();
         gambar();
