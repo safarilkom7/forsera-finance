@@ -15,11 +15,11 @@
             </div>
             <div>
                 <label for="tipe" class="label">Tipe usaha</label>
-                <select id="tipe" name="tipe" required class="input @error('tipe') input-error @enderror">
+                <x-pilihan id="tipe" name="tipe" required class="input @error('tipe') input-error @enderror">
                     @foreach (\App\Enums\TipeUnitUsaha::cases() as $tipe)
                         <option value="{{ $tipe->value }}" @selected(old('tipe', $unit?->tipe?->value) === $tipe->value)>{{ $tipe->getLabel() }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
                 @error('tipe')<p class="error-text">{{ $message }}</p>@enderror
             </div>
         </div>

@@ -18,21 +18,21 @@
             <div class="grid gap-4 sm:grid-cols-2">
                 <div>
                     <label for="satuan_default_id" class="label">Satuan default</label>
-                    <select id="satuan_default_id" name="satuan_default_id" required class="input">
+                    <x-pilihan id="satuan_default_id" name="satuan_default_id" required searchable class="input">
                         @foreach ($satuans as $satuan)
                             <option value="{{ $satuan->id }}" @selected((int) old('satuan_default_id', $item?->satuan_default_id) === $satuan->id)>{{ $satuan->nama }} ({{ $satuan->singkatan }})</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                     @error('satuan_default_id')<p class="error-text">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="jenis_pengeluaran_id" class="label">Jenis pengeluaran</label>
-                    <select id="jenis_pengeluaran_id" name="jenis_pengeluaran_id" class="input">
+                    <x-pilihan id="jenis_pengeluaran_id" name="jenis_pengeluaran_id" class="input">
                         <option value="">— Tidak terkait —</option>
                         @foreach ($jenises as $jenis)
                             <option value="{{ $jenis->id }}" @selected((int) old('jenis_pengeluaran_id', $item?->jenis_pengeluaran_id) === $jenis->id)>{{ $jenis->nama }}</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                 </div>
             </div>
 

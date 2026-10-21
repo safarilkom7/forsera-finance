@@ -15,11 +15,11 @@
 
         <div>
             <label for="tipe" class="label">Tipe</label>
-            <select id="tipe" name="tipe" required class="input">
+            <x-pilihan id="tipe" name="tipe" required class="input">
                 @foreach (\App\Enums\TipeMetodePembayaran::cases() as $tipe)
                     <option value="{{ $tipe->value }}" @selected(old('tipe', $metode?->tipe?->value) === $tipe->value)>{{ $tipe->getLabel() }}</option>
                 @endforeach
-            </select>
+            </x-pilihan>
             <p class="hint">TUNAI memakai potongan kas harian; QRIS/TRANSFER memakai biaya admin dan menunggu settlement.</p>
         </div>
 

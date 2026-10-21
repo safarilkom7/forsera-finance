@@ -101,12 +101,12 @@
                         @csrf
                         <div class="min-w-[14rem] flex-1">
                             <label for="penanggung_jawab_id" class="label">Penanggung jawab</label>
-                            <select id="penanggung_jawab_id" name="penanggung_jawab_id" class="input">
+                            <x-pilihan id="penanggung_jawab_id" name="penanggung_jawab_id" searchable class="input">
                                 <option value="">— Tidak ada —</option>
                                 @foreach ($pengguna as $orang)
                                     <option value="{{ $orang->id }}" @selected($insiden->penanggung_jawab_id === $orang->id)>{{ $orang->name }}</option>
                                 @endforeach
-                            </select>
+                            </x-pilihan>
                         </div>
                         <button class="btn-secondary">Simpan PJ</button>
                     </form>
@@ -121,12 +121,12 @@
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="tipe_penyelesaian" class="label">Tipe penyelesaian</label>
-                                <select id="tipe_penyelesaian" name="tipe_penyelesaian" required class="input">
+                                <x-pilihan id="tipe_penyelesaian" name="tipe_penyelesaian" required class="input">
                                     <option value="">Pilih tipe</option>
                                     @foreach ($opsiTipe as $tipe)
                                         <option value="{{ $tipe->value }}" @selected(old('tipe_penyelesaian') === $tipe->value)>{{ $tipe->getLabel() }}</option>
                                     @endforeach
-                                </select>
+                                </x-pilihan>
                                 @error('tipe_penyelesaian')<p class="error-text">{{ $message }}</p>@enderror
                             </div>
                             <div id="nominal-wrapper" class="hidden">

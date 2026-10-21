@@ -29,11 +29,11 @@
         <div class="grid gap-4 sm:grid-cols-2">
             <div>
                 <label for="role" class="label">Peran</label>
-                <select id="role" name="role" required class="input @error('role') input-error @enderror">
+                <x-pilihan id="role" name="role" required class="input @error('role') input-error @enderror">
                     <option value="owner" @selected($roleTerpilih === 'owner')>Owner — akses penuh</option>
                     <option value="admin_keuangan" @selected($roleTerpilih === 'admin_keuangan')>Admin Keuangan</option>
                     <option value="staf_unit" @selected($roleTerpilih === 'staf_unit')>Staf Unit</option>
-                </select>
+                </x-pilihan>
                 @error('role')<p class="error-text">{{ $message }}</p>@enderror
             </div>
             <x-password-input name="password"

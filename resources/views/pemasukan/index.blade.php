@@ -37,57 +37,57 @@
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
                 <label for="dari" class="label">Dari tanggal</label>
-                <input type="date" id="dari" name="dari" value="{{ $filter['dari'] }}" class="input">
+                <x-tanggal id="dari" name="dari" value="{{ $filter['dari'] }}" class="input" />
             </div>
             <div>
                 <label for="sampai" class="label">Sampai tanggal</label>
-                <input type="date" id="sampai" name="sampai" value="{{ $filter['sampai'] }}" class="input">
+                <x-tanggal id="sampai" name="sampai" value="{{ $filter['sampai'] }}" class="input" />
             </div>
             <div>
                 <label for="unit" class="label">Unit usaha</label>
-                <select id="unit" name="unit" class="input">
+                <x-pilihan id="unit" name="unit" class="input">
                     <option value="">Semua unit</option>
                     @foreach ($units as $unit)
                         <option value="{{ $unit->id }}" @selected($filter['unit'] === $unit->id)>{{ $unit->nama }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="metode" class="label">Metode</label>
-                <select id="metode" name="metode" class="input">
+                <x-pilihan id="metode" name="metode" class="input">
                     <option value="">Semua metode</option>
                     @foreach ($metodes as $metode)
                         <option value="{{ $metode->id }}" @selected($filter['metode'] === $metode->id)>{{ $metode->nama }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="kategori" class="label">Kategori</label>
-                <select id="kategori" name="kategori" class="input">
+                <x-pilihan id="kategori" name="kategori" class="input">
                     <option value="">Semua kategori</option>
                     @foreach ($kategoris as $kategori)
                         <option value="{{ $kategori->id }}" @selected($filter['kategori'] === $kategori->id)>{{ $kategori->nama }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="status" class="label">Status</label>
-                <select id="status" name="status" class="input">
+                <x-pilihan id="status" name="status" class="input">
                     <option value="">Semua status</option>
                     @foreach ($statuses as $status)
                         <option value="{{ $status->value }}" @selected($filter['status'] === $status->value)>{{ $status->getLabel() }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             @if ($pembuat->isNotEmpty())
                 <div>
                     <label for="pembuat" class="label">Dibuat oleh</label>
-                    <select id="pembuat" name="pembuat" class="input">
+                    <x-pilihan id="pembuat" name="pembuat" class="input">
                         <option value="">Semua pengguna</option>
                         @foreach ($pembuat as $user)
                             <option value="{{ $user->id }}" @selected($filter['pembuat'] === $user->id)>{{ $user->name }}</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                 </div>
             @endif
             <div>

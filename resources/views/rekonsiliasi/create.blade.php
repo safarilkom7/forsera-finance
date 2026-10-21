@@ -30,29 +30,29 @@
             <div class="mt-5 grid gap-4 sm:grid-cols-2">
                 <div>
                     <label for="unit" class="label">Unit usaha</label>
-                    <select id="unit" name="unit" required class="input">
+                    <x-pilihan id="unit" name="unit" required class="input">
                         <option value="">Pilih unit</option>
                         @foreach ($units as $unit)
                             <option value="{{ $unit->id }}" @selected((int) $unitId === $unit->id)>{{ $unit->nama }}</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                 </div>
                 <div>
                     <label for="metode" class="label">Metode pembayaran</label>
-                    <select id="metode" name="metode" required class="input">
+                    <x-pilihan id="metode" name="metode" required class="input">
                         <option value="">Pilih metode</option>
                         @foreach ($metodes as $metode)
                             <option value="{{ $metode->id }}" @selected((int) $metodeId === $metode->id)>{{ $metode->nama }}</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                 </div>
                 <div>
                     <label for="mulai" class="label">Periode mulai</label>
-                    <input type="date" id="mulai" name="mulai" required value="{{ $mulai }}" class="input">
+                    <x-tanggal id="mulai" name="mulai" required value="{{ $mulai }}" class="input" />
                 </div>
                 <div>
                     <label for="selesai" class="label">Periode selesai</label>
-                    <input type="date" id="selesai" name="selesai" required value="{{ $selesai }}" class="input">
+                    <x-tanggal id="selesai" name="selesai" required value="{{ $selesai }}" class="input" />
                 </div>
             </div>
 
@@ -134,7 +134,7 @@
                         <div class="mt-4 grid gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="tanggal_diterima" class="label">Tanggal dana diterima</label>
-                                <input type="date" id="tanggal_diterima" name="tanggal_diterima" value="{{ $tanggalDiterimaDefault }}" class="input">
+                                <x-tanggal id="tanggal_diterima" name="tanggal_diterima" value="{{ $tanggalDiterimaDefault }}" class="input" />
                             </div>
                             <div>
                                 <label for="total_diterima" class="label">Total diterima</label>

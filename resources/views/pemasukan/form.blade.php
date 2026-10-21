@@ -34,9 +34,9 @@
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label for="tanggal" class="label">Tanggal</label>
-                    <input type="date" id="tanggal" name="tanggal" required max="{{ now()->toDateString() }}"
+                    <x-tanggal id="tanggal" name="tanggal" required max="{{ now()->toDateString() }}"
                            value="{{ old('tanggal', $tanggalDefault) }}"
-                           class="input @error('tanggal') input-error @enderror">
+                           class="input @error('tanggal') input-error @enderror" />
                     @error('tanggal')<p class="error-text">{{ $message }}</p>@enderror
                 </div>
 
@@ -46,12 +46,12 @@
                         <input type="hidden" name="unit_usaha_id" value="{{ $unitTerpilih }}">
                         <p class="input bg-slate-50 dark:bg-slate-800">{{ $pemasukan->unitUsaha?->nama }}</p>
                     @else
-                        <select id="unit_usaha_id" name="unit_usaha_id" required class="input @error('unit_usaha_id') input-error @enderror">
+                        <x-pilihan id="unit_usaha_id" name="unit_usaha_id" required class="input @error('unit_usaha_id') input-error @enderror">
                             <option value="">Pilih unit</option>
                             @foreach ($units as $unit)
                                 <option value="{{ $unit->id }}" @selected($unitTerpilih === $unit->id)>{{ $unit->nama }}</option>
                             @endforeach
-                        </select>
+                        </x-pilihan>
                     @endif
                     @error('unit_usaha_id')<p class="error-text">{{ $message }}</p>@enderror
                 </div>
@@ -78,14 +78,14 @@
             <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label for="kategori_pemasukan_id" class="label">Kategori</label>
-                    <select id="kategori_pemasukan_id" name="kategori_pemasukan_id" required class="input @error('kategori_pemasukan_id') input-error @enderror">
+                    <x-pilihan id="kategori_pemasukan_id" name="kategori_pemasukan_id" required searchable class="input @error('kategori_pemasukan_id') input-error @enderror">
                         <option value="">Pilih kategori</option>
                         @foreach ($kategoris as $kategori)
                             <option value="{{ $kategori->id }}" data-unit="{{ $kategori->unit_usaha_id ?? 'all' }}" @selected($kategoriTerpilih === $kategori->id)>
                                 {{ $kategori->nama }}{{ $kategori->unit_usaha_id ? '' : ' (semua unit)' }}
                             </option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                     @error('kategori_pemasukan_id')<p class="error-text">{{ $message }}</p>@enderror
                 </div>
 
@@ -156,6 +156,8 @@
                     });
                     if (kategori.selectedOptions[0]?.hidden) {
                         kategori.value = '';
+                        // Beri tahu komponen dropdown agar label yang tampil ikut berubah.
+                        kategori.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 };
 

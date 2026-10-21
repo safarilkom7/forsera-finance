@@ -8,38 +8,38 @@
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
             <div>
                 <label for="status" class="label">Status</label>
-                <select id="status" name="status" class="input">
+                <x-pilihan id="status" name="status" class="input">
                     <option value="">Semua status</option>
                     @foreach ($statuses as $status)
                         <option value="{{ $status->value }}" @selected($filter['status'] === $status->value)>{{ $status->getLabel() }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="jenis" class="label">Jenis</label>
-                <select id="jenis" name="jenis" class="input">
+                <x-pilihan id="jenis" name="jenis" class="input">
                     <option value="">Semua jenis</option>
                     @foreach ($jenises as $jenis)
                         <option value="{{ $jenis->value }}" @selected($filter['jenis'] === $jenis->value)>{{ $jenis->getLabel() }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="arah" class="label">Arah</label>
-                <select id="arah" name="arah" class="input">
+                <x-pilihan id="arah" name="arah" class="input">
                     <option value="">Keduanya</option>
                     <option value="KURANG" @selected($filter['arah'] === 'KURANG')>Kurang</option>
                     <option value="LEBIH" @selected($filter['arah'] === 'LEBIH')>Lebih</option>
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="unit" class="label">Unit</label>
-                <select id="unit" name="unit" class="input">
+                <x-pilihan id="unit" name="unit" class="input">
                     <option value="">Semua unit</option>
                     @foreach ($units as $unit)
                         <option value="{{ $unit->id }}" @selected($filter['unit'] === $unit->id)>{{ $unit->nama }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="q" class="label">Cari kode</label>

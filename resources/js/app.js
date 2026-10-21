@@ -560,6 +560,497 @@ const initPilihanMassal = () => {
     });
 };
 
+const BULAN_SINGKAT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+const BULAN_PANJANG = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+const keTanggal = (iso) => {
+    const [tahun, bulan, hari] = iso.split('-').map(Number);
+    return new Date(tahun, bulan - 1, hari);
+};
+
+const keIso = (tanggal) => [
+    tanggal.getFullYear(),
+    String(tanggal.getMonth() + 1).padStart(2, '0'),
+    String(tanggal.getDate()).padStart(2, '0'),
+].join('-');
+
+const formatTanggalPendek = (iso) => {
+    const tanggal = keTanggal(iso);
+    return tanggal.getDate() + ' ' + BULAN_SINGKAT[tanggal.getMonth()] + ' ' + tanggal.getFullYear();
+};
+
+/** Kontrol native tetap dirender 1px agar validasi browser tidak gagal diam-diam. */
+const sembunyikanKontrolAsli = (kontrol) => {
+    kontrol.classList.add('kontrol-asli');
+    kontrol.setAttribute('tabindex', '-1');
+    kontrol.setAttribute('aria-hidden', 'true');
+};
+
+const daftarPilihan = [];
+const daftarKalender = [];
+let pendengarKomponenTerpasang = false;
+
+const tutupPilihanLain = (kecuali) => {
+    daftarPilihan.forEach((pilihan) => {
+        if (pilihan.akar !== kecuali) pilihan.tutup();
+    });
+};
+
+const tutupKalenderLain = (kecuali) => {
+    daftarKalender.forEach((kalender) => {
+        if (kalender.akar !== kecuali) kalender.tutup();
+    });
+};
+
+const pasangPendengarKomponen = () => {
+    if (pendengarKomponenTerpasang) return;
+    pendengarKomponenTerpasang = true;
+
+    document.addEventListener('mousedown', (event) => {
+        daftarPilihan.forEach((pilihan) => {
+            if (!pilihan.akar.contains(event.target)) pilihan.tutup();
+        });
+        daftarKalender.forEach((kalender) => {
+            if (!kalender.akar.contains(event.target)) kalender.tutup();
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        daftarPilihan.forEach((pilihan) => pilihan.tutup());
+        daftarKalender.forEach((kalender) => kalender.tutup());
+    });
+};
+
+/**
+ * Dropdown custom dari <select> asli. Pilihan tetap dibaca dari <option>,
+ * jadi tidak ada data yang diduplikasi di markup maupun di server.
+ */
+const initPilihan = (root = document) => {
+    pasangPendengarKomponen();
+
+    root.querySelectorAll('[data-pilihan]').forEach((akar) => {
+        if (akar.dataset.pilihanSiap === '1') return;
+
+        const asli = akar.querySelector('[data-pilihan-asli]');
+        const kontrol = akar.querySelector('[data-pilihan-kontrol]');
+        const tombol = akar.querySelector('[data-pilihan-tombol]');
+        const label = akar.querySelector('[data-pilihan-label]');
+        const menu = akar.querySelector('[data-pilihan-menu]');
+        const wadahDaftar = akar.querySelector('[data-pilihan-daftar]');
+        const wadahCari = akar.querySelector('[data-pilihan-cari-wrap]');
+        const cari = akar.querySelector('[data-pilihan-cari]');
+
+        if (!asli || !kontrol || !tombol || !label || !menu || !wadahDaftar) return;
+
+        akar.dataset.pilihanSiap = '1';
+
+        const bisaCari = wadahCari !== null && cari !== null && !wadahCari.hasAttribute('hidden');
+        let aktif = -1;
+
+        const perbaruiLabel = () => {
+            const opsi = asli.options[asli.selectedIndex] ?? null;
+            const teks = opsi ? opsi.textContent.trim() : '';
+
+            label.textContent = teks;
+            label.classList.toggle('text-slate-500', teks === '');
+            label.classList.toggle('dark:text-slate-400', teks === '');
+        };
+
+        const opsiTampil = () => Array.from(wadahDaftar.querySelectorAll('[role="option"]'))
+            .filter((item) => item.getAttribute('aria-disabled') !== 'true');
+
+        const sorot = (posisi) => {
+            const item = opsiTampil();
+
+            if (item.length === 0) return;
+
+            aktif = Math.max(0, Math.min(posisi, item.length - 1));
+
+            item.forEach((li, urutan) => {
+                const menyala = urutan === aktif;
+                li.classList.toggle('bg-emerald-100', menyala);
+                li.classList.toggle('dark:bg-emerald-500/20', menyala);
+            });
+
+            tombol.setAttribute('aria-activedescendant', item[aktif].id);
+            item[aktif].scrollIntoView({ block: 'nearest' });
+        };
+
+        const gambarDaftar = () => {
+            wadahDaftar.textContent = '';
+
+            const terpilih = asli.selectedIndex;
+            const kunci = (cari?.value ?? '').trim().toLowerCase();
+
+            Array.from(asli.options).forEach((opsi, indeks) => {
+                // Opsi yang disembunyikan skrip halaman (mis. kategori per unit) ikut disembunyikan.
+                if (opsi.hidden) return;
+                if (kunci !== '' && !opsi.textContent.toLowerCase().includes(kunci)) return;
+
+                const li = document.createElement('li');
+                li.id = wadahDaftar.id + '-opsi-' + indeks;
+                li.dataset.indeks = String(indeks);
+                li.setAttribute('role', 'option');
+                li.setAttribute('aria-selected', String(indeks === terpilih));
+                li.className = 'flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-slate-700 transition hover:bg-emerald-50 dark:text-slate-200 dark:hover:bg-emerald-500/10';
+
+                if (indeks === terpilih) {
+                    li.classList.add('bg-emerald-50', 'font-semibold', 'text-emerald-800', 'dark:bg-emerald-500/10', 'dark:text-emerald-300');
+                }
+
+                if (opsi.disabled) {
+                    li.classList.add('cursor-not-allowed', 'opacity-50');
+                    li.setAttribute('aria-disabled', 'true');
+                }
+
+                const teks = document.createElement('span');
+                teks.className = 'truncate';
+                teks.textContent = opsi.textContent.trim();
+                li.append(teks);
+                wadahDaftar.append(li);
+            });
+
+            if (wadahDaftar.children.length === 0) {
+                const kosong = document.createElement('li');
+                kosong.className = 'px-3 py-2 text-sm text-slate-500 dark:text-slate-400';
+                kosong.textContent = 'Tidak ada pilihan yang cocok.';
+                wadahDaftar.append(kosong);
+            }
+
+            aktif = -1;
+        };
+
+        const tutup = (fokusKembali = false) => {
+            if (menu.hidden) return;
+
+            menu.hidden = true;
+            tombol.setAttribute('aria-expanded', 'false');
+            tombol.removeAttribute('aria-activedescendant');
+            tombol.classList.remove('[&>svg]:rotate-180');
+            aktif = -1;
+
+            if (fokusKembali) tombol.focus();
+        };
+
+        const buka = () => {
+            if (asli.disabled) return;
+
+            tutupPilihanLain(akar);
+
+            if (cari) cari.value = '';
+            gambarDaftar();
+            menu.hidden = false;
+            tombol.setAttribute('aria-expanded', 'true');
+            tombol.classList.add('[&>svg]:rotate-180');
+
+            const posisiTerpilih = opsiTampil().findIndex((li) => Number(li.dataset.indeks) === asli.selectedIndex);
+            sorot(posisiTerpilih >= 0 ? posisiTerpilih : 0);
+
+            if (bisaCari) {
+                cari.focus();
+                cari.select();
+            }
+        };
+
+        const pilih = (indeks) => {
+            const opsi = asli.options[indeks];
+
+            if (!opsi || opsi.disabled || opsi.hidden) return;
+
+            asli.selectedIndex = indeks;
+            perbaruiLabel();
+            tutup();
+            tombol.focus();
+            asli.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        const tanganiTombol = (event) => {
+            if (menu.hidden) {
+                if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
+                    event.preventDefault();
+                    buka();
+                }
+
+                return;
+            }
+
+            const item = opsiTampil();
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                tutup(true);
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                sorot(aktif + 1);
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                sorot(aktif - 1);
+            } else if (event.key === 'Home') {
+                event.preventDefault();
+                sorot(0);
+            } else if (event.key === 'End') {
+                event.preventDefault();
+                sorot(item.length - 1);
+            } else if (event.key === 'Enter' || (event.key === ' ' && event.currentTarget === tombol)) {
+                event.preventDefault();
+                if (aktif >= 0 && item[aktif]) pilih(Number(item[aktif].dataset.indeks));
+            } else if (event.key === 'Tab') {
+                tutup();
+            }
+        };
+
+        tombol.addEventListener('click', () => (menu.hidden ? buka() : tutup(true)));
+        tombol.addEventListener('keydown', tanganiTombol);
+
+        wadahDaftar.addEventListener('click', (event) => {
+            const li = event.target.closest('[role="option"]');
+            if (li) pilih(Number(li.dataset.indeks));
+        });
+
+        wadahDaftar.addEventListener('mousemove', (event) => {
+            const li = event.target.closest('[role="option"]');
+            if (!li) return;
+
+            const posisi = opsiTampil().indexOf(li);
+            if (posisi >= 0 && posisi !== aktif) sorot(posisi);
+        });
+
+        if (cari) {
+            cari.addEventListener('input', gambarDaftar);
+            cari.addEventListener('keydown', tanganiTombol);
+        }
+
+        asli.addEventListener('change', perbaruiLabel);
+
+        if (asli.disabled) {
+            tombol.setAttribute('aria-disabled', 'true');
+            tombol.classList.add('cursor-not-allowed', 'opacity-60');
+        }
+
+        // Nama aksesibel diambil dari <label for="…"> yang sudah ada di halaman.
+        let punyaLabel = false;
+
+        if (asli.id) {
+            const labelAsli = document.querySelector('label[for="' + CSS.escape(asli.id) + '"]');
+            if (labelAsli) {
+                if (!labelAsli.id) labelAsli.id = asli.id + '-label';
+                tombol.setAttribute('aria-labelledby', labelAsli.id);
+                punyaLabel = true;
+            }
+        }
+
+        // Baris dinamis (mis. detail pengeluaran) hanya punya label tanpa atribut for.
+        if (!punyaLabel) {
+            const labelSekitar = akar.parentElement?.querySelector('label');
+            const teksLabel = labelSekitar?.textContent.trim();
+
+            if (teksLabel) tombol.setAttribute('aria-label', teksLabel);
+        }
+
+        if (asli.required) tombol.setAttribute('aria-required', 'true');
+
+        sembunyikanKontrolAsli(asli);
+        kontrol.hidden = false;
+        perbaruiLabel();
+        gambarDaftar();
+
+        daftarPilihan.push({ akar, tutup });
+    });
+};
+
+/** Input tanggal custom dengan popup kalender berbahasa Indonesia. */
+const initKalender = (root = document) => {
+    pasangPendengarKomponen();
+
+    root.querySelectorAll('[data-kalender]').forEach((akar) => {
+        if (akar.dataset.kalenderSiap === '1') return;
+
+        const asli = akar.querySelector('[data-kalender-asli]');
+        const kontrol = akar.querySelector('[data-kalender-kontrol]');
+        const tombol = akar.querySelector('[data-kalender-tombol]');
+        const label = akar.querySelector('[data-kalender-label]');
+        const popup = akar.querySelector('[data-kalender-popup]');
+        const judul = akar.querySelector('[data-kalender-judul]');
+        const wadahHari = akar.querySelector('[data-kalender-hari]');
+        const tombolMundur = akar.querySelector('[data-kalender-mundur]');
+        const tombolMaju = akar.querySelector('[data-kalender-maju]');
+
+        if (!asli || !kontrol || !tombol || !label || !popup || !judul || !wadahHari) return;
+
+        akar.dataset.kalenderSiap = '1';
+
+        const hariIni = keIso(new Date());
+        let tampilan = asli.value ? keTanggal(asli.value) : new Date();
+        tampilan = new Date(tampilan.getFullYear(), tampilan.getMonth(), 1);
+
+        const perbaruiLabel = () => {
+            const kosong = asli.value === '';
+
+            label.textContent = kosong ? 'Pilih tanggal' : formatTanggalPendek(asli.value);
+            label.classList.toggle('text-slate-500', kosong);
+            label.classList.toggle('dark:text-slate-400', kosong);
+        };
+
+        const gambar = () => {
+            judul.textContent = BULAN_PANJANG[tampilan.getMonth()] + ' ' + tampilan.getFullYear();
+            wadahHari.textContent = '';
+
+            const awalBulan = new Date(tampilan.getFullYear(), tampilan.getMonth(), 1);
+            const geser = (awalBulan.getDay() + 6) % 7;
+            const jumlahHari = new Date(tampilan.getFullYear(), tampilan.getMonth() + 1, 0).getDate();
+
+            for (let kosong = 0; kosong < geser; kosong++) {
+                wadahHari.append(document.createElement('span'));
+            }
+
+            for (let tanggal = 1; tanggal <= jumlahHari; tanggal++) {
+                const iso = keIso(new Date(tampilan.getFullYear(), tampilan.getMonth(), tanggal));
+                const terpilih = iso === asli.value;
+                const hari = document.createElement('button');
+
+                hari.type = 'button';
+                hari.dataset.nilai = iso;
+                hari.textContent = String(tanggal);
+                hari.setAttribute('aria-pressed', String(terpilih));
+                hari.setAttribute('aria-label', tanggal + ' ' + BULAN_PANJANG[tampilan.getMonth()] + ' ' + tampilan.getFullYear());
+                hari.className = terpilih
+                    ? 'grid h-9 w-full place-items-center rounded-lg bg-emerald-700 text-sm font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500'
+                    : 'grid h-9 w-full place-items-center rounded-lg text-sm text-slate-700 transition hover:bg-emerald-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 dark:text-slate-200 dark:hover:bg-emerald-500/10';
+
+                if (!terpilih && iso === hariIni) {
+                    hari.classList.add('ring-1', 'ring-emerald-500');
+                }
+
+                wadahHari.append(hari);
+            }
+        };
+
+        const tutup = (fokusKembali = false) => {
+            if (popup.hidden) return;
+
+            popup.hidden = true;
+            tombol.setAttribute('aria-expanded', 'false');
+
+            if (fokusKembali) tombol.focus();
+        };
+
+        const pilih = (iso) => {
+            asli.value = iso;
+            perbaruiLabel();
+            tutup(true);
+            asli.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        const buka = () => {
+            if (asli.disabled) return;
+
+            tutupKalenderLain(akar);
+
+            const dasar = asli.value ? keTanggal(asli.value) : new Date();
+            tampilan = new Date(dasar.getFullYear(), dasar.getMonth(), 1);
+            gambar();
+            popup.hidden = false;
+            tombol.setAttribute('aria-expanded', 'true');
+
+            const terpilih = wadahHari.querySelector('[aria-pressed="true"]') ?? wadahHari.querySelector('button');
+            terpilih?.focus();
+        };
+
+        const geserBulan = (langkah) => {
+            tampilan = new Date(tampilan.getFullYear(), tampilan.getMonth() + langkah, 1);
+            gambar();
+
+            const terpilih = wadahHari.querySelector('[aria-pressed="true"]') ?? wadahHari.querySelector('button');
+            terpilih?.focus();
+        };
+
+        tombol.addEventListener('click', () => (popup.hidden ? buka() : tutup(true)));
+
+        tombolMundur?.addEventListener('click', () => geserBulan(-1));
+        tombolMaju?.addEventListener('click', () => geserBulan(1));
+        akar.querySelector('[data-kalender-hari-ini]')?.addEventListener('click', () => pilih(hariIni));
+        akar.querySelector('[data-kalender-kosong]')?.addEventListener('click', () => pilih(''));
+
+        wadahHari.addEventListener('keydown', (event) => {
+            const hari = event.target.closest('button[data-nilai]');
+            if (!hari) return;
+
+            const semuaHari = Array.from(wadahHari.querySelectorAll('button[data-nilai]'));
+            const posisi = semuaHari.indexOf(hari);
+            const kolom = (keTanggal(hari.dataset.nilai).getDay() + 6) % 7;
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                tutup(true);
+                return;
+            }
+
+            if (event.key === 'PageUp') {
+                event.preventDefault();
+                geserBulan(-1);
+                return;
+            }
+
+            if (event.key === 'PageDown') {
+                event.preventDefault();
+                geserBulan(1);
+                return;
+            }
+
+            const tujuan = {
+                ArrowRight: posisi + 1,
+                ArrowLeft: posisi - 1,
+                ArrowDown: posisi + 7,
+                ArrowUp: posisi - 7,
+                Home: posisi - kolom,
+                End: posisi + (6 - kolom),
+            }[event.key];
+
+            if (tujuan === undefined) return;
+
+            event.preventDefault();
+
+            if (tujuan < 0 || tujuan >= semuaHari.length) {
+                geserBulan(tujuan < 0 ? -1 : 1);
+                return;
+            }
+
+            semuaHari[tujuan].focus();
+        });
+
+        sembunyikanKontrolAsli(asli);
+        kontrol.hidden = false;
+        perbaruiLabel();
+        gambar();
+
+        daftarKalender.push({ akar, tutup });
+    });
+};
+
+/** ID komponen pada <template> akan terduplikasi saat baris dikloning, jadi diperbarui dulu. */
+const beriIdUnik = (akar) => {
+    const daftar = akar.querySelector('[data-pilihan-daftar]');
+    const asli = akar.querySelector('[data-pilihan-asli]');
+
+    if (!daftar) return;
+
+    const baru = daftar.id + '-' + Math.random().toString(36).slice(2, 7);
+    daftar.id = baru;
+    akar.querySelector('[data-pilihan-tombol]')?.setAttribute('aria-controls', baru);
+
+    if (asli) {
+        asli.id = '';
+    }
+};
+
+/** Dipakai halaman yang menambah baris form secara dinamis (mis. detail pengeluaran). */
+window.siapkanKomponen = (root = document) => {
+    root.querySelectorAll?.('[data-pilihan]').forEach(beriIdUnik);
+    initPilihan(root);
+    initKalender(root);
+};
+
 const initFilters = () => {
     document.querySelectorAll('[data-auto-submit]').forEach((element) => {
         element.addEventListener('change', () => element.closest('form')?.submit());
@@ -571,6 +1062,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initDropdowns();
     initSidebar();
     initRupiahInputs();
+    initPilihan();
+    initKalender();
     initPilihanMassal();
     initConfirmations();
     initDialogs();

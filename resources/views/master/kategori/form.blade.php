@@ -15,12 +15,12 @@
 
         <div>
             <label for="unit_usaha_id" class="label">Unit usaha</label>
-            <select id="unit_usaha_id" name="unit_usaha_id" class="input">
+            <x-pilihan id="unit_usaha_id" name="unit_usaha_id" class="input">
                 <option value="">Semua unit</option>
                 @foreach ($units as $unit)
                     <option value="{{ $unit->id }}" @selected((int) old('unit_usaha_id', $kategori?->unit_usaha_id) === $unit->id)>{{ $unit->nama }}</option>
                 @endforeach
-            </select>
+            </x-pilihan>
         </div>
 
         <label class="flex items-center gap-2 text-sm">

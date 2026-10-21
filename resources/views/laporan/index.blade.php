@@ -8,28 +8,28 @@
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
                 <label for="periode" class="label">Periode</label>
-                <select id="periode" name="periode" class="input" data-auto-submit>
+                <x-pilihan id="periode" name="periode" class="input" data-auto-submit>
                     @foreach ($pilihan_periode as $key => $label)
                         <option value="{{ $key }}" @selected($periode['preset'] === $key)>{{ $label }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="unit" class="label">Unit</label>
-                <select id="unit" name="unit" class="input" data-auto-submit>
+                <x-pilihan id="unit" name="unit" class="input" data-auto-submit>
                     <option value="">Semua unit</option>
                     @foreach ($units as $unit)
                         <option value="{{ $unit->id }}" @selected($periode['unit_id'] === $unit->id)>{{ $unit->nama }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="dari" class="label">Dari</label>
-                <input type="date" id="dari" name="dari" value="{{ request('dari', $periode['mulai']->toDateString()) }}" class="input">
+                <x-tanggal id="dari" name="dari" value="{{ request('dari', $periode['mulai']->toDateString()) }}" class="input" />
             </div>
             <div>
                 <label for="sampai" class="label">Sampai</label>
-                <input type="date" id="sampai" name="sampai" value="{{ request('sampai', $periode['selesai']->toDateString()) }}" class="input">
+                <x-tanggal id="sampai" name="sampai" value="{{ request('sampai', $periode['selesai']->toDateString()) }}" class="input" />
             </div>
         </div>
         <div class="mt-4 flex flex-wrap gap-2">

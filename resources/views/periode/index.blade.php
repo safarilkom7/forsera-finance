@@ -17,23 +17,23 @@
             </div>
             <div>
                 <label for="periode" class="label">Periode</label>
-                <select id="periode" name="periode" class="input">
+                <x-pilihan id="periode" name="periode" class="input">
                     @foreach ($opsi as $pilihan)
                         <option value="{{ $pilihan['kunci'] }}" @selected(old('periode', sprintf('%04d-%02d', $sekarang['tahun'], $sekarang['bulan'])) === $pilihan['kunci'])>
                             {{ $pilihan['label'] }} · {{ $pilihan['rentang'] }}{{ $pilihan['berjalan'] ? ' (berjalan)' : '' }}
                         </option>
                     @endforeach
-                </select>
+                </x-pilihan>
                 @error('periode')<p class="error-text mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label for="unit_usaha_id" class="label">Cakupan</label>
-                <select id="unit_usaha_id" name="unit_usaha_id" class="input">
+                <x-pilihan id="unit_usaha_id" name="unit_usaha_id" class="input">
                     <option value="">Semua unit</option>
                     @foreach ($units as $unit)
                         <option value="{{ $unit->id }}" @selected((int) old('unit_usaha_id') === $unit->id)>{{ $unit->nama }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <button type="submit" class="btn-primary" data-confirm-form
                     data-confirm="Transaksi, rekonsiliasi, dan koreksi pada periode yang dipilih akan dikunci untuk semua peran. Tindakan ini tercatat di audit log."

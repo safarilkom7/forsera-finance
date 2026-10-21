@@ -8,29 +8,29 @@
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <div>
                 <label for="dari" class="label">Dari</label>
-                <input type="date" id="dari" name="dari" value="{{ $filter['dari'] }}" class="input">
+                <x-tanggal id="dari" name="dari" value="{{ $filter['dari'] }}" class="input" />
             </div>
             <div>
                 <label for="sampai" class="label">Sampai</label>
-                <input type="date" id="sampai" name="sampai" value="{{ $filter['sampai'] }}" class="input">
+                <x-tanggal id="sampai" name="sampai" value="{{ $filter['sampai'] }}" class="input" />
             </div>
             <div>
                 <label for="log" class="label">Kategori log</label>
-                <select id="log" name="log" class="input">
+                <x-pilihan id="log" name="log" class="input">
                     <option value="">Semua</option>
                     @foreach ($logs as $log)
                         <option value="{{ $log }}" @selected($filter['log'] === $log)>{{ $log }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="causer" class="label">Pengguna</label>
-                <select id="causer" name="causer" class="input">
+                <x-pilihan id="causer" name="causer" class="input">
                     <option value="">Semua</option>
                     @foreach ($pengguna as $user)
                         <option value="{{ $user->id }}" @selected((string) $filter['causer'] === (string) $user->id)>{{ $user->name }}</option>
                     @endforeach
-                </select>
+                </x-pilihan>
             </div>
             <div>
                 <label for="q" class="label">Cari deskripsi</label>

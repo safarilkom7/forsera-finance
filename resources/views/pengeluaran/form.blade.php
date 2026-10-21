@@ -38,37 +38,37 @@
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label for="tanggal" class="label">Tanggal</label>
-                    <input type="date" id="tanggal" name="tanggal" required value="{{ old('tanggal', $tanggalDefault) }}" class="input @error('tanggal') input-error @enderror">
+                    <x-tanggal id="tanggal" name="tanggal" required value="{{ old('tanggal', $tanggalDefault) }}" class="input @error('tanggal') input-error @enderror" />
                     @error('tanggal')<p class="error-text">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="unit_usaha_id" class="label">Unit usaha</label>
-                    <select id="unit_usaha_id" name="unit_usaha_id" required class="input @error('unit_usaha_id') input-error @enderror">
+                    <x-pilihan id="unit_usaha_id" name="unit_usaha_id" required class="input @error('unit_usaha_id') input-error @enderror">
                         <option value="">Pilih unit</option>
                         @foreach ($units as $unit)
                             <option value="{{ $unit->id }}" @selected($unitTerpilih === $unit->id)>{{ $unit->nama }}</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                     @error('unit_usaha_id')<p class="error-text">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="jenis_pengeluaran_id" class="label">Jenis pengeluaran</label>
-                    <select id="jenis_pengeluaran_id" name="jenis_pengeluaran_id" required class="input @error('jenis_pengeluaran_id') input-error @enderror">
+                    <x-pilihan id="jenis_pengeluaran_id" name="jenis_pengeluaran_id" required class="input @error('jenis_pengeluaran_id') input-error @enderror">
                         <option value="">Pilih jenis</option>
                         @foreach ($jenises as $jenis)
                             <option value="{{ $jenis->id }}" @selected($jenisTerpilih === $jenis->id)>{{ $jenis->nama }}</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                     @error('jenis_pengeluaran_id')<p class="error-text">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="metode_pembayaran_id" class="label">Metode pembayaran</label>
-                    <select id="metode_pembayaran_id" name="metode_pembayaran_id" required class="input @error('metode_pembayaran_id') input-error @enderror">
+                    <x-pilihan id="metode_pembayaran_id" name="metode_pembayaran_id" required class="input @error('metode_pembayaran_id') input-error @enderror">
                         <option value="">Pilih metode</option>
                         @foreach ($metodes as $metode)
                             <option value="{{ $metode->id }}" data-tipe="{{ $metode->tipe?->value }}" @selected($metodeTerpilih === $metode->id)>{{ $metode->nama }}</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                     @error('metode_pembayaran_id')<p class="error-text">{{ $message }}</p>@enderror
                 </div>
                 <div>
@@ -76,10 +76,10 @@
                     @php
                         $kasDefault = old('dari_kas_harian', $pengeluaran?->dari_kas_harian ?? ($metodes->firstWhere('id', $metodeTerpilih)?->tipe?->value === 'TUNAI' ? '1' : '0'));
                     @endphp
-                    <select id="dari_kas_harian" name="dari_kas_harian" class="input">
+                    <x-pilihan id="dari_kas_harian" name="dari_kas_harian" class="input">
                         <option value="1" @selected((string) $kasDefault === '1')>Ya — uang tunai di laci</option>
                         <option value="0" @selected((string) $kasDefault === '0')>Tidak</option>
-                    </select>
+                    </x-pilihan>
                     <p class="hint">Untuk metode tunai default-nya Ya; dipakai saat rekonsiliasi kas.</p>
                 </div>
                 <div>
@@ -114,12 +114,12 @@
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-12">
                             <div class="col-span-2 sm:col-span-4">
                                 <label class="label">Item</label>
-                                <select name="detail[{{ $i }}][item_id]" data-item class="input">
+                                <x-pilihan name="detail[{{ $i }}][item_id]" data-item searchable class="input">
                                     <option value="">Pilih item</option>
                                     @foreach ($items as $item)
                                         <option value="{{ $item->id }}" data-satuan="{{ $item->satuan_default_id }}" data-harga="{{ $item->harga_terakhir }}" @selected((int) ($row['item_id'] ?? 0) === $item->id)>{{ $item->nama }}</option>
                                     @endforeach
-                                </select>
+                                </x-pilihan>
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="label">Jumlah</label>
@@ -127,12 +127,12 @@
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="label">Satuan</label>
-                                <select name="detail[{{ $i }}][satuan_id]" data-satuan class="input">
+                                <x-pilihan name="detail[{{ $i }}][satuan_id]" data-satuan searchable class="input">
                                     <option value="">Pilih</option>
                                     @foreach ($satuans as $satuan)
                                         <option value="{{ $satuan->id }}" @selected((int) ($row['satuan_id'] ?? 0) === $satuan->id)>{{ $satuan->singkatan }} — {{ $satuan->nama }}</option>
                                     @endforeach
-                                </select>
+                                </x-pilihan>
                             </div>
                             <div class="sm:col-span-3">
                                 <label class="label">Harga satuan</label>
@@ -183,12 +183,12 @@
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-12">
                 <div class="col-span-2 sm:col-span-4">
                     <label class="label">Item</label>
-                    <select name="detail[__INDEX__][item_id]" data-item class="input">
+                    <x-pilihan name="detail[__INDEX__][item_id]" data-item searchable class="input">
                         <option value="">Pilih item</option>
                         @foreach ($items as $item)
                             <option value="{{ $item->id }}" data-satuan="{{ $item->satuan_default_id }}" data-harga="{{ $item->harga_terakhir }}">{{ $item->nama }}</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                 </div>
                 <div class="sm:col-span-2">
                     <label class="label">Jumlah</label>
@@ -196,12 +196,12 @@
                 </div>
                 <div class="sm:col-span-2">
                     <label class="label">Satuan</label>
-                    <select name="detail[__INDEX__][satuan_id]" data-satuan class="input">
+                    <x-pilihan name="detail[__INDEX__][satuan_id]" data-satuan searchable class="input">
                         <option value="">Pilih</option>
                         @foreach ($satuans as $satuan)
                             <option value="{{ $satuan->id }}">{{ $satuan->singkatan }} — {{ $satuan->nama }}</option>
                         @endforeach
-                    </select>
+                    </x-pilihan>
                 </div>
                 <div class="sm:col-span-3">
                     <label class="label">Harga satuan</label>
@@ -253,7 +253,10 @@
                     item?.addEventListener('change', () => {
                         const option = item.selectedOptions[0];
                         if (option?.dataset.satuan) {
-                            row.querySelector('select[data-satuan]').value = option.dataset.satuan;
+                            const satuanRow = row.querySelector('select[data-satuan]');
+                            satuanRow.value = option.dataset.satuan;
+                            // Komponen dropdown membaca nilai dari select asli lewat event change.
+                            satuanRow.dispatchEvent(new Event('change', { bubbles: true }));
                         }
                         if (option?.dataset.harga) {
                             harga.value = rupiah(option.dataset.harga);
@@ -284,6 +287,7 @@
                 document.getElementById('add-detail')?.addEventListener('click', () => {
                     const html = template.innerHTML.replaceAll('__INDEX__', String(nextIndex++));
                     rows.insertAdjacentHTML('beforeend', html);
+                    window.siapkanKomponen?.(rows.lastElementChild);
                     bind(rows.lastElementChild);
                     rows.lastElementChild.querySelector('[data-item]')?.focus();
                 });
