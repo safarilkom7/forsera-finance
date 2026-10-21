@@ -123,14 +123,14 @@
                     <div class="mt-3 flex flex-wrap gap-2">
                         @if ($boleh_verifikasi && $item->status_verifikasi === \App\Enums\StatusVerifikasi::BELUM_DICEK)
                             <a href="{{ route('rekonsiliasi.create', ['unit' => $item->unit_usaha_id, 'metode' => $item->metode_pembayaran_id, 'mulai' => $item->tanggal->toDateString(), 'selesai' => now()->toDateString()]) }}"
-                               class="btn-secondary btn-sm text-emerald-700"
+                               class="btn-ghost-success btn-sm"
                                data-confirm="Pemasukan {{ format_rupiah($item->nominal) }} akan dicocokkan dengan dana yang benar-benar diterima. Anda akan diarahkan ke langkah rekonsiliasi."
                                data-confirm-title="Verifikasi pemasukan?"
                                data-confirm-severity="info"
                                data-confirm-label="Ya, verifikasi">Verifikasi</a>
                         @endif
                         @can('update', $item)
-                            <a href="{{ route('pemasukan.edit', $item) }}" class="btn-secondary btn-sm">{{ $item->terkunci() ? 'Koreksi' : 'Ubah' }}</a>
+                            <a href="{{ route('pemasukan.edit', $item) }}" class="btn-ghost btn-sm">{{ $item->terkunci() ? 'Koreksi' : 'Ubah' }}</a>
                         @endcan
                         @can('delete', $item)
                             <form method="POST" action="{{ route('pemasukan.destroy', $item) }}"
@@ -140,7 +140,7 @@
                                   data-confirm-label="Ya, hapus">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn-ghost btn-sm text-red-600">Hapus</button>
+                                <button type="submit" class="btn-ghost-danger btn-sm">Hapus</button>
                             </form>
                         @endcan
                     </div>
@@ -191,7 +191,7 @@
                             <div class="flex justify-end gap-1">
                                 @if ($boleh_verifikasi && $item->status_verifikasi === \App\Enums\StatusVerifikasi::BELUM_DICEK)
                                     <a href="{{ route('rekonsiliasi.create', ['unit' => $item->unit_usaha_id, 'metode' => $item->metode_pembayaran_id, 'mulai' => $item->tanggal->toDateString(), 'selesai' => now()->toDateString()]) }}"
-                                       class="btn-ghost btn-sm text-emerald-600" title="Cocokkan dengan dana yang diterima"
+                                       class="btn-ghost-success btn-sm" title="Cocokkan dengan dana yang diterima"
                                        data-confirm="Pemasukan {{ format_rupiah($item->nominal) }} akan dicocokkan dengan dana yang benar-benar diterima. Anda akan diarahkan ke langkah rekonsiliasi."
                                        data-confirm-title="Verifikasi pemasukan?"
                                        data-confirm-severity="info"
@@ -208,7 +208,7 @@
                                           data-confirm-label="Ya, hapus">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn-ghost btn-sm text-red-600">Hapus</button>
+                                        <button type="submit" class="btn-ghost-danger btn-sm">Hapus</button>
                                     </form>
                                 @endcan
                             </div>

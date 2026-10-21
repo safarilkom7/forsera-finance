@@ -87,7 +87,7 @@
                     <p class="mt-1 text-xs text-slate-500">{{ $item->metode?->nama }} · {{ $item->dari_kas_harian ? 'dari kas harian' : 'bukan kas harian' }}</p>
                     <div class="mt-3 flex flex-wrap gap-2">
                         @can('update', $item)
-                            <a href="{{ route('pengeluaran.edit', $item) }}" class="btn-secondary btn-sm">Ubah</a>
+                            <a href="{{ route('pengeluaran.edit', $item) }}" class="btn-ghost btn-sm">Ubah</a>
                         @endcan
                         @can('setujui', $item)
                             @if ($item->butuhPersetujuan())
@@ -95,18 +95,18 @@
                                       data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan disetujui dan ikut dihitung sebagai biaya. Pastikan bukti dan nominalnya sudah benar."
                                       data-confirm-title="Setujui pengeluaran?"
                                       data-confirm-severity="info"
-                                      data-confirm-label="Ya, setujui">@csrf<button class="btn-primary btn-sm">Setujui</button></form>
+                                      data-confirm-label="Ya, setujui">@csrf<button class="btn-ghost-success btn-sm">Setujui</button></form>
                                 <form method="POST" action="{{ route('pengeluaran.tolak', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan ditolak. Pembuat dapat memperbaikinya."
                                           data-confirm-title="Tolak pengeluaran?"
                                           data-confirm-severity="warning"
-                                          data-confirm-label="Ya, tolak">@csrf<button class="btn-ghost btn-sm text-red-600">Tolak</button></form>
+                                          data-confirm-label="Ya, tolak">@csrf<button class="btn-ghost-warning btn-sm">Tolak</button></form>
                             @endif
                         @endcan
                         @can('delete', $item)
                             <form method="POST" action="{{ route('pengeluaran.destroy', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan dihapus permanen dan tercatat di audit log."
                                           data-confirm-title="Hapus pengeluaran?"
                                           data-confirm-severity="danger"
-                                          data-confirm-label="Ya, hapus">@csrf @method('DELETE')<button class="btn-ghost btn-sm text-red-600">Hapus</button></form>
+                                          data-confirm-label="Ya, hapus">@csrf @method('DELETE')<button class="btn-ghost-danger btn-sm">Hapus</button></form>
                         @endcan
                     </div>
                 </div>
@@ -156,18 +156,18 @@
                                               data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan disetujui dan ikut dihitung sebagai biaya. Pastikan bukti dan nominalnya sudah benar."
                                               data-confirm-title="Setujui pengeluaran?"
                                               data-confirm-severity="info"
-                                              data-confirm-label="Ya, setujui">@csrf<button class="btn-ghost btn-sm text-emerald-600">Setujui</button></form>
+                                              data-confirm-label="Ya, setujui">@csrf<button class="btn-ghost-success btn-sm">Setujui</button></form>
                                         <form method="POST" action="{{ route('pengeluaran.tolak', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan ditolak. Pembuat dapat memperbaikinya."
                                           data-confirm-title="Tolak pengeluaran?"
                                           data-confirm-severity="warning"
-                                          data-confirm-label="Ya, tolak">@csrf<button class="btn-ghost btn-sm text-red-600">Tolak</button></form>
+                                          data-confirm-label="Ya, tolak">@csrf<button class="btn-ghost-warning btn-sm">Tolak</button></form>
                                     @endif
                                 @endcan
                                 @can('delete', $item)
                                     <form method="POST" action="{{ route('pengeluaran.destroy', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan dihapus permanen dan tercatat di audit log."
                                           data-confirm-title="Hapus pengeluaran?"
                                           data-confirm-severity="danger"
-                                          data-confirm-label="Ya, hapus">@csrf @method('DELETE')<button class="btn-ghost btn-sm text-red-600">Hapus</button></form>
+                                          data-confirm-label="Ya, hapus">@csrf @method('DELETE')<button class="btn-ghost-danger btn-sm">Hapus</button></form>
                                 @endcan
                             </div>
                         </td>

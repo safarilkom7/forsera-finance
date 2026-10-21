@@ -6,10 +6,13 @@
 @section('content')
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
         <a href="{{ route('rekonsiliasi.index') }}" class="btn-ghost btn-sm"><x-icon name="arrow-left" class="h-4 w-4" /> Kembali</a>
-        <div class="flex items-center gap-2">
-            <x-status-badge :status="$rekonsiliasi->status" />
+        <div class="flex flex-wrap items-center gap-3">
+            <span class="flex items-center gap-2">
+                <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Status</span>
+                <x-status-badge :status="$rekonsiliasi->status" />
+            </span>
             @if ($rekonsiliasi->status !== \App\Enums\StatusRekonsiliasi::DIBATALKAN && auth()->user()->isOwner())
-                <button type="button" class="btn-secondary btn-sm text-red-600" data-dialog-open="dialog-batal">Batalkan</button>
+                <button type="button" class="btn-danger-outline btn-sm" data-dialog-open="dialog-batal">Batalkan</button>
             @endif
         </div>
     </div>

@@ -94,6 +94,12 @@ const KELAS_IKON_KONFIRMASI = {
     info: 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-200 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/30',
 };
 
+const KELAS_TOMBOL_KONFIRMASI = {
+    warning: 'btn-warning',
+    danger: 'btn-danger',
+    info: 'btn-primary',
+};
+
 const LABEL_KONFIRMASI = {
     warning: 'Ya, lanjutkan',
     danger: 'Ya, hapus',
@@ -129,7 +135,7 @@ const initConfirmations = () => {
         if (pesan) pesan.textContent = opsi.pesan;
         if (tombolTerima) {
             tombolTerima.textContent = opsi.labelTerima;
-            tombolTerima.className = opsi.severity === 'danger' ? 'btn-danger' : 'btn-primary';
+            tombolTerima.className = KELAS_TOMBOL_KONFIRMASI[opsi.severity] || KELAS_TOMBOL_KONFIRMASI.warning;
         }
         if (tombolBatal) tombolBatal.textContent = opsi.labelBatal;
         if (ikon) {

@@ -65,7 +65,7 @@
                             </td>
                             <td class="text-right">
                                 @if (! $periode->dibuka_kembali_at)
-                                    <button type="button" class="btn-ghost btn-sm text-amber-600" data-dialog-open="buka-{{ $periode->id }}">Buka kembali</button>
+                                    <button type="button" class="btn-ghost-warning btn-sm" data-dialog-open="buka-{{ $periode->id }}">Buka kembali</button>
                                     <dialog id="buka-{{ $periode->id }}" class="w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/50 backdrop:backdrop-blur-[2px] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
                                         <form method="POST" action="{{ route('periode.buka', $periode) }}">
                                             @csrf

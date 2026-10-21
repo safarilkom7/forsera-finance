@@ -7,7 +7,7 @@
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
         <form method="GET" action="{{ route('users.index') }}" class="flex gap-2">
             <input type="search" name="q" value="{{ $q }}" class="input w-56" placeholder="Cari nama atau email">
-            <button class="btn-secondary">Cari</button>
+            <button class="btn-primary">Cari</button>
         </form>
         <a href="{{ route('users.create') }}" class="btn-primary"><x-icon name="plus" class="h-4 w-4" /> Pengguna baru</a>
     </div>
