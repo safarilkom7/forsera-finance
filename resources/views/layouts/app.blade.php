@@ -33,7 +33,7 @@
                 <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['brand'] }}"
                      class="h-10 w-10 shrink-0 rounded-xl bg-white object-contain p-1 ring-1 ring-slate-200 dark:ring-slate-700">
             @else
-                <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-600 text-sm font-black text-white">{{ $branding['inisial'] }}</div>
+                <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-700 text-sm font-black text-white">{{ $branding['inisial'] }}</div>
             @endif
             <div class="min-w-0">
                 <p class="truncate text-sm font-bold text-slate-900 dark:text-white">{{ $branding['brand'] }}</p>
@@ -41,14 +41,14 @@
                     <p class="truncate text-xs text-slate-500 dark:text-slate-400">{{ $branding['title'] }}</p>
                 @endif
             </div>
-            <button type="button" class="ml-auto rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden" data-sidebar-close aria-label="Tutup menu">
+            <button type="button" class="ml-auto rounded-lg p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden" data-sidebar-close aria-label="Tutup menu">
                 <x-icon name="x" class="h-5 w-5" />
             </button>
         </div>
 
         <nav class="flex-1 space-y-6 overflow-y-auto px-3 py-5">
             <div>
-                <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Operasional</p>
+                <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Operasional</p>
                 <div class="space-y-1">
                     <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'nav-link-active' : '' }}">
                         <x-icon name="dashboard" /> Dashboard
@@ -72,14 +72,14 @@
 
             @if ($isInternal)
                 <div>
-                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Analitik</p>
+                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Analitik</p>
                     <a href="{{ route('laporan.index') }}" class="nav-link {{ request()->routeIs('laporan.*') ? 'nav-link-active' : '' }}">
                         <x-icon name="chart" /> Laporan
                     </a>
                 </div>
 
                 <div>
-                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Master Data</p>
+                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Master Data</p>
                     <div class="space-y-1">
                         <a href="{{ route('master.unit.index') }}" class="nav-link {{ request()->routeIs('master.unit.*') ? 'nav-link-active' : '' }}">
                             <x-icon name="building" /> Unit Usaha
@@ -105,7 +105,7 @@
 
             @if ($isOwner)
                 <div>
-                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Administrasi</p>
+                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Administrasi</p>
                     <div class="space-y-1">
                         <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'nav-link-active' : '' }}">
                             <x-icon name="users" /> Pengguna
@@ -127,7 +127,7 @@
                 <a href="{{ route('notifikasi.index') }}" class="nav-link {{ request()->routeIs('notifikasi.*') ? 'nav-link-active' : '' }}">
                     <x-icon name="bell" /> Notifikasi
                     @if ($unread > 0)
-                        <span class="ml-auto rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">{{ $unread }}</span>
+                        <span class="ml-auto rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">{{ $unread }}</span>
                     @endif
                 </a>
             </div>
@@ -184,20 +184,20 @@
                                 <a href="{{ $n->data['url'] ?? route('notifikasi.index') }}" class="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/60">
                                     <p class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $n->data['title'] ?? 'Notifikasi' }}</p>
                                     <p class="mt-0.5 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{{ $n->data['body'] ?? '' }}</p>
-                                    <p class="mt-1 text-[11px] text-slate-400">{{ $n->created_at->diffForHumans() }}</p>
+                                    <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">{{ $n->created_at->diffForHumans() }}</p>
                                 </a>
                             @empty
                                 <p class="px-4 py-6 text-center text-sm text-slate-500">Belum ada notifikasi.</p>
                             @endforelse
                         </div>
-                        <a href="{{ route('notifikasi.index') }}" class="block border-t border-slate-100 px-4 py-3 text-center text-sm font-semibold text-emerald-600 hover:bg-slate-50 dark:border-slate-800 dark:text-emerald-400 dark:hover:bg-slate-800/60">Lihat semua</a>
+                        <a href="{{ route('notifikasi.index') }}" class="block border-t border-slate-100 px-4 py-3 text-center text-sm font-semibold text-emerald-700 hover:bg-slate-50 dark:border-slate-800 dark:text-emerald-400 dark:hover:bg-slate-800/60">Lihat semua</a>
                     </div>
                 </div>
 
                 <div class="relative">
                     <button type="button" class="flex items-center gap-2 rounded-xl p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800" data-dropdown-toggle="user-menu">
-                        <span class="grid h-8 w-8 place-items-center rounded-full bg-emerald-600 text-xs font-bold text-white">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span>
-                        <x-icon name="chevron-down" class="hidden h-4 w-4 text-slate-400 sm:block" />
+                        <span class="grid h-8 w-8 place-items-center rounded-full bg-emerald-700 text-xs font-bold text-white">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</span>
+                        <x-icon name="chevron-down" class="hidden h-4 w-4 text-slate-500 dark:text-slate-400 sm:block" />
                     </button>
                     <div id="user-menu" data-dropdown class="absolute right-0 mt-2 hidden w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
                         <div class="border-b border-slate-100 px-4 py-3 dark:border-slate-800">

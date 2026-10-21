@@ -26,7 +26,7 @@
             @if ($branding['logo_url'])
                 <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['brand'] }}" class="h-11 w-11 rounded-2xl bg-white object-contain p-1">
             @else
-                <div class="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-500 text-base font-black">{{ $branding['inisial'] }}</div>
+                <div class="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-700 text-base font-black">{{ $branding['inisial'] }}</div>
             @endif
             <div>
                 <p class="text-base font-bold">{{ $branding['brand'] }}</p>
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <p class="relative text-xs text-slate-500">© {{ date('Y') }} {{ $branding['brand'] }}. Zona waktu Asia/Jakarta.</p>
+        <p class="relative text-xs text-slate-400">© {{ date('Y') }} {{ $branding['brand'] }}. Zona waktu Asia/Jakarta.</p>
     </div>
 
     <div class="flex items-center justify-center px-4 py-10 sm:px-8">
@@ -65,7 +65,7 @@
                 @if ($branding['logo_url'])
                     <img src="{{ $branding['logo_url'] }}" alt="{{ $branding['brand'] }}" class="h-10 w-10 rounded-xl bg-white object-contain p-1 ring-1 ring-slate-200 dark:ring-slate-700">
                 @else
-                    <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-600 text-sm font-black text-white">{{ $branding['inisial'] }}</div>
+                    <div class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-700 text-sm font-black text-white">{{ $branding['inisial'] }}</div>
                 @endif
                 <div>
                     <p class="text-sm font-bold text-slate-900 dark:text-white">{{ $branding['brand'] }}</p>
@@ -88,7 +88,7 @@
 
             @yield('content')
 
-            <div class="mt-8 flex items-center justify-between text-xs text-slate-400">
+            <div class="mt-8 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                 <span>© {{ date('Y') }} {{ $branding['brand'] }}</span>
                 <button type="button" class="rounded-lg p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800" data-dark-toggle aria-label="Ganti mode gelap">
                     <x-icon name="sun" class="h-4 w-4 dark:hidden" />

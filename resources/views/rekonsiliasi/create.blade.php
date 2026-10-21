@@ -65,15 +65,15 @@
         <div class="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-900">
             <div>
                 <span class="font-semibold">{{ $unitTerpilih?->nama }}</span>
-                <span class="text-slate-400">·</span> {{ $metodeTerpilih?->nama }}
-                <span class="text-slate-400">·</span> {{ format_tanggal($mulai) }} – {{ format_tanggal($selesai) }}
+                <span class="text-slate-500 dark:text-slate-400">·</span> {{ $metodeTerpilih?->nama }}
+                <span class="text-slate-500 dark:text-slate-400">·</span> {{ format_tanggal($mulai) }} – {{ format_tanggal($selesai) }}
             </div>
-            <a href="{{ route('rekonsiliasi.create') }}" class="text-xs font-semibold text-emerald-600 hover:underline dark:text-emerald-400">Ubah pilihan</a>
+            <a href="{{ route('rekonsiliasi.create') }}" class="inline-flex min-h-6 items-center text-xs font-semibold text-emerald-700 hover:underline dark:text-emerald-400">Ubah pilihan</a>
         </div>
 
         @if ($kandidat->isEmpty())
             <div class="card card-pad py-12 text-center">
-                <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800"><x-icon name="search" class="h-6 w-6" /></div>
+                <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-slate-500 dark:text-slate-400 dark:bg-slate-800"><x-icon name="search" class="h-6 w-6" /></div>
                 <h2 class="mt-3 text-lg font-semibold">Tidak ada pemasukan yang bisa direkonsiliasi</h2>
                 <p class="mx-auto mt-1 max-w-md text-sm text-slate-500">Semua pemasukan pada kombinasi ini mungkin sudah diverifikasi atau belum diinput. Coba rentang tanggal lain.</p>
                 <a href="{{ route('rekonsiliasi.create') }}" class="btn-secondary mt-5 inline-flex">Kembali ke langkah 1</a>
@@ -103,7 +103,7 @@
                                 @php $milikSendiri = auth()->user()->tundukMakerChecker() && $pemasukan->dibuat_oleh === auth()->id(); @endphp
                                 <label class="flex cursor-pointer items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 {{ $milikSendiri ? 'opacity-60' : '' }}">
                                     <input type="checkbox" name="pemasukan_ids[]" value="{{ $pemasukan->id }}"
-                                           class="mt-1 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                           class="mt-1 h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500"
                                            data-nominal="{{ $pemasukan->nominal }}"
                                            @checked(in_array($pemasukan->id, $dipilih, true))
                                            @disabled($milikSendiri)>
@@ -114,7 +114,7 @@
                                         </div>
                                         <p class="text-xs text-slate-500">{{ $pemasukan->note ?: 'Tanpa catatan' }} · oleh {{ $pemasukan->dibuatOleh?->name }}</p>
                                         @if ($milikSendiri)
-                                            <p class="mt-1 text-[11px] font-medium text-amber-600 dark:text-amber-400">Dibuat oleh Anda — tidak dapat diverifikasi sendiri (maker-checker).</p>
+                                            <p class="mt-1 text-[11px] font-medium text-amber-700 dark:text-amber-400">Dibuat oleh Anda — tidak dapat diverifikasi sendiri (maker-checker).</p>
                                         @endif
                                     </div>
                                 </label>
@@ -139,26 +139,26 @@
                             <div>
                                 <label for="total_diterima" class="label">Total diterima</label>
                                 <div class="relative">
-                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-400">Rp</span>
+                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Rp</span>
                                     <input type="text" id="total_diterima" name="total_diterima" inputmode="numeric" data-rupiah value="{{ old('total_diterima') }}" class="input pl-10 text-lg font-bold" placeholder="0">
                                 </div>
                             </div>
                             <div>
                                 <label for="biaya_admin" class="label">Biaya admin / MDR</label>
                                 <div class="relative">
-                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-400">Rp</span>
+                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Rp</span>
                                     <input type="text" id="biaya_admin" name="biaya_admin" inputmode="numeric" data-rupiah value="{{ old('biaya_admin') }}" class="input pl-10" placeholder="0">
                                 </div>
                                 @if ($saran > 0)
                                     <p class="hint">Saran MDR {{ \App\Support\Format::persen($mdr) }}: {{ format_rupiah($saran) }}.
-                                        <button type="button" id="isi-saran" class="font-semibold text-emerald-600 hover:underline dark:text-emerald-400" data-saran="{{ $saran }}">Isi otomatis</button>
+                                        <button type="button" id="isi-saran" class="inline-flex min-h-6 items-center font-semibold text-emerald-700 hover:underline dark:text-emerald-400" data-saran="{{ $saran }}">Isi otomatis</button>
                                     </p>
                                 @endif
                             </div>
                             <div>
                                 <label for="potongan_kas_manual" class="label">Potongan kas tunai {{ $isOwner ? '(Owner)' : '' }}</label>
                                 <div class="relative">
-                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-400">Rp</span>
+                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Rp</span>
                                     <input type="text" id="potongan_kas_manual" name="potongan_kas_manual" inputmode="numeric" data-rupiah value="{{ old('potongan_kas_manual') }}" class="input pl-10" placeholder="{{ number_format($potongan, 0, ',', '.') }}" @readonly(! $isOwner)>
                                 </div>
                                 <p class="hint">Otomatis dari pengeluaran kas harian: {{ format_rupiah($potongan) }}. {{ $isOwner ? 'Koreksi hanya bila perlu; catatan wajib diisi.' : '' }}</p>
@@ -172,7 +172,7 @@
 
                         @if ($metodeTipe !== 'TUNAI')
                             <label class="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm dark:border-amber-500/30 dark:bg-amber-500/10">
-                                <input type="checkbox" name="menunggu_settlement" value="1" id="menunggu_settlement" class="mt-0.5 h-4 w-4 rounded border-amber-300 text-amber-600" @checked($menungguDefault)>
+                                <input type="checkbox" name="menunggu_settlement" value="1" id="menunggu_settlement" class="mt-0.5 h-4 w-4 rounded border-amber-300 text-amber-700" @checked($menungguDefault)>
                                 <span>
                                     <span class="font-semibold text-amber-800 dark:text-amber-300">Tandai menunggu settlement</span>
                                     <span class="mt-0.5 block text-xs text-amber-700 dark:text-amber-300/80">Dana belum masuk. Pemasukan berubah menjadi Menunggu Settlement dan tidak membuat insiden.</span>
@@ -190,7 +190,7 @@
 
                 <div class="xl:col-span-1">
                     <div class="card card-pad xl:sticky xl:top-24">
-                        <p class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Langkah 3</p>
+                        <p class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Langkah 3</p>
                         <h2 class="section-title mt-1">Ringkasan &amp; simpan</h2>
 
                         <dl class="mt-4 space-y-3 text-sm">
@@ -221,7 +221,7 @@
                         <button type="submit" class="btn-primary mt-5 w-full" id="tombol-simpan">
                             <x-icon name="check" class="h-4 w-4" /> Simpan rekonsiliasi
                         </button>
-                        <p class="mt-2 text-center text-[11px] text-slate-400">Selisih di atas toleransi akan membuat insiden otomatis.</p>
+                        <p class="mt-2 text-center text-[11px] text-slate-500 dark:text-slate-400">Selisih di atas toleransi akan membuat insiden otomatis.</p>
                         <a href="{{ route('rekonsiliasi.index') }}" class="btn-ghost mt-2 w-full">Batal</a>
                     </div>
                 </div>
@@ -264,7 +264,7 @@
 
                     const selisihEl = document.getElementById('ringkasan-selisih');
                     selisihEl.textContent = (selisih < 0 ? '−' : (selisih > 0 ? '+' : '')) + rupiah(Math.abs(selisih));
-                    selisihEl.className = 'text-lg font-bold ' + (selisih < 0 ? 'text-red-600' : (selisih > 0 ? 'text-orange-600' : 'text-emerald-600'));
+                    selisihEl.className = 'text-lg font-bold ' + (selisih < 0 ? 'text-red-600' : (selisih > 0 ? 'text-orange-700' : 'text-emerald-700'));
 
                     const status = document.getElementById('ringkasan-status');
                     if (menunggu) {

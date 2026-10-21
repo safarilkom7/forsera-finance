@@ -46,17 +46,17 @@
                 @endif
             </div>
         </div>
-        <p class="mt-2 text-xs text-slate-400">Tanggal hanya dipakai saat memilih periode Custom. Periode berjalan mengikuti periode akuntansi (mulai tanggal {{ $periode['tanggal_mulai'] }}, bisa diubah di Pengaturan). Semua angka mengikuti zona waktu Asia/Jakarta.</p>
+        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Tanggal hanya dipakai saat memilih periode Custom. Periode berjalan mengikuti periode akuntansi (mulai tanggal {{ $periode['tanggal_mulai'] }}, bisa diubah di Pengaturan). Semua angka mengikuti zona waktu Asia/Jakarta.</p>
     </form>
 
     <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
         <div class="card card-pad col-span-2 xl:col-span-1">
             <div class="flex items-center justify-between">
-                <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Pemasukan</p>
-                <span class="rounded-lg bg-emerald-50 p-1.5 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"><x-icon name="income" class="h-4 w-4" /></span>
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Pemasukan</p>
+                <span class="rounded-lg bg-emerald-50 p-1.5 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"><x-icon name="income" class="h-4 w-4" /></span>
             </div>
             <p class="stat-value">{{ format_rupiah($ringkasan['total_pemasukan']) }}</p>
-            <p class="mt-1 text-xs {{ $ringkasan['perubahan_pemasukan'] === null ? 'text-slate-400' : ($ringkasan['perubahan_pemasukan'] >= 0 ? 'text-emerald-600' : 'text-red-500') }}">
+            <p class="mt-1 text-xs {{ $ringkasan['perubahan_pemasukan'] === null ? 'text-slate-500 dark:text-slate-400' : ($ringkasan['perubahan_pemasukan'] >= 0 ? 'text-emerald-700' : 'text-red-600') }}">
                 @if ($ringkasan['perubahan_pemasukan'] === null)
                     Tidak ada data pembanding
                 @else
@@ -67,11 +67,11 @@
 
         <div class="card card-pad col-span-2 xl:col-span-1">
             <div class="flex items-center justify-between">
-                <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Pengeluaran</p>
-                <span class="rounded-lg bg-orange-50 p-1.5 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"><x-icon name="expense" class="h-4 w-4" /></span>
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Pengeluaran</p>
+                <span class="rounded-lg bg-orange-50 p-1.5 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400"><x-icon name="expense" class="h-4 w-4" /></span>
             </div>
             <p class="stat-value">{{ format_rupiah($ringkasan['total_pengeluaran']) }}</p>
-            <p class="mt-1 text-xs {{ $ringkasan['perubahan_pengeluaran'] === null ? 'text-slate-400' : ($ringkasan['perubahan_pengeluaran'] <= 0 ? 'text-emerald-600' : 'text-orange-500') }}">
+            <p class="mt-1 text-xs {{ $ringkasan['perubahan_pengeluaran'] === null ? 'text-slate-500 dark:text-slate-400' : ($ringkasan['perubahan_pengeluaran'] <= 0 ? 'text-emerald-700' : 'text-orange-700') }}">
                 @if ($ringkasan['perubahan_pengeluaran'] === null)
                     Tidak ada data pembanding
                 @else
@@ -81,19 +81,19 @@
         </div>
 
         <div class="card card-pad col-span-1">
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Laba bersih</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Laba bersih</p>
             <p class="stat-value text-lg sm:text-2xl">{{ format_rupiah($ringkasan['laba']) }}</p>
             <p class="mt-1 text-xs text-slate-500">Margin {{ \App\Support\Format::persen($ringkasan['margin']) }}</p>
         </div>
 
         <div class="card card-pad col-span-1">
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Terverifikasi</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Terverifikasi</p>
             <p class="stat-value text-lg sm:text-2xl">{{ \App\Support\Format::persen($ringkasan['terverifikasi_persen']) }}</p>
             <p class="mt-1 text-xs text-slate-500">{{ format_rupiah($ringkasan['terverifikasi_nominal']) }} dari pemasukan</p>
         </div>
 
         <div class="card card-pad col-span-2 xl:col-span-1">
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Selisih terbuka</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Selisih terbuka</p>
             <p class="stat-value text-lg sm:text-2xl {{ $ringkasan['selisih_terbuka_nominal'] > 0 ? 'text-red-600 dark:text-red-400' : '' }}">{{ format_rupiah($ringkasan['selisih_terbuka_nominal']) }}</p>
             <p class="mt-1 text-xs text-slate-500">{{ $ringkasan['selisih_terbuka_jumlah'] }} insiden belum tuntas</p>
         </div>
@@ -170,7 +170,7 @@
             <div class="max-h-[32rem] space-y-4 overflow-y-auto p-4 sm:p-5">
                 @if ($perhatian['belum_dicek'] !== [])
                     <div>
-                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-400"><x-icon name="clock" class="h-4 w-4" /> Belum diverifikasi</p>
+                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400"><x-icon name="clock" class="h-4 w-4" /> Belum diverifikasi</p>
                         <div class="space-y-2">
                             @foreach ($perhatian['belum_dicek'] as $item)
                                 <a href="{{ route('rekonsiliasi.create', ['unit' => $item['unit_id'], 'metode' => $item['metode_id'], 'mulai' => \Illuminate\Support\Carbon::parse($item['tertua'])->toDateString(), 'selesai' => now()->toDateString()]) }}" class="block rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/10">
@@ -185,7 +185,7 @@
 
                 @if ($perhatian['insiden']->isNotEmpty())
                     <div>
-                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-400"><x-icon name="warning" class="h-4 w-4" /> Insiden terbuka</p>
+                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400"><x-icon name="warning" class="h-4 w-4" /> Insiden terbuka</p>
                         <div class="space-y-2">
                             @foreach ($perhatian['insiden'] as $insiden)
                                 <a href="{{ route('insiden.show', $insiden) }}" class="flex items-center justify-between gap-2 rounded-xl border border-slate-200 p-2.5 text-xs hover:border-red-300 dark:border-slate-700">
@@ -202,7 +202,7 @@
 
                 @if ($perhatian['settlement'] !== [])
                     <div>
-                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-400"><x-icon name="banknotes" class="h-4 w-4" /> Menunggu settlement</p>
+                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400"><x-icon name="banknotes" class="h-4 w-4" /> Menunggu settlement</p>
                         @foreach ($perhatian['settlement'] as $item)
                             <div class="mb-2 rounded-xl border border-slate-200 p-2.5 text-xs dark:border-slate-700">
                                 <p class="font-semibold">{{ $item['unit'] }} · {{ $item['metode'] }}</p>
@@ -214,7 +214,7 @@
 
                 @if ($perhatian['menunggu_persetujuan']->isNotEmpty())
                     <div>
-                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-400"><x-icon name="check" class="h-4 w-4" /> Menunggu persetujuan</p>
+                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400"><x-icon name="check" class="h-4 w-4" /> Menunggu persetujuan</p>
                         <div class="space-y-2">
                             @foreach ($perhatian['menunggu_persetujuan'] as $pengeluaran)
                                 <div class="rounded-xl border border-slate-200 p-2.5 text-xs dark:border-slate-700">
@@ -228,7 +228,7 @@
 
                 @if ($perhatian['tanpa_lampiran']->isNotEmpty())
                     <div>
-                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-400"><x-icon name="file-text" class="h-4 w-4" /> Pengeluaran tanpa lampiran</p>
+                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400"><x-icon name="file-text" class="h-4 w-4" /> Pengeluaran tanpa lampiran</p>
                         <div class="space-y-1.5">
                             @foreach ($perhatian['tanpa_lampiran'] as $pengeluaran)
                                 <p class="rounded-lg bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800/60">{{ $pengeluaran->unitUsaha->nama }} · {{ format_rupiah($pengeluaran->total_nominal) }} · {{ format_tanggal($pengeluaran->tanggal) }}</p>
@@ -239,7 +239,7 @@
 
                 @if ($perhatian['lonjakan_harga'] !== [])
                     <div>
-                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-400"><x-icon name="chart" class="h-4 w-4" /> Lonjakan harga</p>
+                        <p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400"><x-icon name="chart" class="h-4 w-4" /> Lonjakan harga</p>
                         @foreach ($perhatian['lonjakan_harga'] as $lonjakan)
                             <p class="mb-1.5 rounded-lg bg-orange-50 px-3 py-2 text-xs text-orange-800 dark:bg-orange-500/10 dark:text-orange-300">{{ $lonjakan['item'] }}: {{ format_rupiah($lonjakan['harga']) }} (rata-rata {{ format_rupiah($lonjakan['rata_rata']) }}, +{{ $lonjakan['persen'] }}%)</p>
                         @endforeach
@@ -252,7 +252,7 @@
 
                 @if ($perhatianCount === 0)
                     <div class="py-8 text-center">
-                        <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"><x-icon name="check" class="h-6 w-6" /></div>
+                        <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"><x-icon name="check" class="h-6 w-6" /></div>
                         <p class="mt-3 text-sm font-semibold">Semua terkendali</p>
                         <p class="mt-1 text-xs text-slate-500">Tidak ada hal yang perlu ditindaklanjuti.</p>
                     </div>

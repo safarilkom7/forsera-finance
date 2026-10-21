@@ -52,9 +52,9 @@
                     <tbody>
                     @forelse ($data as $periode)
                         <tr>
-                            <td class="font-medium">{{ \App\Support\Format::periode($periode->tahun, $periode->bulan) }}<br><span class="text-[11px] text-slate-400">{{ $periode->rentang() }}</span></td>
+                            <td class="font-medium">{{ \App\Support\Format::periode($periode->tahun, $periode->bulan) }}<br><span class="text-[11px] text-slate-500 dark:text-slate-400">{{ $periode->rentang() }}</span></td>
                             <td>{{ $periode->unitUsaha?->nama ?? 'Semua unit' }}</td>
-                            <td class="text-xs">{{ $periode->ditutupOleh?->name }}<br><span class="text-slate-400">{{ format_tanggal($periode->ditutup_at) }}</span></td>
+                            <td class="text-xs">{{ $periode->ditutupOleh?->name }}<br><span class="text-slate-500 dark:text-slate-400">{{ format_tanggal($periode->ditutup_at) }}</span></td>
                             <td>
                                 @if ($periode->dibuka_kembali_at)
                                     <span class="badge badge-gray">Dibuka kembali</span>
@@ -71,18 +71,18 @@
                                             @csrf
                                             <div class="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
                                                 <div class="flex items-center gap-2.5">
-                                                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/30">
+                                                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/30">
                                                         <x-icon name="warning" class="h-4 w-4" />
                                                     </span>
                                                     <h3 class="text-base font-bold text-slate-900 dark:text-white">Buka kembali periode?</h3>
                                                 </div>
-                                                <button type="button" data-dialog-close aria-label="Tutup dialog" class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200">
+                                                <button type="button" data-dialog-close aria-label="Tutup dialog" class="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200">
                                                     <x-icon name="x" class="h-4 w-4" />
                                                 </button>
                                             </div>
                                             <div class="px-5 py-5">
                                                 <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{{ \App\Support\Format::periode($periode->tahun, $periode->bulan) }} ({{ $periode->rentang() }}) · {{ $periode->unitUsaha?->nama ?? 'Semua unit' }}. Alasan wajib dicatat di audit log.</p>
-                                                <label for="alasan-buka-{{ $periode->id }}" class="label mt-4">Alasan pembukaan <span class="text-red-500">*</span></label>
+                                                <label for="alasan-buka-{{ $periode->id }}" class="label mt-4">Alasan pembukaan <span class="text-red-600">*</span></label>
                                                 <textarea id="alasan-buka-{{ $periode->id }}" name="alasan" rows="3" required minlength="5" class="input" placeholder="Contoh: koreksi data dari franchisor"></textarea>
                                             </div>
                                             <div class="flex flex-col-reverse gap-2 border-t border-slate-100 bg-slate-50/70 px-5 py-3.5 sm:flex-row sm:justify-end dark:border-slate-800 dark:bg-slate-900/40">

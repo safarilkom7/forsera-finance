@@ -17,7 +17,7 @@
                 @forelse ($data as $item)
                     <tr>
                         <td class="font-medium text-slate-900 dark:text-slate-100">{{ $item->nama }}</td>
-                        <td>{{ $item->satuanDefault?->singkatan }} <span class="text-xs text-slate-400">({{ $item->satuanDefault?->nama }})</span></td>
+                        <td>{{ $item->satuanDefault?->singkatan }} <span class="text-xs text-slate-500 dark:text-slate-400">({{ $item->satuanDefault?->nama }})</span></td>
                         <td>{{ $item->jenisPengeluaran?->nama ?? '—' }}</td>
                         <td class="text-right">{{ $item->harga_terakhir ? format_rupiah($item->harga_terakhir) : '—' }}</td>
                         <td><span class="badge {{ $item->aktif ? 'badge-green' : 'badge-gray' }}">{{ $item->aktif ? 'Aktif' : 'Nonaktif' }}</span></td>

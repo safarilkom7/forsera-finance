@@ -63,7 +63,7 @@
                     <p class="mt-1 text-xs text-slate-500">{{ $insiden->rekonsiliasi?->unitUsaha?->nama }} · {{ $insiden->rekonsiliasi?->metode?->nama }}</p>
                     <div class="mt-2 flex items-center justify-between">
                         <span class="text-xs text-slate-500">{{ $insiden->jenis?->getLabel() }} · {{ $insiden->arah?->getLabel() }}</span>
-                        <span class="font-bold {{ $insiden->arah?->value === 'KURANG' ? 'text-red-600' : 'text-orange-600' }}">{{ format_rupiah($insiden->nominal_selisih) }}</span>
+                        <span class="font-bold {{ $insiden->arah?->value === 'KURANG' ? 'text-red-600' : 'text-orange-700' }}">{{ format_rupiah($insiden->nominal_selisih) }}</span>
                     </div>
                 </a>
             @empty

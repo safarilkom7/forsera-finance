@@ -92,7 +92,7 @@
                 <div>
                     <label for="nominal" class="label">Nominal</label>
                     <div class="relative">
-                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-400">Rp</span>
+                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Rp</span>
                         <input type="text" id="nominal" name="nominal" inputmode="numeric" required
                                value="{{ $nominalNilai }}" data-rupiah
                                class="input pl-10 text-lg font-bold @error('nominal') input-error @enderror"
@@ -103,14 +103,14 @@
             </div>
 
             <div class="mt-4">
-                <label for="note" class="label">Catatan <span class="font-normal text-slate-400">(opsional)</span></label>
+                <label for="note" class="label">Catatan <span class="font-normal text-slate-500 dark:text-slate-400">(opsional)</span></label>
                 <textarea id="note" name="note" rows="2" maxlength="500" class="input @error('note') input-error @enderror" placeholder="Contoh: meja 4, pesanan take away">{{ old('note', $pemasukan?->note) }}</textarea>
                 @error('note')<p class="error-text">{{ $message }}</p>@enderror
             </div>
 
             @if ($terkunci)
                 <div class="mt-4">
-                    <label for="alasan" class="label">Alasan koreksi <span class="text-red-500">*</span></label>
+                    <label for="alasan" class="label">Alasan koreksi <span class="text-red-600">*</span></label>
                     <textarea id="alasan" name="alasan" rows="2" required maxlength="1000" class="input @error('alasan') input-error @enderror" placeholder="Jelaskan alasan koreksi data terkunci">{{ old('alasan') }}</textarea>
                     @error('alasan')<p class="error-text">{{ $message }}</p>@enderror
                 </div>

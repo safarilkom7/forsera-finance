@@ -50,7 +50,7 @@
             <div class="grid gap-2 sm:grid-cols-2">
                 @foreach ($units as $unit)
                     <label class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2.5 text-sm dark:border-slate-700">
-                        <input type="checkbox" name="units[]" value="{{ $unit->id }}" @checked(in_array($unit->id, $unitTerpilih, true)) class="h-4 w-4 rounded border-slate-300 text-emerald-600">
+                        <input type="checkbox" name="units[]" value="{{ $unit->id }}" @checked(in_array($unit->id, $unitTerpilih, true)) class="h-4 w-4 rounded border-slate-300 text-emerald-700">
                         {{ $unit->nama }}
                     </label>
                 @endforeach
@@ -60,7 +60,7 @@
         </div>
 
         <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="aktif" value="1" @checked(old('aktif', $user?->aktif ?? true)) class="h-4 w-4 rounded border-slate-300 text-emerald-600">
+            <input type="checkbox" name="aktif" value="1" @checked(old('aktif', $user?->aktif ?? true)) class="h-4 w-4 rounded border-slate-300 text-emerald-700">
             Pengguna aktif
         </label>
 

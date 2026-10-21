@@ -62,14 +62,14 @@
                         <td class="max-w-xs">
                             @if ($log->properties && $log->properties->isNotEmpty())
                                 <details>
-                                    <summary class="cursor-pointer text-xs font-medium text-emerald-600 dark:text-emerald-400">Lihat data</summary>
+                                    <summary class="cursor-pointer text-xs font-medium text-emerald-700 dark:text-emerald-400">Lihat data</summary>
                                     <pre class="mt-1 max-h-40 overflow-auto whitespace-pre-wrap rounded bg-slate-50 p-2 text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">{{ json_encode($log->properties->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
                                 </details>
                             @else
-                                <span class="text-xs text-slate-400">—</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400">—</span>
                             @endif
                         </td>
-                        <td class="text-[11px] text-slate-400">{{ $log->properties['ip'] ?? '—' }}</td>
+                        <td class="text-[11px] text-slate-500 dark:text-slate-400">{{ $log->properties['ip'] ?? '—' }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="7" class="py-8 text-center text-slate-500">Tidak ada aktivitas pada filter ini.</td></tr>

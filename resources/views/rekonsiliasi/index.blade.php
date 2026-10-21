@@ -65,7 +65,7 @@
                     <p class="text-xs text-slate-500">{{ format_tanggal($rek->periode_mulai) }} – {{ format_tanggal($rek->periode_selesai) }}</p>
                     <div class="mt-2 flex items-center justify-between">
                         <span class="text-sm text-slate-500">Selisih</span>
-                        <span class="font-bold {{ $rek->selisih < 0 ? 'text-red-600' : ($rek->selisih > 0 ? 'text-orange-600' : 'text-emerald-600') }}">{{ \App\Support\Format::rupiahSigned($rek->selisih) }}</span>
+                        <span class="font-bold {{ $rek->selisih < 0 ? 'text-red-600' : ($rek->selisih > 0 ? 'text-orange-700' : 'text-emerald-700') }}">{{ \App\Support\Format::rupiahSigned($rek->selisih) }}</span>
                     </div>
                 </a>
             @empty
@@ -99,7 +99,7 @@
                         <td class="whitespace-nowrap text-xs">{{ format_tanggal($rek->periode_mulai) }} – {{ format_tanggal($rek->periode_selesai) }}</td>
                         <td class="text-right">{{ format_rupiah($rek->total_dicatat) }}</td>
                         <td class="text-right">{{ format_rupiah($rek->total_diterima) }}</td>
-                        <td class="text-right font-semibold {{ $rek->selisih < 0 ? 'text-red-600' : ($rek->selisih > 0 ? 'text-orange-600' : 'text-emerald-600') }}">{{ \App\Support\Format::rupiahSigned($rek->selisih) }}</td>
+                        <td class="text-right font-semibold {{ $rek->selisih < 0 ? 'text-red-600' : ($rek->selisih > 0 ? 'text-orange-700' : 'text-emerald-700') }}">{{ \App\Support\Format::rupiahSigned($rek->selisih) }}</td>
                         <td><x-status-badge :status="$rek->status" /></td>
                         <td class="text-xs">{{ $rek->diverifikasiOleh?->name ?? '—' }}</td>
                         <td class="text-right"><a href="{{ route('rekonsiliasi.show', $rek) }}" class="btn-ghost btn-sm">Detail</a></td>

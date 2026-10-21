@@ -30,44 +30,44 @@
             <div class="card card-pad">
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Selisih</p>
-                        <p class="mt-1 text-2xl font-bold {{ $insiden->arah?->value === 'KURANG' ? 'text-red-600' : 'text-orange-600' }}">{{ format_rupiah($insiden->nominal_selisih) }}</p>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Selisih</p>
+                        <p class="mt-1 text-2xl font-bold {{ $insiden->arah?->value === 'KURANG' ? 'text-red-600' : 'text-orange-700' }}">{{ format_rupiah($insiden->nominal_selisih) }}</p>
                         <p class="mt-1 text-xs text-slate-500">Arah: {{ $insiden->arah?->getLabel() }}</p>
                     </div>
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Terselesaikan</p>
-                        <p class="mt-1 text-2xl font-bold text-emerald-600">{{ format_rupiah($insiden->nominal_terselesaikan) }}</p>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Terselesaikan</p>
+                        <p class="mt-1 text-2xl font-bold text-emerald-700">{{ format_rupiah($insiden->nominal_terselesaikan) }}</p>
                         <p class="mt-1 text-xs text-slate-500">Sisa {{ format_rupiah($insiden->sisa()) }}</p>
                     </div>
                 </div>
 
                 <dl class="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-                    <div><dt class="text-xs text-slate-400">Rekonsiliasi</dt><dd><a class="font-semibold text-emerald-600 hover:underline dark:text-emerald-400" href="{{ route('rekonsiliasi.show', $insiden->rekonsiliasi) }}">{{ $insiden->rekonsiliasi?->kode }}</a></dd></div>
-                    <div><dt class="text-xs text-slate-400">Periode rekonsiliasi</dt><dd>{{ format_tanggal($insiden->rekonsiliasi?->periode_mulai) }} – {{ format_tanggal($insiden->rekonsiliasi?->periode_selesai) }}</dd></div>
-                    <div><dt class="text-xs text-slate-400">Dibuat oleh</dt><dd>{{ $insiden->dibuatOleh?->name }} · {{ format_tanggal($insiden->created_at) }}</dd></div>
-                    <div><dt class="text-xs text-slate-400">Penanggung jawab</dt><dd>{{ $insiden->penanggungJawab?->name ?? 'Belum ditugaskan' }}</dd></div>
+                    <div><dt class="text-xs text-slate-500 dark:text-slate-400">Rekonsiliasi</dt><dd><a class="font-semibold text-emerald-700 hover:underline dark:text-emerald-400" href="{{ route('rekonsiliasi.show', $insiden->rekonsiliasi) }}">{{ $insiden->rekonsiliasi?->kode }}</a></dd></div>
+                    <div><dt class="text-xs text-slate-500 dark:text-slate-400">Periode rekonsiliasi</dt><dd>{{ format_tanggal($insiden->rekonsiliasi?->periode_mulai) }} – {{ format_tanggal($insiden->rekonsiliasi?->periode_selesai) }}</dd></div>
+                    <div><dt class="text-xs text-slate-500 dark:text-slate-400">Dibuat oleh</dt><dd>{{ $insiden->dibuatOleh?->name }} · {{ format_tanggal($insiden->created_at) }}</dd></div>
+                    <div><dt class="text-xs text-slate-500 dark:text-slate-400">Penanggung jawab</dt><dd>{{ $insiden->penanggungJawab?->name ?? 'Belum ditugaskan' }}</dd></div>
                     @if ($insiden->ditutup_at)
-                        <div><dt class="text-xs text-slate-400">Ditutup oleh</dt><dd>{{ $insiden->ditutupOleh?->name }} · {{ format_tanggal($insiden->ditutup_at) }}</dd></div>
-                        <div><dt class="text-xs text-slate-400">Tipe penyelesaian</dt><dd>{{ $insiden->tipe_penyelesaian?->getLabel() ?? '—' }}</dd></div>
+                        <div><dt class="text-xs text-slate-500 dark:text-slate-400">Ditutup oleh</dt><dd>{{ $insiden->ditutupOleh?->name }} · {{ format_tanggal($insiden->ditutup_at) }}</dd></div>
+                        <div><dt class="text-xs text-slate-500 dark:text-slate-400">Tipe penyelesaian</dt><dd>{{ $insiden->tipe_penyelesaian?->getLabel() ?? '—' }}</dd></div>
                     @endif
                 </dl>
 
                 @if ($insiden->penyebab)
                     <div class="mt-4 rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800/60">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Penyebab</p>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Penyebab</p>
                         <p class="mt-1 whitespace-pre-line">{{ $insiden->penyebab }}</p>
                     </div>
                 @endif
                 @if ($insiden->catatan_penyelesaian)
                     <div class="mt-3 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-200">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">Catatan penyelesaian</p>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Catatan penyelesaian</p>
                         <p class="mt-1 whitespace-pre-line">{{ $insiden->catatan_penyelesaian }}</p>
                     </div>
                 @endif
 
                 @if (! empty($insiden->lampiran))
                     <div class="mt-4">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Bukti</p>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Bukti</p>
                         <div class="mt-2 flex flex-wrap gap-2">
                             @foreach ($insiden->lampiran as $index => $file)
                                 <a href="{{ route('lampiran.download', ['jenis' => 'insiden', 'id' => $insiden->id, 'index' => $index]) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-slate-50 dark:border-slate-700 dark:text-emerald-400">
@@ -132,7 +132,7 @@
                             <div id="nominal-wrapper" class="hidden">
                                 <label for="nominal" class="label">Nominal diterima</label>
                                 <div class="relative">
-                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-400">Rp</span>
+                                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Rp</span>
                                     <input type="text" id="nominal" name="nominal" inputmode="numeric" data-rupiah value="{{ old('nominal') }}" class="input pl-10" placeholder="0">
                                 </div>
                                 <p class="hint">Boleh bertahap. Insiden ditutup bila total ≥ {{ format_rupiah($insiden->nominal_selisih) }}.</p>
@@ -180,7 +180,7 @@
                             <span class="absolute -left-[7px] top-1 h-3 w-3 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-slate-900"></span>
                             <div class="flex flex-wrap items-center justify-between gap-2">
                                 <p class="text-sm font-semibold">{{ $log->aksi }}</p>
-                                <p class="text-xs text-slate-400">{{ format_tanggal($log->created_at).' '.$log->created_at?->format('H:i') }}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">{{ format_tanggal($log->created_at).' '.$log->created_at?->format('H:i') }}</p>
                             </div>
                             <p class="text-xs text-slate-500">{{ $log->user?->name ?? 'Sistem' }}@if ($log->nominal) · {{ format_rupiah($log->nominal) }}@endif</p>
                             @if ($log->catatan)

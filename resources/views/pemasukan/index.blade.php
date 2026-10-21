@@ -29,7 +29,7 @@
             Pembuat transaksi tidak boleh mencocokkan transaksinya sendiri (maker-checker), kecuali Owner.
         </p>
         @if ($boleh_verifikasi)
-            <a href="{{ route('rekonsiliasi.create') }}" class="mt-2 inline-flex font-semibold text-sky-700 hover:underline dark:text-sky-300">Mulai rekonsiliasi →</a>
+            <a href="{{ route('rekonsiliasi.create') }}" class="mt-1 inline-flex min-h-6 items-center font-semibold text-sky-700 hover:underline dark:text-sky-300">Mulai rekonsiliasi →</a>
         @endif
     </div>
 

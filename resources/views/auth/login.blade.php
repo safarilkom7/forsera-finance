@@ -26,7 +26,7 @@
 
         <label class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
             <input type="checkbox" name="remember" value="1" @checked(old('remember'))
-                   class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900">
+                   class="h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900">
             Ingat saya di perangkat ini
         </label>
 

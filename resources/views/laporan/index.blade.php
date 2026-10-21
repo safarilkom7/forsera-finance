@@ -37,7 +37,7 @@
             <a href="{{ route('laporan.excel', request()->query()) }}" class="btn-secondary"><x-icon name="download" class="h-4 w-4" /> Excel</a>
             <a href="{{ route('laporan.pdf', request()->query()) }}" class="btn-secondary"><x-icon name="download" class="h-4 w-4" /> PDF</a>
         </div>
-        <p class="mt-2 text-xs text-slate-400">Periode berjalan mengikuti periode akuntansi (mulai tanggal {{ $periode['tanggal_mulai'] }}, bisa diubah di Pengaturan). Tanggal di atas hanya dipakai saat memilih Custom.</p>
+        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Periode berjalan mengikuti periode akuntansi (mulai tanggal {{ $periode['tanggal_mulai'] }}, bisa diubah di Pengaturan). Tanggal di atas hanya dipakai saat memilih Custom.</p>
     </form>
 
     <nav class="mb-5 flex flex-wrap gap-2 text-xs">
@@ -120,7 +120,7 @@
                     <tbody>
                     @forelse ($pengeluaran_item as $baris)
                         <tr>
-                            <td>{{ $baris->item }} <span class="text-xs text-slate-400">({{ $baris->satuan }})</span></td>
+                            <td>{{ $baris->item }} <span class="text-xs text-slate-500 dark:text-slate-400">({{ $baris->satuan }})</span></td>
                             <td class="text-right">{{ \App\Support\Format::angka($baris->jumlah) }}</td>
                             <td class="text-right">{{ format_rupiah(round($baris->harga_rata)) }}</td>
                             <td class="text-right">{{ format_rupiah($baris->harga_min) }}</td>
@@ -142,7 +142,7 @@
                 <thead><tr><th>Metode</th><th class="text-right">Jumlah</th><th class="text-right">Dicatat</th><th class="text-right">Diterima</th><th class="text-right">Selisih</th></tr></thead>
                 <tbody>
                 @forelse ($rekonsiliasi['per_metode'] as $baris)
-                    <tr><td>{{ $baris->metode }}</td><td class="text-right">{{ $baris->jumlah }}</td><td class="text-right">{{ format_rupiah($baris->dicatat) }}</td><td class="text-right">{{ format_rupiah($baris->diterima) }}</td><td class="text-right font-semibold {{ $baris->selisih < 0 ? 'text-red-600' : ($baris->selisih > 0 ? 'text-orange-600' : '') }}">{{ \App\Support\Format::rupiahSigned($baris->selisih) }}</td></tr>
+                    <tr><td>{{ $baris->metode }}</td><td class="text-right">{{ $baris->jumlah }}</td><td class="text-right">{{ format_rupiah($baris->dicatat) }}</td><td class="text-right">{{ format_rupiah($baris->diterima) }}</td><td class="text-right font-semibold {{ $baris->selisih < 0 ? 'text-red-600' : ($baris->selisih > 0 ? 'text-orange-700' : '') }}">{{ \App\Support\Format::rupiahSigned($baris->selisih) }}</td></tr>
                 @empty
                     <tr><td colspan="5" class="py-8 text-center text-slate-500">Tidak ada rekonsiliasi.</td></tr>
                 @endforelse
@@ -170,7 +170,7 @@
                     <tbody>
                     @forelse ($rekonsiliasi['insiden'] as $insiden)
                         <tr>
-                            <td><a href="{{ route('insiden.show', $insiden) }}" class="font-medium text-emerald-600 hover:underline dark:text-emerald-400">{{ $insiden->kode }}</a></td>
+                            <td><a href="{{ route('insiden.show', $insiden) }}" class="font-medium text-emerald-700 hover:underline dark:text-emerald-400">{{ $insiden->kode }}</a></td>
                             <td class="text-xs">{{ $insiden->arah?->getLabel() }}</td>
                             <td class="text-right">{{ format_rupiah($insiden->nominal_selisih) }}</td>
                             <td class="text-right">{{ format_rupiah($insiden->nominal_terselesaikan) }}</td>
@@ -206,7 +206,7 @@
                                 <td class="whitespace-nowrap">{{ format_tanggal($baris['tanggal']) }}</td>
                                 <td>{{ $baris['keterangan'] }}</td>
                                 <td class="text-right text-emerald-700 dark:text-emerald-400">{{ $baris['masuk'] ? format_rupiah($baris['masuk']) : '—' }}</td>
-                                <td class="text-right text-orange-600">{{ $baris['keluar'] ? format_rupiah($baris['keluar']) : '—' }}</td>
+                                <td class="text-right text-orange-700">{{ $baris['keluar'] ? format_rupiah($baris['keluar']) : '—' }}</td>
                                 <td class="text-right font-semibold">{{ format_rupiah($baris['saldo']) }}</td>
                             </tr>
                         @empty

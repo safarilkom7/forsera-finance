@@ -36,7 +36,7 @@
 
     <div class="flex flex-wrap items-start justify-between gap-2">
         <div>
-            <h2 class="section-title">{{ $label }}@unless ($wajib) <span class="text-sm font-normal text-slate-400">(opsional)</span>@endunless</h2>
+            <h2 class="section-title">{{ $label }}@unless ($wajib) <span class="text-sm font-normal text-slate-500 dark:text-slate-400">(opsional)</span>@endunless</h2>
             <p class="hint mt-1">{{ $hint ?? 'Nota, struk, atau bukti pendukung lainnya.' }}</p>
         </div>
         <span class="badge badge-gray" data-counter>{{ $berkasLama->count() }}/{{ $max }} berkas</span>
@@ -44,7 +44,7 @@
 
     @if ($berkasLama->isNotEmpty())
         <div class="mt-4">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Berkas tersimpan</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Berkas tersimpan</p>
             <ul class="mt-2 grid gap-2 sm:grid-cols-2">
                 @foreach ($berkasLama as $file)
                     @php
@@ -81,11 +81,11 @@
                             @else
                                 <p class="truncate text-sm font-medium text-slate-800 dark:text-slate-100" data-nama-berkas>{{ $nama }}</p>
                             @endif
-                            <p class="mt-0.5 text-[11px] text-slate-400">{{ $ukuran }}@if ($ext) · {{ $ext }} @endif</p>
+                            <p class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{{ $ukuran }}@if ($ext) · {{ $ext }} @endif</p>
                         </div>
 
                         @if ($urlUnduh)
-                            <a href="{{ $urlUnduh }}" class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200" title="Unduh {{ $nama }}" aria-label="Unduh {{ $nama }}">
+                            <a href="{{ $urlUnduh }}" class="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200" title="Unduh {{ $nama }}" aria-label="Unduh {{ $nama }}">
                                 <x-icon name="download" class="h-4 w-4" />
                             </a>
                         @endif
@@ -107,7 +107,7 @@
 
     <div class="mt-4 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/70 px-4 py-6 text-center transition hover:border-emerald-400 hover:bg-emerald-50/40 dark:border-slate-700 dark:bg-slate-900/40 dark:hover:border-emerald-500/60 dark:hover:bg-emerald-500/5"
          data-dropzone>
-        <span class="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:text-emerald-400 dark:ring-slate-700">
+        <span class="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-white text-emerald-700 shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:text-emerald-400 dark:ring-slate-700">
             <x-icon name="upload-cloud" class="h-5 w-5" />
         </span>
         <p class="mt-2 text-sm font-semibold text-slate-700 dark:text-slate-200">Tarik &amp; lepas berkas di sini</p>
@@ -122,7 +122,7 @@
             </button>
         </div>
 
-        <p class="mt-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">JPG · PNG · WEBP · HEIC · PDF · DOCX · XLSX</p>
+        <p class="mt-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">JPG · PNG · WEBP · HEIC · PDF · DOCX · XLSX</p>
     </div>
 
     <input type="file" name="{{ $name }}[]" multiple accept="{{ $accept }}" class="sr-only" data-input tabindex="-1" aria-hidden="true">
@@ -130,7 +130,7 @@
     <input type="file" accept="image/*" capture="environment" class="sr-only" data-camera tabindex="-1" aria-hidden="true">
 
     <div class="mt-3 hidden" data-terpilih>
-        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Akan diunggah</p>
+        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Akan diunggah</p>
         <ul class="mt-2 grid gap-2 sm:grid-cols-2" data-list></ul>
     </div>
 

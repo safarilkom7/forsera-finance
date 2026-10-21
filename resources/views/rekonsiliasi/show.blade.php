@@ -8,7 +8,7 @@
         <a href="{{ route('rekonsiliasi.index') }}" class="btn-ghost btn-sm"><x-icon name="arrow-left" class="h-4 w-4" /> Kembali</a>
         <div class="flex flex-wrap items-center gap-3">
             <span class="flex items-center gap-2">
-                <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Status</span>
+                <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Status</span>
                 <x-status-badge :status="$rekonsiliasi->status" />
             </span>
             @if ($rekonsiliasi->status !== \App\Enums\StatusRekonsiliasi::DIBATALKAN && auth()->user()->isOwner())
@@ -28,22 +28,22 @@
         <div class="card card-pad xl:col-span-2">
             <div class="grid gap-4 sm:grid-cols-2">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Unit / Metode</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Unit / Metode</p>
                     <p class="mt-1 font-semibold">{{ $rekonsiliasi->unitUsaha?->nama }}</p>
                     <p class="text-sm text-slate-500">{{ $rekonsiliasi->metode?->nama }}</p>
                 </div>
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Periode</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Periode</p>
                     <p class="mt-1 font-semibold">{{ format_tanggal($rekonsiliasi->periode_mulai) }} – {{ format_tanggal($rekonsiliasi->periode_selesai) }}</p>
                     <p class="text-sm text-slate-500">Dana diterima {{ format_tanggal($rekonsiliasi->tanggal_diterima) }}</p>
                 </div>
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Diverifikasi oleh</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Diverifikasi oleh</p>
                     <p class="mt-1 font-semibold">{{ $rekonsiliasi->diverifikasiOleh?->name }}</p>
                     <p class="text-sm text-slate-500">{{ format_tanggal($rekonsiliasi->diverifikasi_at) }}</p>
                 </div>
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Jumlah pemasukan</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Jumlah pemasukan</p>
                     <p class="mt-1 font-semibold">{{ $rekonsiliasi->pemasukan->count() }} transaksi</p>
                     <p class="text-sm text-slate-500">{{ $rekonsiliasi->potonganPengeluaran->count() }} pengeluaran kas dipotong</p>
                 </div>
@@ -51,14 +51,14 @@
 
             @if ($rekonsiliasi->catatan)
                 <div class="mt-4 rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800/60">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Catatan</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Catatan</p>
                     <p class="mt-1 whitespace-pre-line">{{ $rekonsiliasi->catatan }}</p>
                 </div>
             @endif
 
             @if (! empty($rekonsiliasi->bukti))
                 <div class="mt-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Bukti penerimaan</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Bukti penerimaan</p>
                     <div class="mt-2 flex flex-wrap gap-2">
                         @foreach ($rekonsiliasi->bukti as $index => $file)
                             <a href="{{ route('lampiran.download', ['jenis' => 'rekonsiliasi', 'id' => $rekonsiliasi->id, 'index' => $index]) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-slate-50 dark:border-slate-700 dark:text-emerald-400">
@@ -71,7 +71,7 @@
         </div>
 
         <div class="card card-pad">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Perhitungan selisih</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Perhitungan selisih</p>
             <dl class="mt-4 space-y-3 text-sm">
                 <div class="flex justify-between gap-2"><dt class="text-slate-500">Total dicatat</dt><dd class="font-semibold">{{ format_rupiah($rekonsiliasi->total_dicatat) }}</dd></div>
                 <div class="flex justify-between gap-2"><dt class="text-slate-500">Potongan kas</dt><dd class="font-semibold">− {{ format_rupiah($rekonsiliasi->potongan_kas) }}</dd></div>
@@ -79,7 +79,7 @@
                 <div class="flex justify-between gap-2 border-t border-slate-200 pt-3 dark:border-slate-700"><dt class="font-semibold">Dana diterima</dt><dd class="font-semibold">{{ format_rupiah($rekonsiliasi->total_diterima) }}</dd></div>
                 <div class="flex items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800/60">
                     <dt class="font-semibold">Selisih</dt>
-                    <dd class="text-lg font-bold {{ $rekonsiliasi->selisih < 0 ? 'text-red-600' : ($rekonsiliasi->selisih > 0 ? 'text-orange-600' : 'text-emerald-600') }}">
+                    <dd class="text-lg font-bold {{ $rekonsiliasi->selisih < 0 ? 'text-red-600' : ($rekonsiliasi->selisih > 0 ? 'text-orange-700' : 'text-emerald-700') }}">
                         {{ \App\Support\Format::rupiahSigned($rekonsiliasi->selisih) }}
                     </dd>
                 </div>
@@ -87,7 +87,7 @@
             @if ($rekonsiliasi->arah())
                 <p class="mt-2 text-xs text-slate-500">Arah: {{ $rekonsiliasi->arah()->getLabel() }} {{ $rekonsiliasi->arah()->value === 'KURANG' ? '(uang masuk lebih kecil dari catatan)' : '(uang masuk lebih besar dari catatan)' }}</p>
             @endif
-            <p class="mt-3 text-[11px] text-slate-400">Rumus: selisih = total diterima − (total dicatat − biaya admin − potongan kas).</p>
+            <p class="mt-3 text-[11px] text-slate-500 dark:text-slate-400">Rumus: selisih = total diterima − (total dicatat − biaya admin − potongan kas).</p>
         </div>
     </div>
 
@@ -162,13 +162,13 @@
                     </span>
                     <h2 class="text-base font-bold text-slate-900 dark:text-white">Batalkan rekonsiliasi?</h2>
                 </div>
-                <button type="button" data-dialog-close aria-label="Tutup dialog" class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200">
+                <button type="button" data-dialog-close aria-label="Tutup dialog" class="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200">
                     <x-icon name="x" class="h-4 w-4" />
                 </button>
             </div>
             <div class="px-5 py-5">
                 <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">Pemasukan kembali ke Belum Dicek, pengeluaran kas dilepas, dan insiden terkait dibatalkan. Tindakan ini tercatat di audit log.</p>
-                <label for="alasan_batal" class="label mt-4">Alasan pembatalan <span class="text-red-500">*</span></label>
+                <label for="alasan_batal" class="label mt-4">Alasan pembatalan <span class="text-red-600">*</span></label>
                 <textarea id="alasan_batal" name="alasan" rows="3" required minlength="5" class="input" placeholder="Contoh: salah memilih batch QRIS"></textarea>
             </div>
             <div class="flex flex-col-reverse gap-2 border-t border-slate-100 bg-slate-50/70 px-5 py-3.5 sm:flex-row sm:justify-end dark:border-slate-800 dark:bg-slate-900/40">

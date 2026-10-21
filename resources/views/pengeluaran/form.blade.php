@@ -83,9 +83,9 @@
                     <p class="hint">Untuk metode tunai default-nya Ya; dipakai saat rekonsiliasi kas.</p>
                 </div>
                 <div>
-                    <label for="total_nominal" class="label">Total manual <span class="font-normal text-slate-400">(tanpa detail item)</span></label>
+                    <label for="total_nominal" class="label">Total manual <span class="font-normal text-slate-500 dark:text-slate-400">(tanpa detail item)</span></label>
                     <div class="relative">
-                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-400">Rp</span>
+                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Rp</span>
                         <input type="text" id="total_nominal" name="total_nominal" inputmode="numeric" data-rupiah value="{{ old('total_nominal', $pengeluaran?->total_nominal ?? '') }}" class="input pl-10" placeholder="0">
                     </div>
                     @error('total_nominal')<p class="error-text">{{ $message }}</p>@enderror
@@ -93,7 +93,7 @@
             </div>
 
             <div class="mt-4">
-                <label for="note" class="label">Catatan <span class="font-normal text-slate-400">(opsional)</span></label>
+                <label for="note" class="label">Catatan <span class="font-normal text-slate-500 dark:text-slate-400">(opsional)</span></label>
                 <textarea id="note" name="note" rows="2" maxlength="500" class="input @error('note') input-error @enderror" placeholder="Contoh: pembelian bahan baku mingguan">{{ old('note', $pengeluaran?->note) }}</textarea>
                 @error('note')<p class="error-text">{{ $message }}</p>@enderror
             </div>
@@ -140,10 +140,10 @@
                             </div>
                             <div class="flex items-end justify-between gap-2 sm:col-span-1">
                                 <div class="text-right">
-                                    <p class="text-[10px] uppercase tracking-wide text-slate-400">Subtotal</p>
+                                    <p class="text-[10px] uppercase tracking-wide text-slate-500 dark:text-slate-400">Subtotal</p>
                                     <p class="text-sm font-semibold" data-subtotal>Rp 0</p>
                                 </div>
-                                <button type="button" class="rounded-lg p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10" data-remove aria-label="Hapus baris">
+                                <button type="button" class="rounded-lg p-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10" data-remove aria-label="Hapus baris">
                                     <x-icon name="trash" class="h-4 w-4" />
                                 </button>
                             </div>
@@ -209,10 +209,10 @@
                 </div>
                 <div class="flex items-end justify-between gap-2 sm:col-span-1">
                     <div class="text-right">
-                        <p class="text-[10px] uppercase tracking-wide text-slate-400">Subtotal</p>
+                        <p class="text-[10px] uppercase tracking-wide text-slate-500 dark:text-slate-400">Subtotal</p>
                         <p class="text-sm font-semibold" data-subtotal>Rp 0</p>
                     </div>
-                    <button type="button" class="rounded-lg p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10" data-remove aria-label="Hapus baris"><x-icon name="trash" class="h-4 w-4" /></button>
+                    <button type="button" class="rounded-lg p-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10" data-remove aria-label="Hapus baris"><x-icon name="trash" class="h-4 w-4" /></button>
                 </div>
             </div>
         </div>

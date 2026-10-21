@@ -39,14 +39,14 @@
             <div>
                 <label for="harga_terakhir" class="label">Harga terakhir</label>
                 <div class="relative">
-                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-400">Rp</span>
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Rp</span>
                     <input id="harga_terakhir" name="harga_terakhir" data-rupiah value="{{ old('harga_terakhir', $item?->harga_terakhir) }}" class="input pl-10" placeholder="0">
                 </div>
                 <p class="hint">Terisi otomatis setiap kali item disimpan pada pengeluaran.</p>
             </div>
 
             <label class="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="aktif" value="1" @checked(old('aktif', $item?->aktif ?? true)) class="h-4 w-4 rounded border-slate-300 text-emerald-600">
+                <input type="checkbox" name="aktif" value="1" @checked(old('aktif', $item?->aktif ?? true)) class="h-4 w-4 rounded border-slate-300 text-emerald-700">
                 Item aktif dan bisa dipilih
             </label>
 
@@ -67,7 +67,7 @@
                         <div class="px-4 py-2.5 text-sm">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="font-semibold">{{ format_rupiah($baris->harga_satuan) }}</span>
-                                <span class="text-xs text-slate-400">{{ format_tanggal($baris->pengeluaran?->tanggal) }}</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400">{{ format_tanggal($baris->pengeluaran?->tanggal) }}</span>
                             </div>
                             <p class="text-xs text-slate-500">{{ $baris->pengeluaran?->unitUsaha?->nama }} · {{ \App\Support\Format::angka($baris->jumlah) }} {{ $baris->satuan?->singkatan }}</p>
                         </div>

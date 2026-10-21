@@ -20,17 +20,17 @@
 
     <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <div class="card card-pad">
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Pemasukan hari ini</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Pemasukan hari ini</p>
             <p class="stat-value text-lg sm:text-2xl">{{ format_rupiah($ringkasan_staf['total_pemasukan']) }}</p>
             <p class="mt-1 text-xs text-slate-500">{{ $ringkasan_staf['jumlah_pemasukan'] }} transaksi</p>
         </div>
         <div class="card card-pad">
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Pengeluaran hari ini</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Pengeluaran hari ini</p>
             <p class="stat-value text-lg sm:text-2xl">{{ format_rupiah($ringkasan_staf['total_pengeluaran']) }}</p>
             <p class="mt-1 text-xs text-slate-500">{{ $ringkasan_staf['jumlah_pengeluaran'] }} transaksi</p>
         </div>
         <div class="card card-pad col-span-2">
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Status input Anda</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Status input Anda</p>
             <div class="mt-2 flex flex-wrap gap-2">
                 @forelse ($ringkasan_staf['per_status'] as $status)
                     <x-status-badge :status="$status->status_verifikasi" />
@@ -77,10 +77,10 @@
         <div class="card card-pad">
             <h2 class="section-title">Yang perlu diingat</h2>
             <ul class="mt-3 space-y-3 text-sm text-slate-600 dark:text-slate-300">
-                <li class="flex gap-2"><x-icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Pemasukan yang sudah diverifikasi terkunci; hubungi Owner bila perlu koreksi.</li>
-                <li class="flex gap-2"><x-icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Lampirkan bukti untuk transaksi besar agar lebih cepat diverifikasi.</li>
-                <li class="flex gap-2"><x-icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Gunakan tombol “Simpan dan tambah lagi” saat mencatat banyak transaksi.</li>
-                <li class="flex gap-2"><x-icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> Tanggal tidak boleh di masa depan dan periode yang sudah ditutup tidak bisa diubah.</li>
+                <li class="flex gap-2"><x-icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" /> Pemasukan yang sudah diverifikasi terkunci; hubungi Owner bila perlu koreksi.</li>
+                <li class="flex gap-2"><x-icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" /> Lampirkan bukti untuk transaksi besar agar lebih cepat diverifikasi.</li>
+                <li class="flex gap-2"><x-icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" /> Gunakan tombol “Simpan dan tambah lagi” saat mencatat banyak transaksi.</li>
+                <li class="flex gap-2"><x-icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" /> Tanggal tidak boleh di masa depan dan periode yang sudah ditutup tidak bisa diubah.</li>
             </ul>
         </div>
     </div>
