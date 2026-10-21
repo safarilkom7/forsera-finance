@@ -353,6 +353,13 @@ DITAGIH → DIBAYAR → SELESAI`, plus `DIBATALKAN`.
 Angka ini selaras dengan pengaturan aplikasi `batas_persetujuan_pengeluaran` (0 = nonaktif).
 Disarankan diisi **1.500.000** agar pengeluaran besar otomatis menunggu persetujuan Owner.
 
+Catatan penting: saat ini ambang tersebut **hanya berlaku untuk pengeluaran yang diinput peran
+`staf_unit`**. Pengeluaran yang diinput Admin Keuangan atau Owner langsung berstatus disetujui,
+sehingga matriks di atas belum berlaku penuh untuk dua finance. Agar ambang juga mengikat finance,
+ubah `PengeluaranService::tentukanStatus()` menjadi memakai `! $user->isOwner()` (bukan `isStaf()`)
+— perubahan kecil, tetapi wajib disertai test agar pengeluaran finance di atas batas benar-benar
+menunggu persetujuan Owner dan tidak bisa disetujui sendiri.
+
 ### 5.5 Yang sudah ada di aplikasi
 
 ✅ Master **jenis pengeluaran** (Bahan Baku, Gaji dan Upah, Listrik/Air/Internet, Sewa, Peralatan,
@@ -624,6 +631,7 @@ di pengeluaran). Pilih penggajian sebagai sumber, pengeluaran sebagai jejak pemb
 | Fee franchise 5% + invoice | ❌ | Sedang | Bisa manual dulu, sebaiknya otomatis |
 | Master karyawan + penggajian | ❌ | Sedang | Gaji tanggal 6 |
 | Anggaran per unit | ❌ | Rendah | Setelah data pengeluaran rapi |
+| Ambang persetujuan berlaku untuk input finance | ⚠️ | Tinggi | Saat ini hanya `staf_unit`; perlu ubah `tentukanStatus()` |
 | Pemisahan izin finance A/B | ⚠️ | Rendah | Cukup prosedural + maker-checker |
 
 Urutan implementasi yang disarankan (dampak terbesar lebih dulu):
