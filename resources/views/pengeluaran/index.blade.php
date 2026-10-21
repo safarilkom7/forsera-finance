@@ -91,7 +91,11 @@
                         @endcan
                         @can('setujui', $item)
                             @if ($item->butuhPersetujuan())
-                                <form method="POST" action="{{ route('pengeluaran.setujui', $item) }}">@csrf<button class="btn-primary btn-sm">Setujui</button></form>
+                                <form method="POST" action="{{ route('pengeluaran.setujui', $item) }}"
+                                      data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan disetujui dan ikut dihitung sebagai biaya. Pastikan bukti dan nominalnya sudah benar."
+                                      data-confirm-title="Setujui pengeluaran?"
+                                      data-confirm-severity="info"
+                                      data-confirm-label="Ya, setujui">@csrf<button class="btn-primary btn-sm">Setujui</button></form>
                                 <form method="POST" action="{{ route('pengeluaran.tolak', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan ditolak. Pembuat dapat memperbaikinya."
                                           data-confirm-title="Tolak pengeluaran?"
                                           data-confirm-severity="warning"
@@ -148,7 +152,11 @@
                                 @endcan
                                 @can('setujui', $item)
                                     @if ($item->butuhPersetujuan())
-                                        <form method="POST" action="{{ route('pengeluaran.setujui', $item) }}">@csrf<button class="btn-ghost btn-sm text-emerald-600">Setujui</button></form>
+                                        <form method="POST" action="{{ route('pengeluaran.setujui', $item) }}"
+                                              data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan disetujui dan ikut dihitung sebagai biaya. Pastikan bukti dan nominalnya sudah benar."
+                                              data-confirm-title="Setujui pengeluaran?"
+                                              data-confirm-severity="info"
+                                              data-confirm-label="Ya, setujui">@csrf<button class="btn-ghost btn-sm text-emerald-600">Setujui</button></form>
                                         <form method="POST" action="{{ route('pengeluaran.tolak', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan ditolak. Pembuat dapat memperbaikinya."
                                           data-confirm-title="Tolak pengeluaran?"
                                           data-confirm-severity="warning"

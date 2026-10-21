@@ -207,7 +207,11 @@
                         <a href="{{ route('profil.edit') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
                             <x-icon name="user" class="h-4 w-4" /> Profil &amp; Password
                         </a>
-                        <form method="POST" action="{{ route('logout') }}">
+                        <form method="POST" action="{{ route('logout') }}"
+                              data-confirm="Sesi Anda akan diakhiri. Anda perlu masuk kembali untuk melanjutkan."
+                              data-confirm-title="Keluar dari aplikasi?"
+                              data-confirm-severity="info"
+                              data-confirm-label="Ya, keluar">
                             @csrf
                             <button type="submit" class="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
                                 <x-icon name="logout" class="h-4 w-4" /> Keluar
