@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
 
+
 // Logo aplikasi tampil di halaman login, jadi harus bisa diakses tanpa login.
 Route::get('branding/logo', BrandingLogoController::class)->name('branding.logo');
 
