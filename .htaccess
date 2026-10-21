@@ -1,0 +1,60 @@
+# versi https
+# <IfModule mod_rewrite.c>
+#     <IfModule mod_negotiation.c>
+#         Options -MultiViews
+#     </IfModule>
+
+#     RewriteEngine On
+
+#     # Redirect Trailing Slashes If Not A Folder...
+#     RewriteCond %{REQUEST_FILENAME} !-d
+#     RewriteCond %{REQUEST_URI} (.+)/$
+#     RewriteRule ^ %1 [L,R=301]
+
+#     # Handle Authorization Header
+#     RewriteCond %{HTTP:Authorization} .
+#     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+#     # Force to https
+#     RewriteCond %{HTTP:X-Forwarded-Proto} =http
+#     RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+
+#     # Force to non www, but register www first
+#     RewriteCond %{HTTPS} on
+#     RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+#     RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+#     # Redirect to public but not rewrite url
+#     RewriteCond %{REQUEST_FILENAME} !-f
+#     RewriteRule ^(.*)$ public/$1 [L]
+
+# </IfModule>
+
+# versi http ok
+
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews
+    </IfModule>
+
+    RewriteEngine On
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Force non-www only when using https
+    RewriteCond %{HTTPS} on
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+    # Redirect to public but not rewrite url
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ public/$1 [L]
+
+</IfModule>
