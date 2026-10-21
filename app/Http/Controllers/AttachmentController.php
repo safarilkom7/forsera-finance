@@ -36,16 +36,28 @@ class AttachmentController extends Controller
 
         abort_unless(Storage::disk('local')->exists($path), 404);
 
+        $nama = $lampiran['nama_asli'] ?? basename($path);
+        $mime = $lampiran['mime'] ?? 'application/octet-stream';
+
+        // mode=inline dipakai untuk pratinjau gambar di daftar lampiran.
+        $inline = $request->boolean('inline') || in_array($request->query('mode'), ['inline', 'lihat', 'preview'], true);
+
         activity('lampiran')
             ->performedOn($model)
             ->causedBy($request->user())
-            ->withProperties(['path' => $path, 'ip' => $request->ip()])
-            ->log('Mengunduh lampiran');
+            ->withProperties(['path' => $path, 'ip' => $request->ip(), 'mode' => $inline ? 'inline' : 'unduh'])
+            ->log($inline ? 'Melihat lampiran' : 'Mengunduh lampiran');
 
-        return Storage::disk('local')->download(
-            $path,
-            $lampiran['nama_asli'] ?? basename($path),
-            ['Content-Type' => $lampiran['mime'] ?? 'application/octet-stream'],
-        );
+        $headers = [
+            'Content-Type' => $mime,
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, max-age=300',
+        ];
+
+        if ($inline) {
+            return Storage::disk('local')->response($path, $nama, $headers);
+        }
+
+        return Storage::disk('local')->download($path, $nama, $headers);
     }
 }

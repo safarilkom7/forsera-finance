@@ -107,7 +107,8 @@ class InsidenController extends Controller
         $this->authorize('kelola', $insiden);
 
         $files = $request->file('lampiran', []);
-        $files = is_array($files) ? array_values(array_filter($files)) : [];
+        $files = LampiranService::bersihkan(is_array($files) ? $files : []);
+        $request->files->set('lampiran', $files);
         $request->merge([
             'nominal' => parse_rupiah($request->input('nominal', 0)),
             'lampiran' => $files === [] ? null : $files,
@@ -118,14 +119,13 @@ class InsidenController extends Controller
             'penyebab' => ['required', 'string', 'max:1000'],
             'catatan_penyelesaian' => ['required', 'string', 'max:2000'],
             'nominal' => ['nullable', 'integer', 'min:0'],
-            'lampiran' => ['nullable', 'array', 'max:5'],
-            'lampiran.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
+            'lampiran' => ['nullable', 'array', 'max:'.LampiranService::MAX_FILES],
+            'lampiran.*' => LampiranService::aturan(),
         ], [
             'tipe_penyelesaian.required' => 'Tipe penyelesaian wajib dipilih.',
             'penyebab.required' => 'Penyebab wajib diisi.',
             'catatan_penyelesaian.required' => 'Catatan penyelesaian wajib diisi.',
-            'lampiran.*.mimes' => 'Bukti harus berupa JPG, PNG, WEBP, atau PDF.',
-            'lampiran.*.max' => 'Ukuran setiap bukti maksimal 5 MB.',
+            ...LampiranService::pesan('lampiran'),
         ]);
 
         $meta = $this->lampiran->simpan($request->file('lampiran', []), 'lampiran/insiden', $request->user());

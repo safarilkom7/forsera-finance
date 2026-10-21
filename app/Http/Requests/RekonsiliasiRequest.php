@@ -4,8 +4,10 @@ namespace App\Http\Requests;
 
 use App\Models\MetodePembayaran;
 use App\Models\UnitUsaha;
+use App\Services\LampiranService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 
 class RekonsiliasiRequest extends FormRequest
 {
@@ -17,7 +19,7 @@ class RekonsiliasiRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $files = $this->file('bukti', []);
-        $files = is_array($files) ? array_values(array_filter($files)) : [];
+        $files = LampiranService::bersihkan(is_array($files) ? $files : []);
         $this->merge(['bukti' => $files === [] ? null : $files]);
 
         $this->merge([
@@ -25,6 +27,16 @@ class RekonsiliasiRequest extends FormRequest
             'biaya_admin' => parse_rupiah($this->input('biaya_admin', 0)),
             'potongan_kas_manual' => $this->filled('potongan_kas_manual') ? parse_rupiah($this->input('potongan_kas_manual')) : null,
             'menunggu_settlement' => $this->boolean('menunggu_settlement'),
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function validationData(): array
+    {
+        return array_merge(parent::validationData(), [
+            'bukti' => LampiranService::bersihkan((array) $this->file('bukti', [])),
         ]);
     }
 
@@ -46,8 +58,8 @@ class RekonsiliasiRequest extends FormRequest
             'potongan_kas_manual' => ['nullable', 'integer', 'min:0'],
             'catatan' => ['nullable', 'string', 'max:2000'],
             'menunggu_settlement' => ['boolean'],
-            'bukti' => ['nullable', 'array', 'max:5'],
-            'bukti.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
+            'bukti' => ['nullable', 'array', 'max:'.LampiranService::MAX_FILES],
+            'bukti.*' => LampiranService::aturan(),
         ];
     }
 
@@ -57,9 +69,7 @@ class RekonsiliasiRequest extends FormRequest
             'pemasukan_ids.required' => 'Pilih minimal satu pemasukan untuk direkonsiliasi.',
             'pemasukan_ids.min' => 'Pilih minimal satu pemasukan untuk direkonsiliasi.',
             'periode_selesai.after_or_equal' => 'Tanggal akhir harus setelah atau sama dengan tanggal mulai.',
-            'bukti.max' => 'Maksimal 5 bukti penerimaan.',
-            'bukti.*.mimes' => 'Bukti harus berupa JPG, PNG, WEBP, atau PDF.',
-            'bukti.*.max' => 'Ukuran setiap bukti maksimal 5 MB.',
+            ...LampiranService::pesan('bukti'),
         ];
     }
 
@@ -87,6 +97,20 @@ class RekonsiliasiRequest extends FormRequest
                 $selesai = Carbon::parse($this->input('periode_selesai'));
                 if ($mulai->diffInDays($selesai) > 366) {
                     $validator->errors()->add('periode_selesai', 'Rentang rekonsiliasi maksimal satu tahun.');
+                }
+
+                $lampiranService = app(LampiranService::class);
+                $files = $this->file('bukti', []);
+                $files = LampiranService::bersihkan(is_array($files) ? $files : []);
+
+                foreach ($files as $index => $file) {
+                    try {
+                        $lampiranService->validasiFile($file);
+                    } catch (ValidationException $exception) {
+                        foreach ($exception->errors()['lampiran'] ?? [] as $pesan) {
+                            $validator->errors()->add('bukti.'.$index, $pesan);
+                        }
+                    }
                 }
             },
         ];

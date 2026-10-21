@@ -4,8 +4,10 @@ namespace App\Http\Requests;
 
 use App\Models\MetodePembayaran;
 use App\Models\UnitUsaha;
+use App\Services\LampiranService;
 use App\Services\PengaturanService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class PengeluaranRequest extends FormRequest
 {
@@ -17,7 +19,7 @@ class PengeluaranRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $files = $this->file('lampiran', []);
-        $files = is_array($files) ? array_values(array_filter($files)) : [];
+        $files = LampiranService::bersihkan(is_array($files) ? $files : []);
         $this->merge(['lampiran' => $files === [] ? null : $files]);
 
         $detail = collect($this->input('detail', []))
@@ -48,6 +50,16 @@ class PengeluaranRequest extends FormRequest
     /**
      * @return array<string, mixed>
      */
+    public function validationData(): array
+    {
+        return array_merge(parent::validationData(), [
+            'lampiran' => LampiranService::bersihkan((array) $this->file('lampiran', [])),
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
@@ -63,8 +75,8 @@ class PengeluaranRequest extends FormRequest
             'detail.*.jumlah' => ['required', 'numeric', 'min:0.001'],
             'detail.*.satuan_id' => ['required', 'integer', 'exists:satuan,id'],
             'detail.*.harga_satuan' => ['required', 'integer', 'min:0'],
-            'lampiran' => ['nullable', 'array', 'max:5'],
-            'lampiran.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
+            'lampiran' => ['nullable', 'array', 'max:'.LampiranService::MAX_FILES],
+            'lampiran.*' => LampiranService::aturan(),
             'hapus_lampiran' => ['nullable', 'array'],
             'hapus_lampiran.*' => ['string'],
         ];
@@ -80,9 +92,7 @@ class PengeluaranRequest extends FormRequest
             'detail.*.item_id.required' => 'Item wajib dipilih pada setiap baris detail.',
             'detail.*.jumlah.min' => 'Jumlah item harus lebih dari nol.',
             'detail.*.harga_satuan.min' => 'Harga satuan tidak boleh negatif.',
-            'lampiran.max' => 'Maksimal 5 lampiran per transaksi.',
-            'lampiran.*.mimes' => 'Lampiran harus berupa JPG, PNG, WEBP, atau PDF.',
-            'lampiran.*.max' => 'Ukuran setiap lampiran maksimal 5 MB.',
+            ...LampiranService::pesan('lampiran'),
         ];
     }
 
@@ -120,6 +130,32 @@ class PengeluaranRequest extends FormRequest
                 $maks = app(PengaturanService::class)->getInt('nominal_maks_transaksi', 2_000_000_000);
                 if ($total > $maks) {
                     $validator->errors()->add('total_nominal', 'Total pengeluaran melebihi batas maksimum transaksi '.format_rupiah($maks).'.');
+                }
+
+                $lampiranService = app(LampiranService::class);
+                $files = $this->file('lampiran', []);
+                $files = LampiranService::bersihkan(is_array($files) ? $files : []);
+
+                foreach ($files as $index => $file) {
+                    try {
+                        $lampiranService->validasiFile($file);
+                    } catch (ValidationException $exception) {
+                        foreach ($exception->errors()['lampiran'] ?? [] as $pesan) {
+                            $validator->errors()->add('lampiran.'.$index, $pesan);
+                        }
+                    }
+                }
+
+                $pengeluaran = $this->route('pengeluaran');
+                if ($pengeluaran !== null) {
+                    $dihapus = (array) $this->input('hapus_lampiran', []);
+                    $tersisa = collect($pengeluaran->lampiran ?? [])
+                        ->reject(fn ($item) => in_array($item['path'] ?? null, $dihapus, true))
+                        ->count();
+
+                    if ($tersisa + count($files) > LampiranService::MAX_FILES) {
+                        $validator->errors()->add('lampiran', 'Total lampiran melebihi '.LampiranService::MAX_FILES.' berkas. Hapus beberapa lampiran lama terlebih dahulu.');
+                    }
                 }
             },
         ];

@@ -79,7 +79,7 @@
                 <a href="{{ route('rekonsiliasi.create') }}" class="btn-secondary mt-5 inline-flex">Kembali ke langkah 1</a>
             </div>
         @else
-            <form method="POST" action="{{ route('rekonsiliasi.store') }}" id="form-rekonsiliasi" class="grid gap-5 xl:grid-cols-3">
+            <form method="POST" action="{{ route('rekonsiliasi.store') }}" id="form-rekonsiliasi" class="grid gap-5 xl:grid-cols-3" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="unit_usaha_id" value="{{ $unitId }}">
                 <input type="hidden" name="metode_pembayaran_id" value="{{ $metodeId }}">
@@ -180,12 +180,11 @@
                             </label>
                         @endif
 
-                        <div class="mt-4">
-                            <label for="bukti" class="label">Bukti penerimaan <span class="font-normal text-slate-400">(opsional)</span></label>
-                            <input type="file" id="bukti" name="bukti[]" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,image/*" class="block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-3 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-600 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white dark:border-slate-700 dark:bg-slate-900">
-                            @error('bukti')<p class="error-text">{{ $message }}</p>@enderror
-                            @error('bukti.*')<p class="error-text">{{ $message }}</p>@enderror
-                        </div>
+                        <x-file-upload
+                            name="bukti"
+                            label="Bukti penerimaan"
+                            hint="Slip setoran, mutasi rekening, atau tangkapan layar settlement."
+                            :bare="true" />
                     </div>
                 </div>
 

@@ -21,7 +21,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ $pemasukan ? route('pemasukan.update', $pemasukan) : route('pemasukan.store') }}" class="space-y-5" id="form-pemasukan">
+    <form method="POST" action="{{ $pemasukan ? route('pemasukan.update', $pemasukan) : route('pemasukan.store') }}" class="space-y-5" id="form-pemasukan" enctype="multipart/form-data">
         @csrf
         @if ($pemasukan)
             @method('PUT')
@@ -118,29 +118,13 @@
         </div>
 
         @unless ($terkunci)
-            <div class="card card-pad">
-                <h2 class="section-title">Lampiran</h2>
-                <p class="hint mt-1">Maksimal 5 file; JPG, PNG, WEBP, atau PDF; masing-masing maksimal 5 MB. Foto langsung dari kamera didukung.</p>
-
-                @if ($pemasukan && ! empty($pemasukan->lampiran))
-                    <div class="mt-3 space-y-2">
-                        @foreach ($pemasukan->lampiran as $index => $file)
-                            <div class="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700">
-                                <x-icon name="file-text" class="h-4 w-4 shrink-0 text-slate-400" />
-                                <a href="{{ route('lampiran.download', ['jenis' => 'pemasukan', 'id' => $pemasukan->id, 'index' => $index]) }}" class="min-w-0 flex-1 truncate font-medium text-emerald-700 hover:underline dark:text-emerald-400">{{ $file['nama_asli'] ?? basename($file['path']) }}</a>
-                                <label class="flex shrink-0 items-center gap-1.5 text-xs text-red-600">
-                                    <input type="checkbox" name="hapus_lampiran[]" value="{{ $file['path'] }}" class="rounded border-slate-300 text-red-600"> Hapus
-                                </label>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-
-                <input type="file" name="lampiran[]" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,image/*"
-                       class="mt-3 block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-4 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-600 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white dark:border-slate-700 dark:bg-slate-900">
-                @error('lampiran')<p class="error-text">{{ $message }}</p>@enderror
-                @error('lampiran.*')<p class="error-text">{{ $message }}</p>@enderror
-            </div>
+            <x-file-upload
+                name="lampiran"
+                label="Lampiran"
+                hint="Struk kasir, bukti transfer, atau rekap setoran."
+                jenis="pemasukan"
+                :existing-id="$pemasukan?->id"
+                :existing="$pemasukan?->lampiran ?? []" />
         @endunless
 
         <div class="flex flex-col-reverse gap-2 sm:flex-row sm:flex-wrap">

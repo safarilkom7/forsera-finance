@@ -160,6 +160,216 @@ const initPasswordToggles = () => {
     });
 };
 
+const formatBytes = (bytes) => {
+    const nilai = Number(bytes) || 0;
+    if (nilai >= 1048576) {
+        return (nilai / 1048576).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' MB';
+    }
+    if (nilai >= 1024) {
+        return Math.round(nilai / 1024).toLocaleString('id-ID') + ' KB';
+    }
+    return nilai + ' B';
+};
+
+const initFileUploads = () => {
+    document.querySelectorAll('[data-file-upload]').forEach((root) => {
+        const input = root.querySelector('[data-input]');
+        const camera = root.querySelector('[data-camera]');
+        const list = root.querySelector('[data-list]');
+        const listWrap = root.querySelector('[data-terpilih]');
+        const dropzone = root.querySelector('[data-dropzone]');
+        const errorBox = root.querySelector('[data-client-error]');
+        const counter = root.querySelector('[data-counter]');
+        if (!input || !list || !listWrap) return;
+
+        const max = Number(root.dataset.max || 5);
+        const maxBytes = Number(root.dataset.maxBytes || 0);
+        const allowed = String(root.dataset.extensions || '').split(',').filter(Boolean);
+        const files = [];
+
+        const hapusToggles = () => Array.from(root.querySelectorAll('[data-hapus-toggle]'));
+        const jumlahLama = () => hapusToggles().filter((checkbox) => !checkbox.checked).length;
+
+        const showError = (pesan) => {
+            if (!errorBox) return;
+            errorBox.textContent = pesan;
+            errorBox.classList.remove('hidden');
+        };
+
+        const clearError = () => {
+            if (!errorBox) return;
+            errorBox.textContent = '';
+            errorBox.classList.add('hidden');
+        };
+
+        const sync = () => {
+            try {
+                const transfer = new DataTransfer();
+                files.forEach((file) => transfer.items.add(file));
+                input.files = transfer.files;
+            } catch (e) {
+                // DataTransfer tidak tersedia: input tetap berisi berkas terakhir.
+            }
+
+            if (counter) {
+                const total = jumlahLama() + files.length;
+                counter.textContent = total + '/' + max + ' berkas';
+                counter.classList.toggle('badge-red', total > max);
+                counter.classList.toggle('badge-gray', total <= max);
+            }
+        };
+
+        const buatBaris = (file, index) => {
+            const row = document.createElement('li');
+            row.className = 'flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900/50';
+
+            const thumb = document.createElement('span');
+            thumb.className = 'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-500 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-700';
+
+            const bisaPratinjau = file.type.startsWith('image/') && !/heic|heif/i.test(file.type);
+            if (bisaPratinjau) {
+                const img = document.createElement('img');
+                img.className = 'h-full w-full object-cover';
+                img.alt = file.name;
+                const url = URL.createObjectURL(file);
+                img.src = url;
+                img.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
+                thumb.appendChild(img);
+            } else {
+                const ext = (file.name.split('.').pop() || 'file').slice(0, 4).toUpperCase();
+                const badge = document.createElement('span');
+                badge.className = 'text-[10px] font-bold';
+                badge.textContent = ext;
+                thumb.appendChild(badge);
+            }
+
+            const info = document.createElement('div');
+            info.className = 'min-w-0 flex-1';
+            const nama = document.createElement('p');
+            nama.className = 'truncate text-sm font-medium text-slate-800 dark:text-slate-100';
+            nama.textContent = file.name;
+            const meta = document.createElement('p');
+            meta.className = 'mt-0.5 text-[11px] text-slate-400';
+            meta.textContent = formatBytes(file.size) + ' · siap diunggah';
+            info.append(nama, meta);
+
+            const hapus = document.createElement('button');
+            hapus.type = 'button';
+            hapus.className = 'rounded-lg p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10';
+            hapus.setAttribute('aria-label', 'Batalkan ' + file.name);
+            hapus.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" class="h-4 w-4" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';
+            hapus.addEventListener('click', () => {
+                files.splice(index, 1);
+                clearError();
+                render();
+            });
+
+            row.append(thumb, info, hapus);
+
+            return row;
+        };
+
+        const render = () => {
+            list.textContent = '';
+            files.forEach((file, index) => list.appendChild(buatBaris(file, index)));
+            listWrap.classList.toggle('hidden', files.length === 0);
+            sync();
+        };
+
+        const tambah = (incoming) => {
+            clearError();
+            let ditolak = null;
+
+            Array.from(incoming || []).forEach((file) => {
+                const ekstensi = (file.name.split('.').pop() || '').toLowerCase();
+
+                if (allowed.length > 0 && !allowed.includes(ekstensi)) {
+                    ditolak = ditolak || 'Berkas "' + file.name + '" formatnya belum didukung.';
+                    return;
+                }
+
+                if (maxBytes > 0 && file.size > maxBytes) {
+                    ditolak = ditolak || 'Berkas "' + file.name + '" berukuran ' + formatBytes(file.size) + ', melebihi batas ' + formatBytes(maxBytes) + '.';
+                    return;
+                }
+
+                if (files.some((lain) => lain.name === file.name && lain.size === file.size && lain.lastModified === file.lastModified)) {
+                    return;
+                }
+
+                if (jumlahLama() + files.length >= max) {
+                    ditolak = ditolak || 'Maksimal ' + max + ' berkas. Hapus salah satu berkas terlebih dahulu.';
+                    return;
+                }
+
+                files.push(file);
+            });
+
+            if (ditolak) showError(ditolak);
+            render();
+        };
+
+        root.querySelectorAll('[data-browse]').forEach((button) => {
+            button.addEventListener('click', () => input.click());
+        });
+
+        root.querySelectorAll('[data-camera-open]').forEach((button) => {
+            button.addEventListener('click', () => camera?.click());
+        });
+
+        dropzone?.addEventListener('click', (event) => {
+            if (event.target.closest('button, a')) return;
+            input.click();
+        });
+
+        ['dragenter', 'dragover'].forEach((nama) => {
+            dropzone?.addEventListener(nama, (event) => {
+                event.preventDefault();
+                dropzone.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-500/10');
+            });
+        });
+
+        ['dragleave', 'dragend'].forEach((nama) => {
+            dropzone?.addEventListener(nama, () => {
+                dropzone.classList.remove('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-500/10');
+            });
+        });
+
+        dropzone?.addEventListener('drop', (event) => {
+            event.preventDefault();
+            dropzone.classList.remove('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-500/10');
+            tambah(event.dataTransfer?.files);
+        });
+
+        input.addEventListener('change', () => tambah(input.files));
+
+        camera?.addEventListener('change', () => {
+            tambah(camera.files);
+            camera.value = '';
+        });
+
+        hapusToggles().forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                const item = checkbox.closest('[data-existing-item]');
+                item?.classList.toggle('opacity-60', checkbox.checked);
+                item?.classList.toggle('border-red-200', checkbox.checked);
+                item?.querySelector('[data-nama-berkas]')?.classList.toggle('line-through', checkbox.checked);
+                sync();
+            });
+        });
+
+        root.closest('form')?.addEventListener('submit', (event) => {
+            if (jumlahLama() + files.length > max) {
+                event.preventDefault();
+                showError('Total lampiran melebihi ' + max + ' berkas. Hapus beberapa lampiran lama terlebih dahulu.');
+                errorBox?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        render();
+    });
+};
+
 const initFilters = () => {
     document.querySelectorAll('[data-auto-submit]').forEach((element) => {
         element.addEventListener('change', () => element.closest('form')?.submit());
@@ -174,6 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initConfirmations();
     initDialogs();
     initFilters();
+    initFileUploads();
     initPasswordToggles();
     initCharts();
 });

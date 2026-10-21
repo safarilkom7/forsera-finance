@@ -159,12 +159,11 @@
                             Write-off akan menghapus sisa selisih dan tercatat sebagai “Selisih dihapuskan” pada laporan. Hanya Owner.
                         </div>
 
-                        <div>
-                            <label for="bukti_insiden" class="label">Bukti penyelesaian <span class="font-normal text-slate-400">(opsional)</span></label>
-                            <input type="file" id="bukti_insiden" name="lampiran[]" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,image/*" class="block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-3 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-600 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white dark:border-slate-700 dark:bg-slate-900">
-                            @error('lampiran')<p class="error-text">{{ $message }}</p>@enderror
-                            @error('lampiran.*')<p class="error-text">{{ $message }}</p>@enderror
-                        </div>
+                        <x-file-upload
+                            name="lampiran"
+                            label="Bukti penyelesaian"
+                            hint="Foto setoran ulang, bukti transfer, atau tangkapan layar mutasi."
+                            :bare="true" />
 
                         <button type="submit" class="btn-primary">Catat penyelesaian</button>
                     </form>

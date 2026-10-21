@@ -5,9 +5,11 @@ namespace App\Http\Requests;
 use App\Models\KategoriPemasukan;
 use App\Models\MetodePembayaran;
 use App\Models\UnitUsaha;
+use App\Services\LampiranService;
 use App\Services\PengaturanService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 class PemasukanRequest extends FormRequest
 {
@@ -19,12 +21,25 @@ class PemasukanRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $files = $this->file('lampiran', []);
-        $files = is_array($files) ? array_values(array_filter($files)) : [];
+        $files = LampiranService::bersihkan(is_array($files) ? $files : []);
         $this->merge(['lampiran' => $files === [] ? null : $files]);
 
         if ($this->has('nominal')) {
             $this->merge(['nominal' => parse_rupiah($this->input('nominal'))]);
         }
+    }
+
+    /**
+     * Pastikan entri berkas kosong (mis. input yang dikosongkan pengguna)
+     * tidak ikut divalidasi sebagai unggahan gagal.
+     *
+     * @return array<string, mixed>
+     */
+    public function validationData(): array
+    {
+        return array_merge(parent::validationData(), [
+            'lampiran' => LampiranService::bersihkan((array) $this->file('lampiran', [])),
+        ]);
     }
 
     /**
@@ -39,8 +54,8 @@ class PemasukanRequest extends FormRequest
             'metode_pembayaran_id' => ['required', 'integer', 'exists:metode_pembayaran,id'],
             'nominal' => ['required', 'integer', 'min:1'],
             'note' => ['nullable', 'string', 'max:500'],
-            'lampiran' => ['nullable', 'array', 'max:5'],
-            'lampiran.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
+            'lampiran' => ['nullable', 'array', 'max:'.LampiranService::MAX_FILES],
+            'lampiran.*' => LampiranService::aturan(),
             'hapus_lampiran' => ['nullable', 'array'],
             'hapus_lampiran.*' => ['string'],
             'alasan' => ['nullable', 'string', 'max:1000'],
@@ -58,9 +73,7 @@ class PemasukanRequest extends FormRequest
             'unit_usaha_id.required' => 'Unit usaha wajib dipilih.',
             'kategori_pemasukan_id.required' => 'Kategori pemasukan wajib dipilih.',
             'metode_pembayaran_id.required' => 'Metode pembayaran wajib dipilih.',
-            'lampiran.max' => 'Maksimal 5 lampiran per transaksi.',
-            'lampiran.*.mimes' => 'Lampiran harus berupa JPG, PNG, WEBP, atau PDF.',
-            'lampiran.*.max' => 'Ukuran setiap lampiran maksimal 5 MB.',
+            ...LampiranService::pesan('lampiran'),
         ];
     }
 
@@ -93,6 +106,32 @@ class PemasukanRequest extends FormRequest
                 $maks = app(PengaturanService::class)->getInt('nominal_maks_transaksi', 2_000_000_000);
                 if ((int) $this->input('nominal') > $maks) {
                     $validator->errors()->add('nominal', 'Nominal melebihi batas maksimum transaksi '.format_rupiah($maks).'.');
+                }
+
+                $lampiranService = app(LampiranService::class);
+                $files = $this->file('lampiran', []);
+                $files = LampiranService::bersihkan(is_array($files) ? $files : []);
+
+                foreach ($files as $index => $file) {
+                    try {
+                        $lampiranService->validasiFile($file);
+                    } catch (ValidationException $exception) {
+                        foreach ($exception->errors()['lampiran'] ?? [] as $pesan) {
+                            $validator->errors()->add('lampiran.'.$index, $pesan);
+                        }
+                    }
+                }
+
+                $pemasukan = $this->route('pemasukan');
+                if ($pemasukan !== null) {
+                    $dihapus = (array) $this->input('hapus_lampiran', []);
+                    $tersisa = collect($pemasukan->lampiran ?? [])
+                        ->reject(fn ($item) => in_array($item['path'] ?? null, $dihapus, true))
+                        ->count();
+
+                    if ($tersisa + count($files) > LampiranService::MAX_FILES) {
+                        $validator->errors()->add('lampiran', 'Total lampiran melebihi '.LampiranService::MAX_FILES.' berkas. Hapus beberapa lampiran lama terlebih dahulu.');
+                    }
                 }
 
                 if ($this->route('pemasukan') !== null && $this->route('pemasukan')->terkunci()) {
