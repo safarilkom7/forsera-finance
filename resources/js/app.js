@@ -88,11 +88,132 @@ const initRupiahInputs = () => {
     });
 };
 
+const KELAS_IKON_KONFIRMASI = {
+    warning: 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/30',
+    danger: 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/30',
+    info: 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-200 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/30',
+};
+
+const LABEL_KONFIRMASI = {
+    warning: 'Ya, lanjutkan',
+    danger: 'Ya, hapus',
+    info: 'Mengerti',
+};
+
 const initConfirmations = () => {
+    const dialog = document.getElementById('confirm-dialog');
+    const judul = dialog?.querySelector('[data-confirm-title]');
+    const pesan = dialog?.querySelector('[data-confirm-message]');
+    const ikon = dialog?.querySelector('[data-confirm-icon]');
+    const tombolTerima = dialog?.querySelector('[data-confirm-accept]');
+    const tombolBatal = dialog?.querySelector('[data-confirm-cancel]');
+    const tombolTutup = dialog?.querySelector('[data-confirm-close]');
+    let selesaikan = null;
+
+    const opsiDari = (elemen) => {
+        const severity = ['danger', 'warning', 'info'].includes(elemen.dataset.confirmSeverity)
+            ? elemen.dataset.confirmSeverity
+            : 'warning';
+
+        return {
+            judul: elemen.dataset.confirmTitle || 'Konfirmasi',
+            pesan: elemen.dataset.confirm || elemen.dataset.confirmMessage || 'Lanjutkan tindakan ini?',
+            severity,
+            labelTerima: elemen.dataset.confirmLabel || LABEL_KONFIRMASI[severity],
+            labelBatal: elemen.dataset.confirmCancelLabel || 'Batal',
+        };
+    };
+
+    const terapkanOpsi = (opsi) => {
+        if (judul) judul.textContent = opsi.judul;
+        if (pesan) pesan.textContent = opsi.pesan;
+        if (tombolTerima) {
+            tombolTerima.textContent = opsi.labelTerima;
+            tombolTerima.className = opsi.severity === 'danger' ? 'btn-danger' : 'btn-primary';
+        }
+        if (tombolBatal) tombolBatal.textContent = opsi.labelBatal;
+        if (ikon) {
+            ikon.className = KELAS_IKON_KONFIRMASI[opsi.severity] || KELAS_IKON_KONFIRMASI.warning;
+            ikon.querySelectorAll('[data-confirm-icon-svg]').forEach((svg) => {
+                svg.classList.toggle('hidden', svg.dataset.confirmIconSvg !== opsi.severity);
+            });
+        }
+    };
+
+    const buka = (opsi = {}) => new Promise((resolve) => {
+        const lengkap = {
+            judul: opsi.judul || 'Konfirmasi',
+            pesan: opsi.pesan || 'Lanjutkan tindakan ini?',
+            severity: opsi.severity || 'warning',
+            labelTerima: opsi.labelTerima || LABEL_KONFIRMASI[opsi.severity] || 'Ya, lanjutkan',
+            labelBatal: opsi.labelBatal || 'Batal',
+        };
+
+        if (!dialog || typeof dialog.showModal !== 'function') {
+            resolve(window.confirm(lengkap.pesan));
+            return;
+        }
+
+        if (dialog.open) {
+            resolve(false);
+            return;
+        }
+
+        selesaikan = resolve;
+        terapkanOpsi(lengkap);
+        dialog.returnValue = '';
+        dialog.showModal();
+        window.requestAnimationFrame(() => tombolTerima?.focus());
+    });
+
+    window.konfirmasi = buka;
+
+    dialog?.addEventListener('close', () => {
+        const diterima = dialog.returnValue === 'confirm';
+        const lanjutkan = selesaikan;
+        selesaikan = null;
+        lanjutkan?.(diterima);
+    });
+
+    tombolTerima?.addEventListener('click', () => dialog.close('confirm'));
+    tombolBatal?.addEventListener('click', () => dialog.close('cancel'));
+    tombolTutup?.addEventListener('click', () => dialog.close('cancel'));
+
     document.querySelectorAll('form[data-confirm]').forEach((form) => {
-        form.addEventListener('submit', (event) => {
-            if (!window.confirm(form.dataset.confirm)) {
-                event.preventDefault();
+        form.addEventListener('submit', async (event) => {
+            if (form.dataset.konfirmasiDisetujui === '1') {
+                delete form.dataset.konfirmasiDisetujui;
+                return;
+            }
+
+            event.preventDefault();
+
+            if (await buka(opsiDari(form))) {
+                form.dataset.konfirmasiDisetujui = '1';
+                form.requestSubmit();
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-confirm-form]').forEach((tombol) => {
+        tombol.addEventListener('click', async (event) => {
+            const form = tombol.form;
+            if (!form) return;
+
+            event.preventDefault();
+
+            if (await buka(opsiDari(tombol))) {
+                form.requestSubmit(tombol);
+            }
+        });
+    });
+
+    document.querySelectorAll('a[data-confirm]').forEach((tautan) => {
+        tautan.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            if (await buka(opsiDari(tautan))) {
+                window.location.href = tautan.href;
             }
         });
     });

@@ -128,7 +128,11 @@
                             <a href="{{ route('pemasukan.edit', $item) }}" class="btn-secondary btn-sm">{{ $item->terkunci() ? 'Koreksi' : 'Ubah' }}</a>
                         @endcan
                         @can('delete', $item)
-                            <form method="POST" action="{{ route('pemasukan.destroy', $item) }}" data-confirm="Hapus pemasukan ini? Tindakan dapat diaudit.">
+                            <form method="POST" action="{{ route('pemasukan.destroy', $item) }}"
+                                  data-confirm="Pemasukan {{ format_rupiah($item->nominal) }} akan dihapus permanen dan tercatat di audit log."
+                                  data-confirm-title="Hapus pemasukan?"
+                                  data-confirm-severity="danger"
+                                  data-confirm-label="Ya, hapus">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-ghost btn-sm text-red-600">Hapus</button>
@@ -188,7 +192,11 @@
                                     <a href="{{ route('pemasukan.edit', $item) }}" class="btn-ghost btn-sm">{{ $item->terkunci() ? 'Koreksi' : 'Ubah' }}</a>
                                 @endcan
                                 @can('delete', $item)
-                                    <form method="POST" action="{{ route('pemasukan.destroy', $item) }}" data-confirm="Hapus pemasukan ini?">
+                                    <form method="POST" action="{{ route('pemasukan.destroy', $item) }}"
+                                          data-confirm="Pemasukan {{ format_rupiah($item->nominal) }} akan dihapus permanen dan tercatat di audit log."
+                                          data-confirm-title="Hapus pemasukan?"
+                                          data-confirm-severity="danger"
+                                          data-confirm-label="Ya, hapus">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-ghost btn-sm text-red-600">Hapus</button>

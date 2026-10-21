@@ -92,11 +92,17 @@
                         @can('setujui', $item)
                             @if ($item->butuhPersetujuan())
                                 <form method="POST" action="{{ route('pengeluaran.setujui', $item) }}">@csrf<button class="btn-primary btn-sm">Setujui</button></form>
-                                <form method="POST" action="{{ route('pengeluaran.tolak', $item) }}" data-confirm="Tolak pengeluaran ini?">@csrf<button class="btn-ghost btn-sm text-red-600">Tolak</button></form>
+                                <form method="POST" action="{{ route('pengeluaran.tolak', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan ditolak. Pembuat dapat memperbaikinya."
+                                          data-confirm-title="Tolak pengeluaran?"
+                                          data-confirm-severity="warning"
+                                          data-confirm-label="Ya, tolak">@csrf<button class="btn-ghost btn-sm text-red-600">Tolak</button></form>
                             @endif
                         @endcan
                         @can('delete', $item)
-                            <form method="POST" action="{{ route('pengeluaran.destroy', $item) }}" data-confirm="Hapus pengeluaran ini?">@csrf @method('DELETE')<button class="btn-ghost btn-sm text-red-600">Hapus</button></form>
+                            <form method="POST" action="{{ route('pengeluaran.destroy', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan dihapus permanen dan tercatat di audit log."
+                                          data-confirm-title="Hapus pengeluaran?"
+                                          data-confirm-severity="danger"
+                                          data-confirm-label="Ya, hapus">@csrf @method('DELETE')<button class="btn-ghost btn-sm text-red-600">Hapus</button></form>
                         @endcan
                     </div>
                 </div>
@@ -143,11 +149,17 @@
                                 @can('setujui', $item)
                                     @if ($item->butuhPersetujuan())
                                         <form method="POST" action="{{ route('pengeluaran.setujui', $item) }}">@csrf<button class="btn-ghost btn-sm text-emerald-600">Setujui</button></form>
-                                        <form method="POST" action="{{ route('pengeluaran.tolak', $item) }}" data-confirm="Tolak pengeluaran ini?">@csrf<button class="btn-ghost btn-sm text-red-600">Tolak</button></form>
+                                        <form method="POST" action="{{ route('pengeluaran.tolak', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan ditolak. Pembuat dapat memperbaikinya."
+                                          data-confirm-title="Tolak pengeluaran?"
+                                          data-confirm-severity="warning"
+                                          data-confirm-label="Ya, tolak">@csrf<button class="btn-ghost btn-sm text-red-600">Tolak</button></form>
                                     @endif
                                 @endcan
                                 @can('delete', $item)
-                                    <form method="POST" action="{{ route('pengeluaran.destroy', $item) }}" data-confirm="Hapus pengeluaran ini?">@csrf @method('DELETE')<button class="btn-ghost btn-sm text-red-600">Hapus</button></form>
+                                    <form method="POST" action="{{ route('pengeluaran.destroy', $item) }}" data-confirm="Pengeluaran {{ format_rupiah($item->total_nominal) }} akan dihapus permanen dan tercatat di audit log."
+                                          data-confirm-title="Hapus pengeluaran?"
+                                          data-confirm-severity="danger"
+                                          data-confirm-label="Ya, hapus">@csrf @method('DELETE')<button class="btn-ghost btn-sm text-red-600">Hapus</button></form>
                                 @endcan
                             </div>
                         </td>

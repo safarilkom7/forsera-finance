@@ -149,16 +149,26 @@
         </div>
     </div>
 
-    <dialog id="dialog-batal" class="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 dark:border-slate-700 dark:bg-slate-900">
-        <form method="POST" action="{{ route('rekonsiliasi.batal', $rekonsiliasi) }}" class="p-5">
+    <dialog id="dialog-batal" class="w-[calc(100%-2rem)] max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/50 backdrop:backdrop-blur-[2px] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+        <form method="POST" action="{{ route('rekonsiliasi.batal', $rekonsiliasi) }}">
             @csrf
-            <h2 class="text-lg font-bold">Batalkan rekonsiliasi?</h2>
-            <p class="mt-1 text-sm text-slate-500">Pemasukan kembali ke Belum Dicek, pengeluaran kas dilepas, dan insiden terkait dibatalkan. Tindakan ini tercatat di audit log.</p>
-            <div class="mt-4">
-                <label for="alasan_batal" class="label">Alasan pembatalan <span class="text-red-500">*</span></label>
+            <div class="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-3.5 dark:border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/30">
+                        <x-icon name="alert-circle" class="h-4 w-4" />
+                    </span>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Batalkan rekonsiliasi?</h2>
+                </div>
+                <button type="button" data-dialog-close aria-label="Tutup dialog" class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200">
+                    <x-icon name="x" class="h-4 w-4" />
+                </button>
+            </div>
+            <div class="px-5 py-5">
+                <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">Pemasukan kembali ke Belum Dicek, pengeluaran kas dilepas, dan insiden terkait dibatalkan. Tindakan ini tercatat di audit log.</p>
+                <label for="alasan_batal" class="label mt-4">Alasan pembatalan <span class="text-red-500">*</span></label>
                 <textarea id="alasan_batal" name="alasan" rows="3" required minlength="5" class="input" placeholder="Contoh: salah memilih batch QRIS"></textarea>
             </div>
-            <div class="mt-4 flex justify-end gap-2">
+            <div class="flex flex-col-reverse gap-2 border-t border-slate-100 bg-slate-50/70 px-5 py-3.5 sm:flex-row sm:justify-end dark:border-slate-800 dark:bg-slate-900/40">
                 <button type="button" class="btn-secondary" data-dialog-close>Batal</button>
                 <button type="submit" class="btn-danger">Ya, batalkan</button>
             </div>
