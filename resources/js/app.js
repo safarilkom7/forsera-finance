@@ -972,6 +972,11 @@ const initKalender = (root = document) => {
         akar.querySelector('[data-kalender-hari-ini]')?.addEventListener('click', () => pilih(hariIni));
         akar.querySelector('[data-kalender-kosong]')?.addEventListener('click', () => pilih(''));
 
+        wadahHari.addEventListener('click', (event) => {
+            const hari = event.target.closest('button[data-nilai]');
+            if (hari) pilih(hari.dataset.nilai);
+        });
+
         wadahHari.addEventListener('keydown', (event) => {
             const hari = event.target.closest('button[data-nilai]');
             if (!hari) return;
