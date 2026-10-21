@@ -19,7 +19,7 @@
             <x-icon name="alert-circle" data-confirm-icon-svg="danger" class="hidden h-5 w-5" />
             <x-icon name="info" data-confirm-icon-svg="info" class="hidden h-5 w-5" />
         </span>
-        <p id="confirm-dialog-message" data-confirm-message class="pt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300"></p>
+        <p id="confirm-dialog-message" data-confirm-message class="max-h-56 overflow-y-auto pt-1 pr-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300"></p>
     </div>
 
     <div class="flex flex-col-reverse gap-2 border-t border-slate-100 bg-slate-50/70 px-5 py-3.5 sm:flex-row sm:justify-end dark:border-slate-800 dark:bg-slate-900/40">
