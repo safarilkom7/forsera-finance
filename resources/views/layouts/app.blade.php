@@ -46,7 +46,7 @@
             </button>
         </div>
 
-        <nav class="flex-1 space-y-6 overflow-y-auto px-3 py-5">
+        <nav class="tanpa-scrollbar flex-1 space-y-6 overflow-y-auto px-3 py-5">
             <div>
                 <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Operasional</p>
                 <div class="space-y-1">
@@ -133,17 +133,6 @@
             </div>
         </nav>
 
-        <div class="border-t border-slate-200 p-4 dark:border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                    {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
-                </div>
-                <div class="min-w-0">
-                    <p class="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{{ auth()->user()->name }}</p>
-                    <p class="truncate text-xs capitalize text-slate-500 dark:text-slate-400">{{ str_replace('_', ' ', auth()->user()->getRoleNames()->first() ?? '-') }}</p>
-                </div>
-            </div>
-        </div>
     </aside>
 
     <div id="sidebar-overlay" class="fixed inset-0 z-30 hidden bg-slate-900/60 backdrop-blur-sm lg:hidden"></div>
