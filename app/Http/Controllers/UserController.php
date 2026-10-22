@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\UnitUsaha;
 use App\Models\User;
+use App\Support\FilterTabel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -16,18 +17,43 @@ class UserController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = User::query()
-            ->with(['roles', 'unitUsaha'])
-            ->when(trim((string) $request->query('q')) !== '', function ($q) use ($request) {
-                $q->where(fn ($r) => $r
-                    ->where('name', 'like', '%'.$request->query('q').'%')
-                    ->orWhere('email', 'like', '%'.$request->query('q').'%'));
-            })
-            ->orderBy('name');
+        $units = UnitUsaha::query()->orderBy('nama')->get();
+
+        $peta = [
+            'f_nama' => ['kolom' => 'name'],
+            'f_email' => ['kolom' => 'email'],
+            'f_peran' => [
+                'kolom' => 'name',
+                'jenis' => 'pilih_relasi',
+                'relasi' => 'roles',
+                'dalam' => [User::ROLE_OWNER, User::ROLE_ADMIN, User::ROLE_STAF],
+            ],
+            // Hanya id unit yang masih ada yang diterima, agar pilihan di dropdown selalu cocok.
+            'f_unit' => [
+                'kolom' => 'id',
+                'jenis' => 'pilih_relasi',
+                'relasi' => 'unitUsaha',
+                'null' => 'tanpa',
+                'dalam' => [...$units->pluck('id')->map(fn ($id) => (string) $id)->all(), 'tanpa'],
+            ],
+            'f_status' => ['kolom' => 'aktif', 'jenis' => 'aktif'],
+            'f_login' => ['kolom' => 'last_login_at', 'jenis' => 'isi'],
+        ];
+
+        $filter = FilterTabel::nilai($request, $peta);
+
+        $query = User::query()->with(['roles', 'unitUsaha']);
+        FilterTabel::terapkan($query, $filter, $peta);
 
         return view('users.index', [
-            'data' => $query->paginate(20)->withQueryString(),
-            'q' => (string) $request->query('q', ''),
+            'data' => $query->orderBy('name')->paginate(20)->withQueryString(),
+            'filter' => $filter,
+            'units' => $units,
+            'peran' => [
+                User::ROLE_OWNER => 'Owner',
+                User::ROLE_ADMIN => 'Admin Keuangan',
+                User::ROLE_STAF => 'Staf Unit',
+            ],
         ]);
     }
 

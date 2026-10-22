@@ -11,6 +11,7 @@
     'options' => [],
     'placeholder' => 'Semua',
     'form' => null,
+    'ringkas' => false,
 ])
 
 @php
@@ -21,7 +22,7 @@
 
 <th {{ $atribut->merge(['class' => 'font-normal']) }}>
     <select id="{{ $id }}" name="{{ $name }}" @if ($form) form="{{ $form }}" @endif
-            class="input min-w-36 py-1.5 pr-6 text-[11px] font-normal normal-case tracking-normal"
+            class="input {{ $ringkas ? 'min-w-32' : 'min-w-36' }} py-1.5 pr-6 text-[11px] font-normal normal-case tracking-normal"
             aria-label="Filter {{ $kata }}" data-auto-submit>
         <option value="">{{ $placeholder }}</option>
         @foreach ($options as $nilai => $label)

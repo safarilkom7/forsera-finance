@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 final class FilterTabel
 {
     /**
-     * @param  array<string, array{kolom: string, jenis?: string, relasi?: string, null?: string}>  $peta
+     * @param  array<string, array{kolom: string, jenis?: string, relasi?: string, null?: string, dalam?: array<int, string>}>  $peta
      * @return array<string, string>
      */
     public static function nilai(Request $request, array $peta): array
@@ -41,6 +41,11 @@ final class FilterTabel
                 continue;
             }
 
+            // Kolom dengan daftar nilai tetap hanya menerima nilai yang tersedia di dropdown.
+            if (isset($peta[$kunci]['dalam']) && ! in_array($isi, $peta[$kunci]['dalam'], true)) {
+                continue;
+            }
+
             if ($isi !== '') {
                 $nilai[$kunci] = $isi;
             }
@@ -50,7 +55,7 @@ final class FilterTabel
     }
 
     /**
-     * @param  array<string, array{kolom: string, jenis?: string, relasi?: string, null?: string}>  $peta
+     * @param  array<string, array{kolom: string, jenis?: string, relasi?: string, null?: string, dalam?: array<int, string>}>  $peta
      * @param  array<string, string>  $nilai
      */
     public static function terapkan(Builder $query, array $nilai, array $peta): void
@@ -77,6 +82,13 @@ final class FilterTabel
                     $aturan['relasi'],
                     fn (Builder $sub) => $sub->where($aturan['kolom'], 'like', '%'.self::tanpaWildcard($isi).'%'),
                 ),
+                // Pilihan tetap pada tabel relasi, mis. peran pengguna atau unit usaha.
+                'pilih_relasi' => isset($aturan['null']) && $isi === $aturan['null']
+                    ? $query->whereDoesntHave($aturan['relasi'])
+                    : $query->whereHas(
+                        $aturan['relasi'],
+                        fn (Builder $sub) => $sub->where($aturan['kolom'], $isi),
+                    ),
                 default => null,
             };
         }

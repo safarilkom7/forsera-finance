@@ -10,6 +10,7 @@
     'value' => '',
     'placeholder' => 'Cari…',
     'form' => null,
+    'ringkas' => false,
 ])
 
 @php
@@ -22,7 +23,7 @@
     <div class="relative">
         <input id="{{ $id }}" type="text" name="{{ $name }}" value="{{ $value }}"
                @if ($form) form="{{ $form }}" @endif
-               class="input min-w-32 py-1.5 pl-2.5 pr-8 text-xs font-normal normal-case tracking-normal"
+               class="input {{ $ringkas ? 'min-w-24' : 'min-w-32' }} py-1.5 pl-2.5 pr-8 text-xs font-normal normal-case tracking-normal"
                placeholder="{{ $placeholder }}" aria-label="Filter {{ $kata }}"
                autocomplete="off" spellcheck="false" data-filter-input>
         <button type="button" @if ($value === '') hidden @endif
