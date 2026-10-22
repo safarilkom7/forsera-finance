@@ -4,10 +4,21 @@
 @section('subtitle', 'Tiga unit bisnis '.$branding['brand'])
 
 @section('content')
-    <div class="mb-5 flex items-center justify-between gap-3">
-        <p class="muted">Menonaktifkan unit lebih aman daripada menghapus data historis.</p>
-        <a href="{{ route('master.unit.create') }}" class="btn-primary"><x-icon name="plus" class="h-4 w-4" /> Unit baru</a>
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+            <p class="muted">Menonaktifkan unit lebih aman daripada menghapus data historis.</p>
+            @if ($filter !== [])
+                <a href="{{ route('master.unit.index') }}" class="btn-ghost btn-sm">
+                    <x-icon name="refresh" class="h-3.5 w-3.5" /> Reset filter
+                </a>
+            @endif
+        </div>
+        <a href="{{ route('master.unit.create') }}" class="btn-primary shrink-0 whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Unit baru</a>
     </div>
+
+    <form method="GET" action="{{ route('master.unit.index') }}" id="filter-unit" class="hidden" data-filter-form>
+        <button type="submit" tabindex="-1" aria-hidden="true">Terapkan</button>
+    </form>
 
     <div class="card overflow-hidden" data-pilih-scope>
         @if ($bolehHapus)
@@ -32,6 +43,18 @@
                     <th class="text-right">Pemasukan</th>
                     <th class="text-right">Pengeluaran</th>
                     <th class="text-right">Aksi</th>
+                </tr>
+                <tr class="filter-baris">
+                    @if ($bolehHapus)
+                        <x-filter-kosong />
+                    @endif
+                    <x-filter-teks name="f_kode" :value="$filter['f_kode'] ?? ''" placeholder="Cari kode" form="filter-unit" />
+                    <x-filter-teks name="f_nama" :value="$filter['f_nama'] ?? ''" placeholder="Cari nama" form="filter-unit" />
+                    <x-filter-pilih name="f_tipe" :value="$filter['f_tipe'] ?? ''" :options="$tipeUnits" placeholder="Semua tipe" form="filter-unit" />
+                    <x-filter-pilih name="f_status" :value="$filter['f_status'] ?? ''" :options="['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif']" placeholder="Semua status" form="filter-unit" />
+                    <x-filter-kosong />
+                    <x-filter-kosong />
+                    <x-filter-kosong />
                 </tr>
                 </thead>
                 <tbody>
@@ -78,7 +101,15 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="{{ $bolehHapus ? 8 : 7 }}" class="py-8 text-center text-slate-500">Belum ada unit usaha.</td></tr>
+                    <tr>
+                        <td colspan="{{ $bolehHapus ? 8 : 7 }}" class="py-8 text-center text-slate-500">
+                            @if ($filter !== [])
+                                Tidak ada unit usaha yang cocok. <a href="{{ route('master.unit.index') }}" class="font-semibold text-emerald-700 underline dark:text-emerald-400">Reset filter</a>.
+                            @else
+                                Belum ada unit usaha.
+                            @endif
+                        </td>
+                    </tr>
                 @endforelse
                 </tbody>
             </table>

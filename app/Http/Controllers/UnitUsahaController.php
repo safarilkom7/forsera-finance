@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\TipeUnitUsaha;
 use App\Models\UnitUsaha;
 use App\Services\MasterDataService;
+use App\Support\FilterTabel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,12 +15,26 @@ class UnitUsahaController extends Controller
 {
     public function __construct(private readonly MasterDataService $master) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $data = UnitUsaha::query()->withCount(['pemasukan', 'pengeluaran'])->orderBy('nama')->get();
+        $peta = [
+            'f_kode' => ['kolom' => 'kode'],
+            'f_nama' => ['kolom' => 'nama'],
+            'f_tipe' => ['kolom' => 'tipe', 'jenis' => 'pilih'],
+            'f_status' => ['kolom' => 'aktif', 'jenis' => 'aktif'],
+        ];
+
+        $filter = FilterTabel::nilai($request, $peta);
+        $query = UnitUsaha::query()->withCount(['pemasukan', 'pengeluaran'])->orderBy('nama');
+        FilterTabel::terapkan($query, $filter, $peta);
+        $data = $query->get();
 
         return view('master.unit.index', [
             'data' => $data,
+            'filter' => $filter,
+            'tipeUnits' => collect(TipeUnitUsaha::cases())
+                ->mapWithKeys(fn (TipeUnitUsaha $tipe) => [$tipe->value => $tipe->getLabel()])
+                ->all(),
             'bolehHapus' => auth()->user()->isOwner(),
             'keterangan' => $this->master->keteranganPemakaian('unit', $data->pluck('id')->all()),
         ]);

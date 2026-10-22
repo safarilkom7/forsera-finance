@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\JenisPengeluaran;
 use App\Models\Satuan;
 use App\Services\MasterDataService;
+use App\Support\FilterTabel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -16,12 +17,26 @@ class ItemController extends Controller
 {
     public function __construct(private readonly MasterDataService $master) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $data = Item::query()->with(['satuanDefault', 'jenisPengeluaran'])->orderBy('nama')->get();
+        $peta = [
+            'f_nama' => ['kolom' => 'nama'],
+            'f_satuan' => ['kolom' => 'satuan_default_id', 'jenis' => 'pilih'],
+            'f_jenis' => ['kolom' => 'jenis_pengeluaran_id', 'jenis' => 'pilih', 'null' => 'tanpa'],
+            'f_harga' => ['kolom' => 'harga_terakhir', 'jenis' => 'isi'],
+            'f_status' => ['kolom' => 'aktif', 'jenis' => 'aktif'],
+        ];
+
+        $filter = FilterTabel::nilai($request, $peta);
+        $query = Item::query()->with(['satuanDefault', 'jenisPengeluaran'])->orderBy('nama');
+        FilterTabel::terapkan($query, $filter, $peta);
+        $data = $query->get();
 
         return view('master.item.index', [
             'data' => $data,
+            'filter' => $filter,
+            'satuans' => Satuan::query()->orderBy('nama')->get(),
+            'jenises' => JenisPengeluaran::query()->orderBy('nama')->get(),
             'bolehHapus' => auth()->user()->isOwner(),
             'keterangan' => $this->master->keteranganPemakaian('item', $data->pluck('id')->all()),
         ]);

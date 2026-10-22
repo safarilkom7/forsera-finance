@@ -3,6 +3,182 @@ import Chart from 'chart.js/auto';
 
 window.Chart = Chart;
 
+/**
+ * Indikator proses global.
+ *
+ * Aplikasi ini berpindah halaman penuh (bukan SPA), jadi status "sedang memuat"
+ * dipakai untuk dua hal: bilah progres di puncak halaman saat data diambil atau
+ * form dikirim, dan penguncian tombol submit agar transaksi tidak terkirim dua
+ * kali saat koneksi lambat atau tombol terklik ganda.
+ */
+const bilahProses = { elemen: null, aktif: false, langkah: [], batas: null };
+
+const pastikanBilah = () => {
+    if (bilahProses.elemen?.isConnected) return bilahProses.elemen;
+
+    const elemen = document.createElement('div');
+    elemen.className = 'bilah-memuat';
+    elemen.setAttribute('role', 'progressbar');
+    elemen.setAttribute('aria-label', 'Memuat halaman');
+    elemen.setAttribute('aria-hidden', 'true');
+    elemen.dataset.aktif = 'false';
+    elemen.append(document.createElement('span'));
+    document.body.append(elemen);
+    bilahProses.elemen = elemen;
+
+    return elemen;
+};
+
+const aturProgres = (persen) => {
+    pastikanBilah().firstElementChild.style.width = persen + '%';
+};
+
+const mulaiMemuat = () => {
+    if (bilahProses.aktif) return;
+
+    bilahProses.aktif = true;
+    const elemen = pastikanBilah();
+    elemen.dataset.aktif = 'true';
+    elemen.setAttribute('aria-hidden', 'false');
+    document.documentElement.setAttribute('aria-busy', 'true');
+
+    aturProgres(10);
+    bilahProses.langkah = [
+        setTimeout(() => aturProgres(45), 120),
+        setTimeout(() => aturProgres(70), 500),
+        setTimeout(() => aturProgres(88), 1200),
+    ];
+
+    // Jaring pengaman: tautan unduhan atau permintaan yang gagal tidak boleh
+    // meninggalkan bilah berjalan selamanya.
+    bilahProses.batas = setTimeout(selesaiMemuat, 20_000);
+};
+
+const selesaiMemuat = () => {
+    bilahProses.langkah.forEach(clearTimeout);
+    bilahProses.langkah = [];
+    clearTimeout(bilahProses.batas);
+    bilahProses.batas = null;
+
+    const elemen = bilahProses.elemen;
+    bilahProses.aktif = false;
+    document.documentElement.removeAttribute('aria-busy');
+
+    if (!elemen) return;
+
+    aturProgres(100);
+
+    setTimeout(() => {
+        if (bilahProses.aktif) return;
+
+        elemen.dataset.aktif = 'false';
+        elemen.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+            if (!bilahProses.aktif) aturProgres(0);
+        }, 250);
+    }, 220);
+};
+
+/** Tombol submit tidak di-disable agar pasangan name/value-nya tetap ikut terkirim. */
+const kunciForm = (form, submitter) => {
+    form.dataset.memuat = '1';
+    form.setAttribute('aria-busy', 'true');
+
+    const tombol = submitter?.tagName === 'BUTTON'
+        ? [submitter]
+        : Array.from(form.querySelectorAll('button[type="submit"], button:not([type]), input[type="submit"]'));
+
+    tombol.forEach((item) => {
+        if (item.dataset.memuatTombol === '1') return;
+
+        item.dataset.memuatTombol = '1';
+        item.setAttribute('aria-disabled', 'true');
+        item.classList.add('sedang-memuat');
+
+        if (item.tagName === 'BUTTON') {
+            // Ikon di depan diganti spinner agar lebar tombol tidak melompat.
+            const ikon = item.querySelector(':scope > svg');
+            if (ikon) {
+                ikon.classList.add('hidden');
+                ikon.dataset.memuatIkon = '1';
+            }
+
+            const spinner = document.createElement('span');
+            spinner.className = 'spinner';
+            spinner.setAttribute('aria-hidden', 'true');
+            item.prepend(spinner);
+        }
+    });
+};
+
+/** Mengembalikan tombol ke keadaan normal, termasuk saat halaman dipulihkan dari cache (bfcache). */
+const lepasKunciForm = () => {
+    document.querySelectorAll('form[data-memuat="1"]').forEach((form) => {
+        delete form.dataset.memuat;
+        form.removeAttribute('aria-busy');
+
+        form.querySelectorAll('[data-memuat-tombol="1"]').forEach((item) => {
+            delete item.dataset.memuatTombol;
+            item.removeAttribute('aria-disabled');
+            item.classList.remove('sedang-memuat');
+            item.querySelectorAll(':scope > .spinner').forEach((spinner) => spinner.remove());
+            item.querySelectorAll(':scope > svg[data-memuat-ikon="1"]').forEach((ikon) => {
+                delete ikon.dataset.memuatIkon;
+                ikon.classList.remove('hidden');
+            });
+        });
+    });
+};
+
+const tautanMemuatHalaman = (tautan, event) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
+    if (tautan.dataset.tanpaMemuat !== undefined || tautan.hasAttribute('download')) return false;
+    if (tautan.target && tautan.target !== '_self') return false;
+
+    const url = new URL(tautan.href, window.location.href);
+
+    if (url.origin !== window.location.origin) return false;
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+
+    // Tautan jangkar di halaman yang sama tidak memuat data baru.
+    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash !== '') return false;
+
+    return true;
+};
+
+const initMemuat = () => {
+    window.mulaiMemuat = mulaiMemuat;
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement) || event.defaultPrevented) return;
+
+        // Submit kedua (mis. Enter ditekan lagi) diabaikan selama yang pertama berjalan.
+        if (form.dataset.memuat === '1') {
+            event.preventDefault();
+            return;
+        }
+
+        kunciForm(form, event.submitter);
+        mulaiMemuat();
+    });
+
+    document.addEventListener('click', (event) => {
+        const tautan = event.target.closest?.('a[href]');
+        if (!tautan || event.defaultPrevented) return;
+        if (tautan.dataset.confirm !== undefined) return;
+        if (!tautanMemuatHalaman(tautan, event)) return;
+
+        mulaiMemuat();
+    });
+
+    // Kembali lewat tombol Back atau halaman dipulihkan dari bfcache: bersihkan sisa status.
+    window.addEventListener('pageshow', () => {
+        selesaiMemuat();
+        lepasKunciForm();
+    });
+};
+
 const formatRupiah = (value) => {
     const digits = String(value).replace(/\D/g, '');
     if (!digits) {
@@ -194,6 +370,9 @@ const initConfirmations = () => {
 
             event.preventDefault();
 
+            // Form sudah dikirim dan sedang diproses: jangan tawarkan konfirmasi lagi.
+            if (form.dataset.memuat === '1') return;
+
             if (await buka(opsiDari(form))) {
                 form.dataset.konfirmasiDisetujui = '1';
                 form.requestSubmit();
@@ -208,6 +387,8 @@ const initConfirmations = () => {
 
             event.preventDefault();
 
+            if (form.dataset.memuat === '1') return;
+
             if (await buka(opsiDari(tombol))) {
                 form.requestSubmit(tombol);
             }
@@ -219,6 +400,7 @@ const initConfirmations = () => {
             event.preventDefault();
 
             if (await buka(opsiDari(tautan))) {
+                mulaiMemuat();
                 window.location.href = tautan.href;
             }
         });
@@ -1148,13 +1330,86 @@ window.siapkanKomponen = (root = document) => {
     initKalender(root);
 };
 
+/**
+ * Filter kolom tabel master memakai GET. Hanya kolom yang terisi yang dikirim
+ * supaya URL tetap pendek dan bisa dibagikan/di-bookmark.
+ */
+const kirimFilter = (form) => {
+    if (!form) return;
+
+    const url = new URL(form.getAttribute('action') || window.location.href, window.location.href);
+    url.search = '';
+
+    new FormData(form).forEach((nilai, kunci) => {
+        const teks = String(nilai).trim();
+        if (teks !== '') url.searchParams.set(kunci, teks);
+    });
+
+    mulaiMemuat();
+    window.location.assign(url.toString());
+};
+
 const initFilters = () => {
     document.querySelectorAll('[data-auto-submit]').forEach((element) => {
-        element.addEventListener('change', () => element.closest('form')?.submit());
+        element.addEventListener('change', () => {
+            const form = element.form ?? element.closest('form');
+            if (!form) return;
+
+            if (form.hasAttribute('data-filter-form')) {
+                kirimFilter(form);
+                return;
+            }
+
+            mulaiMemuat();
+            form.submit();
+        });
+    });
+};
+
+/** Enter menerapkan filter teks; tombol X mengosongkan satu kolom lalu menyaring ulang. */
+const initFilterKolom = () => {
+    document.querySelectorAll('[data-filter-bersih]').forEach((tombol) => {
+        const input = document.getElementById(tombol.dataset.filterBersih);
+        if (!input) return;
+
+        const perbarui = () => {
+            tombol.hidden = input.value.trim() === '';
+        };
+
+        input.addEventListener('input', perbarui);
+        input.addEventListener('change', perbarui);
+        perbarui();
+
+        tombol.addEventListener('click', () => {
+            input.value = '';
+            perbarui();
+            input.focus();
+
+            if (input.form?.hasAttribute('data-filter-form')) kirimFilter(input.form);
+        });
+    });
+
+    document.querySelectorAll('[data-filter-input]').forEach((input) => {
+        input.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter') return;
+
+            const form = input.form;
+            if (!form) return;
+
+            event.preventDefault();
+
+            if (form.hasAttribute('data-filter-form')) {
+                kirimFilter(form);
+            } else {
+                mulaiMemuat();
+                form.requestSubmit?.();
+            }
+        });
     });
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    initMemuat();
     initDarkMode();
     initDropdowns();
     initSidebar();
@@ -1165,6 +1420,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initConfirmations();
     initDialogs();
     initFilters();
+    initFilterKolom();
     initFileUploads();
     initPasswordToggles();
     initCharts();

@@ -10,7 +10,7 @@
             <p class="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{{ format_rupiah($total) }} <span class="text-sm font-normal text-slate-500">total pengeluaran disetujui</span></p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('pengeluaran.export', request()->query()) }}" class="btn-secondary"><x-icon name="download" class="h-4 w-4" /> Excel</a>
+            <a href="{{ route('pengeluaran.export', request()->query()) }}" class="btn-secondary" data-tanpa-memuat><x-icon name="download" class="h-4 w-4" /> Excel</a>
             <a href="{{ route('pengeluaran.create') }}" class="btn-primary"><x-icon name="plus" class="h-4 w-4" /> Pengeluaran</a>
         </div>
     </div>

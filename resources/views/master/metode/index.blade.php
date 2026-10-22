@@ -4,10 +4,21 @@
 @section('subtitle', 'Tunai, QRIS, dan transfer bank')
 
 @section('content')
-    <div class="mb-5 flex items-center justify-between gap-3">
-        <p class="muted">Tipe metode menentukan perilaku rekonsiliasi (kas tunai vs settlement non-tunai).</p>
-        <a href="{{ route('master.metode.create') }}" class="btn-primary"><x-icon name="plus" class="h-4 w-4" /> Metode baru</a>
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+            <p class="muted">Tipe metode menentukan perilaku rekonsiliasi (kas tunai vs settlement non-tunai).</p>
+            @if ($filter !== [])
+                <a href="{{ route('master.metode.index') }}" class="btn-ghost btn-sm">
+                    <x-icon name="refresh" class="h-3.5 w-3.5" /> Reset filter
+                </a>
+            @endif
+        </div>
+        <a href="{{ route('master.metode.create') }}" class="btn-primary shrink-0 whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Metode baru</a>
     </div>
+
+    <form method="GET" action="{{ route('master.metode.index') }}" id="filter-metode" class="hidden" data-filter-form>
+        <button type="submit" tabindex="-1" aria-hidden="true">Terapkan</button>
+    </form>
 
     <div class="card overflow-hidden" data-pilih-scope>
         @if ($bolehHapus)
@@ -29,6 +40,15 @@
                     <th>Tipe</th>
                     <th>Status</th>
                     <th class="text-right">Aksi</th>
+                </tr>
+                <tr class="filter-baris">
+                    @if ($bolehHapus)
+                        <x-filter-kosong />
+                    @endif
+                    <x-filter-teks name="f_nama" :value="$filter['f_nama'] ?? ''" placeholder="Cari nama" form="filter-metode" />
+                    <x-filter-pilih name="f_tipe" :value="$filter['f_tipe'] ?? ''" :options="$tipeMetodes" placeholder="Semua tipe" form="filter-metode" />
+                    <x-filter-pilih name="f_status" :value="$filter['f_status'] ?? ''" :options="['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif']" placeholder="Semua status" form="filter-metode" />
+                    <x-filter-kosong />
                 </tr>
                 </thead>
                 <tbody>
@@ -72,7 +92,15 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="{{ $bolehHapus ? 5 : 4 }}" class="py-8 text-center text-slate-500">Belum ada metode.</td></tr>
+                    <tr>
+                        <td colspan="{{ $bolehHapus ? 5 : 4 }}" class="py-8 text-center text-slate-500">
+                            @if ($filter !== [])
+                                Tidak ada metode yang cocok. <a href="{{ route('master.metode.index') }}" class="font-semibold text-emerald-700 underline dark:text-emerald-400">Reset filter</a>.
+                            @else
+                                Belum ada metode.
+                            @endif
+                        </td>
+                    </tr>
                 @endforelse
                 </tbody>
             </table>

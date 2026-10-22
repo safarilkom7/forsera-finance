@@ -85,7 +85,7 @@
                         </div>
 
                         @if ($urlUnduh)
-                            <a href="{{ $urlUnduh }}" class="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200" title="Unduh {{ $nama }}" aria-label="Unduh {{ $nama }}">
+                            <a href="{{ $urlUnduh }}" data-tanpa-memuat class="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200" title="Unduh {{ $nama }}" aria-label="Unduh {{ $nama }}">
                                 <x-icon name="download" class="h-4 w-4" />
                             </a>
                         @endif

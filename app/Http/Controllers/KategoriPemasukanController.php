@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\KategoriPemasukan;
 use App\Models\UnitUsaha;
 use App\Services\MasterDataService;
+use App\Support\FilterTabel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -13,12 +14,23 @@ class KategoriPemasukanController extends Controller
 {
     public function __construct(private readonly MasterDataService $master) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $data = KategoriPemasukan::query()->with('unitUsaha')->orderBy('nama')->get();
+        $peta = [
+            'f_nama' => ['kolom' => 'nama'],
+            'f_unit' => ['kolom' => 'unit_usaha_id', 'jenis' => 'pilih', 'null' => 'tanpa'],
+            'f_status' => ['kolom' => 'aktif', 'jenis' => 'aktif'],
+        ];
+
+        $filter = FilterTabel::nilai($request, $peta);
+        $query = KategoriPemasukan::query()->with('unitUsaha')->orderBy('nama');
+        FilterTabel::terapkan($query, $filter, $peta);
+        $data = $query->get();
 
         return view('master.kategori.index', [
             'data' => $data,
+            'filter' => $filter,
+            'units' => UnitUsaha::query()->orderBy('nama')->get(),
             'bolehHapus' => auth()->user()->isOwner(),
             'keterangan' => $this->master->keteranganPemakaian('kategori', $data->pluck('id')->all()),
         ]);

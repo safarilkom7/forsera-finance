@@ -34,8 +34,8 @@
         </div>
         <div class="mt-4 flex flex-wrap gap-2">
             <button class="btn-primary">Terapkan</button>
-            <a href="{{ route('laporan.excel', request()->query()) }}" class="btn-secondary"><x-icon name="download" class="h-4 w-4" /> Excel</a>
-            <a href="{{ route('laporan.pdf', request()->query()) }}" class="btn-secondary"><x-icon name="download" class="h-4 w-4" /> PDF</a>
+            <a href="{{ route('laporan.excel', request()->query()) }}" class="btn-secondary" data-tanpa-memuat><x-icon name="download" class="h-4 w-4" /> Excel</a>
+            <a href="{{ route('laporan.pdf', request()->query()) }}" class="btn-secondary" data-tanpa-memuat><x-icon name="download" class="h-4 w-4" /> PDF</a>
         </div>
         <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Periode berjalan mengikuti periode akuntansi (mulai tanggal {{ $periode['tanggal_mulai'] }}, bisa diubah di Pengaturan). Tanggal di atas hanya dipakai saat memilih Custom.</p>
     </form>

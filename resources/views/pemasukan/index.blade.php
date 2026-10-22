@@ -10,7 +10,7 @@
             <p class="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{{ format_rupiah($total) }} <span class="text-sm font-normal text-slate-500">total pemasukan terfilter</span></p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('pemasukan.export', request()->query()) }}" class="btn-secondary">
+            <a href="{{ route('pemasukan.export', request()->query()) }}" class="btn-secondary" data-tanpa-memuat>
                 <x-icon name="download" class="h-4 w-4" /> Excel
             </a>
             <a href="{{ route('pemasukan.create') }}" class="btn-primary">

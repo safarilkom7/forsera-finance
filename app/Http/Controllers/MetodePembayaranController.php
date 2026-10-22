@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\TipeMetodePembayaran;
 use App\Models\MetodePembayaran;
 use App\Services\MasterDataService;
+use App\Support\FilterTabel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,12 +15,25 @@ class MetodePembayaranController extends Controller
 {
     public function __construct(private readonly MasterDataService $master) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $data = MetodePembayaran::query()->orderBy('nama')->get();
+        $peta = [
+            'f_nama' => ['kolom' => 'nama'],
+            'f_tipe' => ['kolom' => 'tipe', 'jenis' => 'pilih'],
+            'f_status' => ['kolom' => 'aktif', 'jenis' => 'aktif'],
+        ];
+
+        $filter = FilterTabel::nilai($request, $peta);
+        $query = MetodePembayaran::query()->orderBy('nama');
+        FilterTabel::terapkan($query, $filter, $peta);
+        $data = $query->get();
 
         return view('master.metode.index', [
             'data' => $data,
+            'filter' => $filter,
+            'tipeMetodes' => collect(TipeMetodePembayaran::cases())
+                ->mapWithKeys(fn (TipeMetodePembayaran $tipe) => [$tipe->value => $tipe->getLabel()])
+                ->all(),
             'bolehHapus' => auth()->user()->isOwner(),
             'keterangan' => $this->master->keteranganPemakaian('metode', $data->pluck('id')->all()),
         ]);

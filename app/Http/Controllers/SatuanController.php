@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Satuan;
 use App\Services\MasterDataService;
+use App\Support\FilterTabel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,12 +14,21 @@ class SatuanController extends Controller
 {
     public function __construct(private readonly MasterDataService $master) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $data = Satuan::query()->orderBy('nama')->get();
+        $peta = [
+            'f_nama' => ['kolom' => 'nama'],
+            'f_singkatan' => ['kolom' => 'singkatan'],
+        ];
+
+        $filter = FilterTabel::nilai($request, $peta);
+        $query = Satuan::query()->orderBy('nama');
+        FilterTabel::terapkan($query, $filter, $peta);
+        $data = $query->get();
 
         return view('master.satuan.index', [
             'data' => $data,
+            'filter' => $filter,
             'bolehHapus' => auth()->user()->isOwner(),
             'keterangan' => $this->master->keteranganPemakaian('satuan', $data->pluck('id')->all()),
         ]);

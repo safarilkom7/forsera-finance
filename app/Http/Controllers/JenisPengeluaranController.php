@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JenisPengeluaran;
 use App\Services\MasterDataService;
+use App\Support\FilterTabel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,12 +14,21 @@ class JenisPengeluaranController extends Controller
 {
     public function __construct(private readonly MasterDataService $master) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $data = JenisPengeluaran::query()->orderBy('nama')->get();
+        $peta = [
+            'f_nama' => ['kolom' => 'nama'],
+            'f_status' => ['kolom' => 'aktif', 'jenis' => 'aktif'],
+        ];
+
+        $filter = FilterTabel::nilai($request, $peta);
+        $query = JenisPengeluaran::query()->orderBy('nama');
+        FilterTabel::terapkan($query, $filter, $peta);
+        $data = $query->get();
 
         return view('master.jenis.index', [
             'data' => $data,
+            'filter' => $filter,
             'bolehHapus' => auth()->user()->isOwner(),
             'keterangan' => $this->master->keteranganPemakaian('jenis', $data->pluck('id')->all()),
         ]);

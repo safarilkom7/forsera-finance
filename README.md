@@ -113,6 +113,37 @@ termasuk validasi `required` bawaan browser. Daftar opsi dropdown dibaca langsun
 jadi tidak ada data yang diduplikasi di server maupun di JavaScript. Baris form dinamis (detail
 pengeluaran) memanggil `window.siapkanKomponen(baris)` setelah hasil klon `<template>` dimasukkan.
 
+## Indikator proses
+
+Karena aplikasi berpindah halaman penuh, setiap pengambilan data, filter, dan submit form
+menampilkan bilah progres tipis di puncak layar (`resources/js/app.js`). Tombol submit langsung
+berstatus `aria-disabled`, diberi spinner, dan tidak bisa diklik lagi sampai halaman berikutnya
+tampil — submit kedua (termasuk karena Enter ditekan berulang) diabaikan, sehingga transaksi tidak
+tercatat dua kali. Tombol tetap `enabled` secara HTML agar pasangan `name`/`value`-nya tidak hilang
+dari data form; penguncian memakai `pointer-events: none`.
+
+Dialog konfirmasi tetap muncul lebih dulu: form baru dikunci setelah pengguna menyetujui, dan
+membatalkan dialog tidak meninggalkan tombol dalam keadaan memuat. Tautan unduhan (Excel, PDF,
+lampiran) ditandai `data-tanpa-memuat` agar tidak memicu bilah yang menggantung. Saat halaman
+dipulihkan dari cache (tombol Back), semua status dibersihkan lewat event `pageshow`.
+
+## Filter kolom tabel master
+
+Enam tabel master (unit, metode, kategori, jenis, satuan, item) punya baris filter tepat di bawah
+judul kolom. Nilainya dikirim sebagai parameter GET (`f_nama`, `f_tipe`, `f_status`, …) sehingga
+hasil filter bisa di-bookmark dan tombol Back tetap bekerja:
+
+- input teks menerapkan filter saat **Enter**, dan tombol ✕ mengosongkan satu kolom;
+- dropdown langsung menyaring saat diganti (opsi “Semua …” mengosongkan kolom itu);
+- hanya kolom yang terisi yang masuk ke URL, dan **Reset filter** muncul jika ada filter aktif;
+- filter yang tidak dikenal diabaikan, dan nilainya hanya bisa menyentuh kolom yang didaftarkan
+  pada peta `App\Support\FilterTabel` di masing-masing controller.
+
+Menambah filter kolom baru berarti menambah satu entri pada peta controller, lalu memakai
+`<x-filter-teks>` atau `<x-filter-pilih>` di baris `filter-baris` pada view. Form GET-nya sengaja
+diletakkan di luar `<table>` (input dihubungkan lewat atribut `form`) karena di dalam tabel sudah
+ada form hapus POST yang tidak boleh bersarang.
+
 ## Alur verifikasi pemasukan (status “Belum Dicek”)
 
 “Belum Dicek” bukan tombol approve yang terlewat — artinya transaksi sudah dicatat tetapi **belum

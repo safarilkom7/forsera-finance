@@ -45,6 +45,12 @@
         }
     }
 
+    @keyframes spinner-putar {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
     body:has(dialog[open]) {
         overflow: hidden;
     }
@@ -67,6 +73,14 @@
         dialog[open],
         dialog[open]::backdrop {
             animation: none;
+        }
+
+        .spinner {
+            animation-duration: 1.4s;
+        }
+
+        .bilah-memuat > span {
+            transition: none;
         }
     }
 }
@@ -231,6 +245,11 @@
         @apply bg-emerald-50/40 dark:bg-emerald-500/5;
     }
 
+    /* Baris filter kolom di bawah judul tabel master data. */
+    .table thead tr.filter-baris th {
+        @apply border-t border-slate-100 bg-white px-2 py-2 align-middle text-left font-normal normal-case tracking-normal dark:border-slate-800 dark:bg-slate-900;
+    }
+
     .nav-link {
         @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white;
     }
@@ -253,5 +272,51 @@
 
     .stat-value {
         @apply mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white;
+    }
+
+    /*
+     * Bilah progres di puncak halaman untuk setiap perpindahan halaman, submit
+     * form, dan filter yang memuat ulang data. Sifatnya indeterminasi: lebarnya
+     * bertambah bertahap lalu penuh saat halaman baru siap.
+     */
+    .bilah-memuat {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 60;
+        height: 3px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 150ms ease;
+    }
+
+    .bilah-memuat[data-aktif='true'] {
+        opacity: 1;
+    }
+
+    .bilah-memuat > span {
+        display: block;
+        height: 100%;
+        width: 0;
+        background-image: linear-gradient(90deg, #047857, #34d399);
+        box-shadow: 0 0 8px rgb(16 185 129 / 0.55);
+        transition: width 320ms ease;
+    }
+
+    /* Spinner mengikuti warna teks tombol, jadi cocok di tombol primer maupun sekunder. */
+    .spinner {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        flex-shrink: 0;
+        border-radius: 9999px;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        animation: spinner-putar 650ms linear infinite;
+    }
+
+    /* Tombol yang sedang memproses tetap terlihat, tetapi tidak bisa diklik dua kali. */
+    .sedang-memuat {
+        pointer-events: none;
+        opacity: 0.75;
     }
 }

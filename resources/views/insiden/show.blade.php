@@ -70,7 +70,7 @@
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Bukti</p>
                         <div class="mt-2 flex flex-wrap gap-2">
                             @foreach ($insiden->lampiran as $index => $file)
-                                <a href="{{ route('lampiran.download', ['jenis' => 'insiden', 'id' => $insiden->id, 'index' => $index]) }}" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-slate-50 dark:border-slate-700 dark:text-emerald-400">
+                                <a href="{{ route('lampiran.download', ['jenis' => 'insiden', 'id' => $insiden->id, 'index' => $index]) }}" data-tanpa-memuat class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-slate-50 dark:border-slate-700 dark:text-emerald-400">
                                     <x-icon name="file-text" class="h-3.5 w-3.5" /> {{ $file['nama_asli'] ?? 'Bukti' }}
                                 </a>
                             @endforeach
