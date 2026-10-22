@@ -46,7 +46,7 @@
                 @endif
             </div>
         </div>
-        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Tanggal hanya dipakai saat memilih periode Custom. Periode berjalan mengikuti periode akuntansi (mulai tanggal {{ $periode['tanggal_mulai'] }}, bisa diubah di Pengaturan). Semua angka mengikuti zona waktu Asia/Jakarta.</p>
+        <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Tanggal hanya dipakai saat memilih periode Custom. Periode berjalan mengikuti periode akuntansi (mulai tanggal {{ $periode['tanggal_mulai'] }}, bisa diubah di Pengaturan). Semua angka mengikuti zona waktu {{ zona_waktu() }}.</p>
     </form>
 
     <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">

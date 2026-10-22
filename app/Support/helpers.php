@@ -1,6 +1,7 @@
 <?php
 
 use App\Support\Format;
+use Carbon\Carbon;
 
 if (! function_exists('parse_rupiah')) {
     /**
@@ -48,5 +49,26 @@ if (! function_exists('format_tanggal')) {
     function format_tanggal(\Carbon\CarbonInterface|string|null $tanggal, bool $denganTahun = true): string
     {
         return Format::tanggal($tanggal, $denganTahun);
+    }
+}
+
+if (! function_exists('zona_waktu')) {
+    /**
+     * Nama zona waktu aplikasi, mengikuti APP_TIMEZONE di .env.
+     */
+    function zona_waktu(): string
+    {
+        return (string) config('app.timezone');
+    }
+}
+
+if (! function_exists('singkatan_zona_waktu')) {
+    /**
+     * Singkatan zona waktu (WIB, WITA, WIT, …) dari APP_TIMEZONE, agar label
+     * tidak perlu ditulis ulang saat zona waktu aplikasi diubah.
+     */
+    function singkatan_zona_waktu(): string
+    {
+        return Carbon::now(zona_waktu())->format('T');
     }
 }

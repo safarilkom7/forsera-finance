@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <p class="relative text-xs text-slate-400">© {{ date('Y') }} {{ $branding['brand'] }}. Zona waktu Asia/Jakarta.</p>
+        <p class="relative text-xs text-slate-400">© {{ date('Y') }} {{ $branding['brand'] }}. Zona waktu {{ zona_waktu() }}.</p>
     </div>
 
     <div class="flex items-center justify-center px-4 py-10 sm:px-8">

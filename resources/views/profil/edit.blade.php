@@ -49,7 +49,7 @@
                 <div><dt class="text-xs text-slate-500 dark:text-slate-400">Peran</dt><dd class="font-medium capitalize">{{ str_replace('_', ' ', $user->getRoleNames()->first() ?? '-') }}</dd></div>
                 <div><dt class="text-xs text-slate-500 dark:text-slate-400">Unit ditugaskan</dt><dd class="font-medium">{{ $user->unitUsaha->pluck('nama')->join(', ') ?: 'Semua unit' }}</dd></div>
                 <div><dt class="text-xs text-slate-500 dark:text-slate-400">Login terakhir</dt><dd class="font-medium">{{ $user->last_login_at ? format_tanggal($user->last_login_at).' '.$user->last_login_at->format('H:i') : '—' }}</dd></div>
-                <div><dt class="text-xs text-slate-500 dark:text-slate-400">Zona waktu</dt><dd class="font-medium">Asia/Jakarta</dd></div>
+                <div><dt class="text-xs text-slate-500 dark:text-slate-400">Zona waktu</dt><dd class="font-medium">{{ zona_waktu() }}</dd></div>
             </dl>
         </div>
     </div>

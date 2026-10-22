@@ -163,6 +163,6 @@
         </table>
     @endforeach
 
-    <p class="footer">Dibuat {{ format_tanggal(now()) }} {{ now()->format('H:i') }} WIB oleh {{ auth()->user()?->name }}. {{ $branding['nama'] }}.</p>
+    <p class="footer">Dibuat {{ format_tanggal(now()) }} {{ now()->format('H:i') }} {{ singkatan_zona_waktu() }} oleh {{ auth()->user()?->name }}. {{ $branding['nama'] }}.</p>
 </body>
 </html>
