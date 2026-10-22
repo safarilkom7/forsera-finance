@@ -30,6 +30,16 @@ final class FilterTabel
             }
 
             $isi = trim(mb_substr($isi, 0, 100));
+            $jenis = $peta[$kunci]['jenis'] ?? 'teks';
+
+            // Nilai di luar pilihan yang sah diabaikan supaya tampilan filter dan hasil tetap konsisten.
+            if ($jenis === 'aktif' && ! in_array($isi, ['aktif', 'nonaktif'], true)) {
+                continue;
+            }
+
+            if ($jenis === 'isi' && ! in_array($isi, ['ada', 'kosong'], true)) {
+                continue;
+            }
 
             if ($isi !== '') {
                 $nilai[$kunci] = $isi;
@@ -57,10 +67,12 @@ final class FilterTabel
                 'pilih' => isset($aturan['null']) && $isi === $aturan['null']
                     ? $query->whereNull($aturan['kolom'])
                     : $query->where($aturan['kolom'], $isi),
-                'aktif' => $query->where($aturan['kolom'], $isi === 'aktif'),
+                'aktif' => $isi === 'aktif'
+                    ? $query->where($aturan['kolom'], true)
+                    : ($isi === 'nonaktif' ? $query->where($aturan['kolom'], false) : null),
                 'isi' => $isi === 'ada'
                     ? $query->whereNotNull($aturan['kolom'])
-                    : $query->whereNull($aturan['kolom']),
+                    : ($isi === 'kosong' ? $query->whereNull($aturan['kolom']) : null),
                 'relasi' => $query->whereHas(
                     $aturan['relasi'],
                     fn (Builder $sub) => $sub->where($aturan['kolom'], 'like', '%'.self::tanpaWildcard($isi).'%'),

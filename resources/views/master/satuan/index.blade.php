@@ -4,16 +4,16 @@
 @section('subtitle', 'Satuan default untuk item dan detail pengeluaran')
 
 @section('content')
-    <div class="mb-5 flex items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
-            <p class="muted">Gunakan singkatan yang konsisten agar laporan mudah dibaca.</p>
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <p class="muted">Gunakan singkatan yang konsisten agar laporan mudah dibaca.</p>
+        <div class="ml-auto flex shrink-0 items-center gap-2">
             @if ($filter !== [])
-                <a href="{{ route('master.satuan.index') }}" class="btn-ghost btn-sm">
+                <a href="{{ route('master.satuan.index') }}" class="btn-ghost btn-sm whitespace-nowrap">
                     <x-icon name="refresh" class="h-3.5 w-3.5" /> Reset filter
                 </a>
             @endif
+            <a href="{{ route('master.satuan.create') }}" class="btn-primary whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Satuan baru</a>
         </div>
-        <a href="{{ route('master.satuan.create') }}" class="btn-primary"><x-icon name="plus" class="h-4 w-4" /> Satuan baru</a>
     </div>
 
     <form method="GET" action="{{ route('master.satuan.index') }}" id="filter-satuan" class="hidden" data-filter-form>

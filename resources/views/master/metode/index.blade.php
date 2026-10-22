@@ -5,15 +5,15 @@
 
 @section('content')
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
-            <p class="muted">Tipe metode menentukan perilaku rekonsiliasi (kas tunai vs settlement non-tunai).</p>
+        <p class="muted">Tipe metode menentukan perilaku rekonsiliasi (kas tunai vs settlement non-tunai).</p>
+        <div class="ml-auto flex shrink-0 items-center gap-2">
             @if ($filter !== [])
-                <a href="{{ route('master.metode.index') }}" class="btn-ghost btn-sm">
+                <a href="{{ route('master.metode.index') }}" class="btn-ghost btn-sm whitespace-nowrap">
                     <x-icon name="refresh" class="h-3.5 w-3.5" /> Reset filter
                 </a>
             @endif
+            <a href="{{ route('master.metode.create') }}" class="btn-primary whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Metode baru</a>
         </div>
-        <a href="{{ route('master.metode.create') }}" class="btn-primary shrink-0 whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Metode baru</a>
     </div>
 
     <form method="GET" action="{{ route('master.metode.index') }}" id="filter-metode" class="hidden" data-filter-form>

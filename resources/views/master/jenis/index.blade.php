@@ -5,15 +5,15 @@
 
 @section('content')
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
-            <p class="muted">Nonaktifkan jenis yang tidak dipakai; data lama tetap tersimpan.</p>
+        <p class="muted">Nonaktifkan jenis yang tidak dipakai; data lama tetap tersimpan.</p>
+        <div class="ml-auto flex shrink-0 items-center gap-2">
             @if ($filter !== [])
-                <a href="{{ route('master.jenis.index') }}" class="btn-ghost btn-sm">
+                <a href="{{ route('master.jenis.index') }}" class="btn-ghost btn-sm whitespace-nowrap">
                     <x-icon name="refresh" class="h-3.5 w-3.5" /> Reset filter
                 </a>
             @endif
+            <a href="{{ route('master.jenis.create') }}" class="btn-primary whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Jenis baru</a>
         </div>
-        <a href="{{ route('master.jenis.create') }}" class="btn-primary shrink-0 whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Jenis baru</a>
     </div>
 
     <form method="GET" action="{{ route('master.jenis.index') }}" id="filter-jenis" class="hidden" data-filter-form>

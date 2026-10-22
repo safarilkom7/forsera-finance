@@ -4,16 +4,16 @@
 @section('subtitle', 'Bahan, perlengkapan, dan barang yang dibeli')
 
 @section('content')
-    <div class="mb-5 flex items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
-            <p class="muted">Harga terakhir otomatis diperbarui dari detail pengeluaran.</p>
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <p class="muted">Harga terakhir otomatis diperbarui dari detail pengeluaran.</p>
+        <div class="ml-auto flex shrink-0 items-center gap-2">
             @if ($filter !== [])
-                <a href="{{ route('master.item.index') }}" class="btn-ghost btn-sm">
+                <a href="{{ route('master.item.index') }}" class="btn-ghost btn-sm whitespace-nowrap">
                     <x-icon name="refresh" class="h-3.5 w-3.5" /> Reset filter
                 </a>
             @endif
+            <a href="{{ route('master.item.create') }}" class="btn-primary whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Item baru</a>
         </div>
-        <a href="{{ route('master.item.create') }}" class="btn-primary"><x-icon name="plus" class="h-4 w-4" /> Item baru</a>
     </div>
 
     <form method="GET" action="{{ route('master.item.index') }}" id="filter-item" class="hidden" data-filter-form>

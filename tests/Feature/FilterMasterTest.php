@@ -120,4 +120,10 @@ it('mengabaikan parameter filter yang tidak dikenal', function () {
         ->assertOk()
         ->assertSee('FORSERA RESTO')
         ->assertDontSee('FORSERA BARBERSHOP');
+
+    // Nilai status di luar aktif/nonaktif diabaikan, bukan dianggap nonaktif.
+    $this->actingAs($owner)->get('/master/unit?f_status=aneh')
+        ->assertOk()
+        ->assertSee('FORSERA RESTO')
+        ->assertDontSee('Reset filter');
 });

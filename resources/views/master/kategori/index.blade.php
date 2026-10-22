@@ -5,15 +5,15 @@
 
 @section('content')
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
-            <p class="muted">Kategori global (tanpa unit) bisa dipakai di semua unit. Contoh: Pendapatan Lain-lain.</p>
+        <p class="muted">Kategori global (tanpa unit) bisa dipakai di semua unit. Contoh: Pendapatan Lain-lain.</p>
+        <div class="ml-auto flex shrink-0 items-center gap-2">
             @if ($filter !== [])
-                <a href="{{ route('master.kategori.index') }}" class="btn-ghost btn-sm">
+                <a href="{{ route('master.kategori.index') }}" class="btn-ghost btn-sm whitespace-nowrap">
                     <x-icon name="refresh" class="h-3.5 w-3.5" /> Reset filter
                 </a>
             @endif
+            <a href="{{ route('master.kategori.create') }}" class="btn-primary whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Kategori baru</a>
         </div>
-        <a href="{{ route('master.kategori.create') }}" class="btn-primary shrink-0 whitespace-nowrap"><x-icon name="plus" class="h-4 w-4" /> Kategori baru</a>
     </div>
 
     <form method="GET" action="{{ route('master.kategori.index') }}" id="filter-kategori" class="hidden" data-filter-form>
@@ -47,7 +47,7 @@
                     @endif
                     <x-filter-teks name="f_nama" :value="$filter['f_nama'] ?? ''" placeholder="Cari nama" form="filter-kategori" />
                     <x-filter-pilih name="f_unit" :value="$filter['f_unit'] ?? ''"
-                                    :options="collect($units)->mapWithKeys(fn ($unit) => [$unit->id => $unit->nama])->prepend('Tanpa unit (global)', 'tanpa')->all()"
+                                    :options="collect($units)->mapWithKeys(fn ($unit) => [$unit->id => $unit->nama])->prepend('Tanpa unit', 'tanpa')->all()"
                                     placeholder="Semua unit" form="filter-kategori" />
                     <x-filter-pilih name="f_status" :value="$filter['f_status'] ?? ''" :options="['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif']" placeholder="Semua status" form="filter-kategori" />
                     <x-filter-kosong />
