@@ -21,7 +21,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * Master data tidak memakai soft delete: transaksi historis menunjuk langsung ke
  * barisnya lewat foreign key. Karena itu penghapusan hanya boleh untuk data yang
- * belum pernah dipakai; sisanya cukup dinonaktifkan (kolom "aktif").
+ * belum dipakai transaksi aktif; sisanya cukup dinonaktifkan (kolom "aktif").
+ * Transaksi yang sudah dihapus (soft delete) tidak menghalangi: baris lunaknya
+ * dibersihkan permanen lebih dulu supaya foreign key tidak menolak.
  */
 class MasterDataService
 {
@@ -57,8 +59,43 @@ class MasterDataService
     }
 
     /**
+     * Sumber pemakaian setiap jenis master: nama sumber => [model, kolom foreign key].
+     *
+     * @return array<string, array{0: class-string<Model>, 1: string}>
+     */
+    private function sumberPemakaian(string $jenis): array
+    {
+        return match ($jenis) {
+            'unit' => [
+                'pemasukan' => [Pemasukan::class, 'unit_usaha_id'],
+                'pengeluaran' => [Pengeluaran::class, 'unit_usaha_id'],
+                'kategori' => [KategoriPemasukan::class, 'unit_usaha_id'],
+            ],
+            'metode' => [
+                'pemasukan' => [Pemasukan::class, 'metode_pembayaran_id'],
+                'pengeluaran' => [Pengeluaran::class, 'metode_pembayaran_id'],
+            ],
+            'kategori' => [
+                'pemasukan' => [Pemasukan::class, 'kategori_pemasukan_id'],
+            ],
+            'jenis' => [
+                'pengeluaran' => [Pengeluaran::class, 'jenis_pengeluaran_id'],
+                'item' => [Item::class, 'jenis_pengeluaran_id'],
+            ],
+            'satuan' => [
+                'item' => [Item::class, 'satuan_default_id'],
+                'detail pengeluaran' => [DetailPengeluaran::class, 'satuan_id'],
+            ],
+            'item' => [
+                'detail pengeluaran' => [DetailPengeluaran::class, 'item_id'],
+            ],
+        };
+    }
+
+    /**
      * Ringkasan pemakaian setiap baris, mis. "dipakai 2 pemasukan, 1 pengeluaran".
-     * String kosong berarti baris aman dihapus.
+     * String kosong berarti baris aman dihapus. Transaksi yang sudah dihapus
+     * (soft delete) tidak dihitung karena tidak terlihat di mana pun.
      *
      * @param  array<int, int>  $ids
      * @return array<int, string>
@@ -73,36 +110,10 @@ class MasterDataService
             return [];
         }
 
-        $sumber = match ($jenis) {
-            'unit' => [
-                'pemasukan' => $this->hitung(Pemasukan::class, 'unit_usaha_id', $ids),
-                'pengeluaran' => $this->hitung(Pengeluaran::class, 'unit_usaha_id', $ids),
-                'kategori' => $this->hitung(KategoriPemasukan::class, 'unit_usaha_id', $ids),
-            ],
-            'metode' => [
-                'pemasukan' => $this->hitung(Pemasukan::class, 'metode_pembayaran_id', $ids),
-                'pengeluaran' => $this->hitung(Pengeluaran::class, 'metode_pembayaran_id', $ids),
-            ],
-            'kategori' => [
-                'pemasukan' => $this->hitung(Pemasukan::class, 'kategori_pemasukan_id', $ids),
-            ],
-            'jenis' => [
-                'pengeluaran' => $this->hitung(Pengeluaran::class, 'jenis_pengeluaran_id', $ids),
-                'item' => $this->hitung(Item::class, 'jenis_pengeluaran_id', $ids),
-            ],
-            'satuan' => [
-                'item' => $this->hitung(Item::class, 'satuan_default_id', $ids),
-                'detail pengeluaran' => $this->hitung(DetailPengeluaran::class, 'satuan_id', $ids),
-            ],
-            'item' => [
-                'detail pengeluaran' => $this->hitung(DetailPengeluaran::class, 'item_id', $ids),
-            ],
-        };
-
         $keterangan = [];
 
-        foreach ($sumber as $nama => $perId) {
-            foreach ($perId as $id => $jumlah) {
+        foreach ($this->sumberPemakaian($jenis) as $nama => [$kelas, $kolom]) {
+            foreach ($this->hitung($kelas, $kolom, $ids) as $id => $jumlah) {
                 $keterangan[$id][] = $jumlah.' '.$nama;
             }
         }
@@ -132,11 +143,16 @@ class MasterDataService
             ->whereIn('id', array_values(array_unique(array_map('intval', $ids))))
             ->get();
 
-        $keterangan = $this->keteranganPemakaian($jenis, $records->pluck('id')->all());
         $terhapus = 0;
         $dilewati = [];
 
-        DB::transaction(function () use ($records, $keterangan, $user, $jenis, &$terhapus, &$dilewati) {
+        DB::transaction(function () use ($records, $user, $jenis, &$terhapus, &$dilewati) {
+            // Transaksi yang sudah dihapus tidak lagi menghalangi penghapusan
+            // master; baris lunaknya dibersihkan permanen lebih dulu.
+            $this->bersihkanYangTerkhapus($jenis, $records->pluck('id')->all());
+
+            $keterangan = $this->keteranganPemakaian($jenis, $records->pluck('id')->all());
+
             foreach ($records as $record) {
                 $alasan = $keterangan[$record->id] ?? '';
 
@@ -166,6 +182,39 @@ class MasterDataService
     }
 
     /**
+     * Hapus permanen transaksi yang sudah dihapus (soft delete) namun masih
+     * menunjuk baris master yang akan dihapus, agar foreign key tidak menolak.
+     *
+     * @param  array<int, int>  $ids
+     */
+    private function bersihkanYangTerkhapus(string $jenis, array $ids): void
+    {
+        if ($ids === []) {
+            return;
+        }
+
+        foreach ($this->sumberPemakaian($jenis) as [$kelas, $kolom]) {
+            if (in_array(SoftDeletes::class, class_uses_recursive($kelas), true)) {
+                $kelas::onlyTrashed()->whereIn($kolom, $ids)->forceDelete();
+
+                continue;
+            }
+
+            // Detail pengeluaran tidak memakai soft delete dan menggantung di
+            // bawah induknya; hapus induknya supaya detail ikut terhapus.
+            if ($kelas === DetailPengeluaran::class) {
+                Pengeluaran::onlyTrashed()
+                    ->whereHas('detail', fn ($query) => $query->whereIn($kolom, $ids))
+                    ->forceDelete();
+            }
+        }
+    }
+
+    /**
+     * Hitung baris aktif per foreign key. Baris yang sudah dihapus (soft delete)
+     * tidak dihitung karena tidak terlihat di mana pun dan akan dibersihkan
+     * saat master dihapus.
+     *
      * @param  class-string<Model>  $kelas
      * @param  array<int, int>  $ids
      * @return array<int, int>
@@ -174,9 +223,10 @@ class MasterDataService
     {
         $query = $kelas::query();
 
-        // Transaksi yang sudah soft delete tetap menyimpan baris foreign key.
-        if (in_array(SoftDeletes::class, class_uses_recursive($kelas), true)) {
-            $query->withTrashed();
+        // Detail milik transaksi yang sudah dihapus ikut terhapus bersama
+        // induknya, jadi tidak dihitung sebagai pemakaian.
+        if ($kelas === DetailPengeluaran::class) {
+            $query->whereHas('pengeluaran');
         }
 
         return $query
