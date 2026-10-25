@@ -79,7 +79,9 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
         Route::resource('unit', UnitUsahaController::class)->only(['index', 'create', 'store', 'edit', 'update']);
         Route::resource('metode', MetodePembayaranController::class)->only(['index', 'create', 'store', 'edit', 'update']);
         Route::resource('kategori', KategoriPemasukanController::class)->only(['index', 'create', 'store', 'edit', 'update']);
-        Route::resource('jenis', JenisPengeluaranController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+        Route::resource('jenis', JenisPengeluaranController::class)
+            ->only(['index', 'create', 'store', 'edit', 'update'])
+            ->parameters(['jenis' => 'jenis']);
         Route::resource('satuan', SatuanController::class)->only(['index', 'create', 'store', 'edit', 'update']);
         Route::resource('item', ItemController::class)->only(['index', 'create', 'store', 'edit', 'update']);
     });
