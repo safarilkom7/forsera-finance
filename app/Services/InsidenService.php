@@ -131,8 +131,8 @@ class InsidenService
             throw ValidationException::withMessages(['catatan_penyelesaian' => 'Catatan penyelesaian wajib diisi.']);
         }
 
-        if ($tipe === TipePenyelesaian::WRITE_OFF && ! $user->isOwner()) {
-            throw ValidationException::withMessages(['tipe_penyelesaian' => 'Write-off hanya dapat dilakukan Owner.']);
+        if ($tipe === TipePenyelesaian::WRITE_OFF && ! $user->hasPermissionTo('write_off')) {
+            throw ValidationException::withMessages(['tipe_penyelesaian' => 'Anda tidak memiliki izin write-off.']);
         }
 
         if ($tipe === TipePenyelesaian::CATAT_PENDAPATAN_LAIN && $insiden->arah !== ArahSelisih::LEBIH) {

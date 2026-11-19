@@ -8,7 +8,7 @@
         $final = $insiden->status->final();
         $opsiTipe = collect($tipePenyelesaian)->filter(function ($tipe) use ($insiden) {
             if ($tipe === \App\Enums\TipePenyelesaian::WRITE_OFF) {
-                return auth()->user()->isOwner();
+                return auth()->user()->can('writeOff', $insiden);
             }
             if ($tipe === \App\Enums\TipePenyelesaian::CATAT_PENDAPATAN_LAIN) {
                 return $insiden->arah === \App\Enums\ArahSelisih::LEBIH;

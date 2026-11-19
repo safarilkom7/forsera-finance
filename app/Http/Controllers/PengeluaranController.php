@@ -56,7 +56,7 @@ class PengeluaranController extends Controller
             'metodes' => MetodePembayaran::query()->orderBy('nama')->get(),
             'jenises' => JenisPengeluaran::query()->orderBy('nama')->get(),
             'statuses' => StatusPersetujuanPengeluaran::cases(),
-            'boleh_hapus' => $user->isOwner(),
+            'boleh_hapus' => $user->can('pengeluaran.hapus'),
         ]);
     }
 

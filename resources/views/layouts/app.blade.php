@@ -22,8 +22,11 @@
     $pengguna = auth()->user();
     $unread = $pengguna->unreadNotifications()->count();
     $notifikasi = $pengguna->notifications()->latest()->limit(5)->get();
-    $isOwner = $pengguna->isOwner();
-    $isInternal = $isOwner || $pengguna->isAdmin();
+    $adaAdministrasi = $pengguna->can('izin.kelola')
+        || $pengguna->can('pengguna.kelola')
+        || $pengguna->can('pengaturan.kelola')
+        || $pengguna->can('periode.kelola')
+        || $pengguna->can('audit.lihat');
 @endphp
 
 <div class="min-h-screen lg:pl-64">
@@ -59,25 +62,29 @@
                     <a href="{{ route('pengeluaran.index') }}" class="nav-link {{ request()->routeIs('pengeluaran.*') ? 'nav-link-active' : '' }}">
                         <x-icon name="expense" /> Pengeluaran
                     </a>
-                    @if ($isInternal)
+                    @can('rekonsiliasi.lihat')
                         <a href="{{ route('rekonsiliasi.index') }}" class="nav-link {{ request()->routeIs('rekonsiliasi.*') ? 'nav-link-active' : '' }}">
                             <x-icon name="scale" /> Rekonsiliasi
                         </a>
+                    @endcan
+                    @can('insiden.lihat')
                         <a href="{{ route('insiden.index') }}" class="nav-link {{ request()->routeIs('insiden.*') ? 'nav-link-active' : '' }}">
                             <x-icon name="warning" /> Insiden
                         </a>
-                    @endif
+                    @endcan
                 </div>
             </div>
 
-            @if ($isInternal)
+            @can('laporan.lihat')
                 <div>
                     <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Analitik</p>
                     <a href="{{ route('laporan.index') }}" class="nav-link {{ request()->routeIs('laporan.*') ? 'nav-link-active' : '' }}">
                         <x-icon name="chart" /> Laporan
                     </a>
                 </div>
+            @endcan
 
+            @can('master.kelola')
                 <div>
                     <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Master Data</p>
                     <div class="space-y-1">
@@ -101,24 +108,37 @@
                         </a>
                     </div>
                 </div>
-            @endif
+            @endcan
 
-            @if ($isOwner)
+            @if ($adaAdministrasi)
                 <div>
                     <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Administrasi</p>
                     <div class="space-y-1">
-                        <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'nav-link-active' : '' }}">
-                            <x-icon name="users" /> Pengguna
-                        </a>
-                        <a href="{{ route('pengaturan.index') }}" class="nav-link {{ request()->routeIs('pengaturan.*') ? 'nav-link-active' : '' }}">
-                            <x-icon name="settings" /> Pengaturan
-                        </a>
-                        <a href="{{ route('periode.index') }}" class="nav-link {{ request()->routeIs('periode.*') ? 'nav-link-active' : '' }}">
-                            <x-icon name="lock" /> Tutup Periode
-                        </a>
-                        <a href="{{ route('activity.index') }}" class="nav-link {{ request()->routeIs('activity.*') ? 'nav-link-active' : '' }}">
-                            <x-icon name="file-text" /> Log Aktivitas
-                        </a>
+                        @can('pengguna.kelola')
+                            <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'nav-link-active' : '' }}">
+                                <x-icon name="users" /> Pengguna
+                            </a>
+                        @endcan
+                        @can('izin.kelola')
+                            <a href="{{ route('izin.index') }}" class="nav-link {{ request()->routeIs('izin.*') ? 'nav-link-active' : '' }}">
+                                <x-icon name="shield" /> Hak Akses
+                            </a>
+                        @endcan
+                        @can('pengaturan.kelola')
+                            <a href="{{ route('pengaturan.index') }}" class="nav-link {{ request()->routeIs('pengaturan.*') ? 'nav-link-active' : '' }}">
+                                <x-icon name="settings" /> Pengaturan
+                            </a>
+                        @endcan
+                        @can('periode.kelola')
+                            <a href="{{ route('periode.index') }}" class="nav-link {{ request()->routeIs('periode.*') ? 'nav-link-active' : '' }}">
+                                <x-icon name="lock" /> Tutup Periode
+                            </a>
+                        @endcan
+                        @can('audit.lihat')
+                            <a href="{{ route('activity.index') }}" class="nav-link {{ request()->routeIs('activity.*') ? 'nav-link-active' : '' }}">
+                                <x-icon name="file-text" /> Log Aktivitas
+                            </a>
+                        @endcan
                     </div>
                 </div>
             @endif

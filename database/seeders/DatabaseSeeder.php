@@ -67,6 +67,7 @@ class DatabaseSeeder extends Seeder
             'audit.lihat',
             'koreksi.terkunci',
             'write_off',
+            'izin.kelola',
         ];
 
         foreach ($izin as $nama) {
@@ -79,16 +80,19 @@ class DatabaseSeeder extends Seeder
 
         $owner->syncPermissions($izin);
 
+        // Hapus transaksi (pemasukan.hapus / pengeluaran.hapus) kini diperiksa
+        // policy — default hanya Owner agar perilaku tidak berubah. Berikan
+        // lewat menu Hak Akses bila pengguna tertentu perlu bisa menghapus.
         $admin->syncPermissions([
-            'dashboard.lihat', 'pemasukan.lihat', 'pemasukan.input', 'pemasukan.ubah', 'pemasukan.hapus',
-            'pengeluaran.lihat', 'pengeluaran.input', 'pengeluaran.ubah', 'pengeluaran.hapus',
+            'dashboard.lihat', 'pemasukan.lihat', 'pemasukan.input', 'pemasukan.ubah',
+            'pengeluaran.lihat', 'pengeluaran.input', 'pengeluaran.ubah',
             'rekonsiliasi.lihat', 'rekonsiliasi.verifikasi', 'insiden.lihat', 'insiden.kelola',
-            'laporan.lihat', 'master.kelola',
+            'laporan.lihat', 'master.kelola', 'audit.lihat',
         ]);
 
         $staf->syncPermissions([
-            'dashboard.lihat', 'pemasukan.lihat', 'pemasukan.input', 'pemasukan.ubah', 'pemasukan.hapus',
-            'pengeluaran.lihat', 'pengeluaran.input', 'pengeluaran.ubah', 'pengeluaran.hapus',
+            'dashboard.lihat', 'pemasukan.lihat', 'pemasukan.input', 'pemasukan.ubah',
+            'pengeluaran.lihat', 'pengeluaran.input', 'pengeluaran.ubah',
         ]);
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();

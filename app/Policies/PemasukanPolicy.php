@@ -28,17 +28,18 @@ class PemasukanPolicy
             return false;
         }
 
+        // Data terkunci hanya lewat koreksi khusus (izinkan lewat koreksi.terkunci).
         if ($pemasukan->terkunci()) {
-            return $user->isOwner();
+            return $user->hasPermissionTo('koreksi.terkunci');
         }
 
         return $user->isOwner() || $user->isAdmin() || $pemasukan->dibuat_oleh === $user->id;
     }
 
-    /** Penghapusan transaksi sementara dibatasi ke Owner. */
+    /** Penghapusan transaksi butuh izin hapus (default: hanya Owner yang memilikinya). */
     public function delete(User $user, Pemasukan $pemasukan): bool
     {
-        return $user->isOwner()
+        return $user->hasPermissionTo('pemasukan.hapus')
             && $this->view($user, $pemasukan)
             && ! $pemasukan->terkunci()
             && $pemasukan->rekonsiliasi_id === null;
@@ -46,6 +47,6 @@ class PemasukanPolicy
 
     public function koreksi(User $user, Pemasukan $pemasukan): bool
     {
-        return $user->isOwner() && $this->view($user, $pemasukan);
+        return $user->hasPermissionTo('koreksi.terkunci') && $this->view($user, $pemasukan);
     }
 }

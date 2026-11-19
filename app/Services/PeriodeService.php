@@ -80,8 +80,8 @@ class PeriodeService
 
     public function bukaKembali(PeriodeTutup $periode, string $alasan, User $user): PeriodeTutup
     {
-        if (! $user->isOwner()) {
-            throw ValidationException::withMessages(['alasan' => 'Hanya Owner yang dapat membuka kembali periode.']);
+        if (! $user->hasPermissionTo('periode.kelola')) {
+            throw ValidationException::withMessages(['alasan' => 'Anda tidak memiliki izin membuka kembali periode.']);
         }
 
         if ($periode->dibuka_kembali_at !== null) {

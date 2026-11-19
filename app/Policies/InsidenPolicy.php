@@ -9,21 +9,22 @@ class InsidenPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->isOwner() || $user->isAdmin();
+        return $user->hasPermissionTo('insiden.lihat');
     }
 
     public function view(User $user, Insiden $insiden): bool
     {
-        return $user->isOwner() || $user->isAdmin();
+        return $user->hasPermissionTo('insiden.lihat');
     }
 
     public function kelola(User $user, Insiden $insiden): bool
     {
-        return $user->isOwner() || $user->isAdmin();
+        return $user->hasPermissionTo('insiden.kelola');
     }
 
+    /** Write-off aset terkait insiden tetap butuh izin write_off (default: Owner). */
     public function writeOff(User $user, Insiden $insiden): bool
     {
-        return $user->isOwner();
+        return $user->hasPermissionTo('write_off');
     }
 }

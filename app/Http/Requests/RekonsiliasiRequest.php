@@ -13,7 +13,7 @@ class RekonsiliasiRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isOwner() || $this->user()?->isAdmin();
+        return $this->user()?->hasPermissionTo('rekonsiliasi.lihat');
     }
 
     protected function prepareForValidation(): void

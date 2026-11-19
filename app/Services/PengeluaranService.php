@@ -118,7 +118,9 @@ class PengeluaranService
             ]);
         }
 
-        if (! $pengeluaran->bisaDiubahOleh($user)) {
+        // Izin hapus (bawaan peran owner atau izin khusus) menentukan hak hapus,
+        // bukan status pembuat seperti pada perubahan data.
+        if (! $user->hasPermissionTo('pengeluaran.hapus')) {
             throw ValidationException::withMessages(['pengeluaran' => 'Anda tidak berhak menghapus pengeluaran ini.']);
         }
 
@@ -165,8 +167,8 @@ class PengeluaranService
 
     public function setujui(Pengeluaran $pengeluaran, User $user): Pengeluaran
     {
-        if (! $user->isOwner()) {
-            throw ValidationException::withMessages(['pengeluaran' => 'Hanya Owner yang dapat menyetujui pengeluaran.']);
+        if (! $user->hasPermissionTo('pengeluaran.setujui')) {
+            throw ValidationException::withMessages(['pengeluaran' => 'Anda tidak memiliki izin menyetujui pengeluaran.']);
         }
 
         if (! $pengeluaran->butuhPersetujuan()) {
@@ -186,8 +188,8 @@ class PengeluaranService
 
     public function tolak(Pengeluaran $pengeluaran, User $user): Pengeluaran
     {
-        if (! $user->isOwner()) {
-            throw ValidationException::withMessages(['pengeluaran' => 'Hanya Owner yang dapat menolak pengeluaran.']);
+        if (! $user->hasPermissionTo('pengeluaran.setujui')) {
+            throw ValidationException::withMessages(['pengeluaran' => 'Anda tidak memiliki izin menolak pengeluaran.']);
         }
 
         if (! $pengeluaran->butuhPersetujuan()) {

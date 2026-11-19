@@ -91,12 +91,13 @@ class PemasukanService
     }
 
     /**
-     * Koreksi data terkunci oleh Owner (aturan 20). Nilai lama & baru tercatat di audit log.
+     * Koreksi data terkunci (aturan 20) — default hanya Owner, dapat diberikan
+     * lewat izin khusus koreksi.terkunci. Nilai lama & baru tercatat di audit log.
      */
     public function koreksi(Pemasukan $pemasukan, array $data, string $alasan, User $user): Pemasukan
     {
-        if (! $user->isOwner()) {
-            throw ValidationException::withMessages(['pemasukan' => 'Hanya Owner yang dapat mengoreksi data terkunci.']);
+        if (! $user->hasPermissionTo('koreksi.terkunci')) {
+            throw ValidationException::withMessages(['pemasukan' => 'Anda tidak memiliki izin mengoreksi data terkunci.']);
         }
 
         if (trim($alasan) === '') {
@@ -167,7 +168,9 @@ class PemasukanService
             ]);
         }
 
-        if (! $pemasukan->bisaDiubahOleh($user)) {
+        // Izin hapus (bawaan peran owner atau izin khusus) menentukan hak hapus,
+        // bukan status pembuat seperti pada perubahan data.
+        if (! $user->hasPermissionTo('pemasukan.hapus')) {
             throw ValidationException::withMessages(['pemasukan' => 'Anda tidak berhak menghapus pemasukan ini.']);
         }
 

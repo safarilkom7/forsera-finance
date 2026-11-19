@@ -135,8 +135,8 @@ class PemasukanRequest extends FormRequest
                 }
 
                 if ($this->route('pemasukan') !== null && $this->route('pemasukan')->terkunci()) {
-                    if (! $user->isOwner()) {
-                        $validator->errors()->add('alasan', 'Data terkunci hanya dapat dikoreksi Owner.');
+                    if (! $user->hasPermissionTo('koreksi.terkunci')) {
+                        $validator->errors()->add('alasan', 'Anda tidak memiliki izin mengoreksi data terkunci.');
                     } elseif (trim((string) $this->input('alasan')) === '') {
                         $validator->errors()->add('alasan', 'Alasan koreksi wajib diisi untuk data terkunci.');
                     }
